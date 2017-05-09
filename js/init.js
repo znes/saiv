@@ -49,9 +49,8 @@ $(function() {
         ElementCreator.createForm($(".form"), evt.cyTarget, submitFunction, eles);
     });
 
-
-    $.getJSON("minimal-example.json", function(jsonData) {
-        console.log(jsonData);
+    // Read Json
+    readJson(function (jsonData) {
         json = jsonData;
         eles = ElementCreator.createCyElements(jsonData);
         cy.add(eles);
@@ -63,6 +62,8 @@ $(function() {
         showData(cy.$("node#" + jsonData.name).data());
         ElementCreator.createForm($(".form"), cy.$("node#" + jsonData.name), submitFunction, []);
     });
+
+
     function submitFunction (e) {
         var data = readData(e);
         //console.log(data);
