@@ -5,22 +5,23 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 	$('.modal-content .modal-body').html(content);
 
 	// Get the <span> element that closes the modal
-	var span = $(".close");
-
 	modal.show();
 
-	span.onclick = function() {
-	    modal.hide();
-	    abortFunction();
-	}
+	modal.find(".close").click(function() {
+		abortFunction();
+	    hideModal();
+	});
 
 	$('html').click(function(event) {
 		console.log("dada");
 		console.log(event.target);
 	    if (!$.contains(modal[0], event.target) && event.target != modal[0]) {
 	    	abortFunction();
-	        modal.hide();
-	        $('html').off('click');
+	    	hideModal();
 	    }
 	});
+}
+function hideModal() {
+    $('.modal').hide();
+    $('html').off('click');
 }

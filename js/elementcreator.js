@@ -37,7 +37,7 @@ ElementCreator.createCyElements = function(jsonData) {
 				group: "edges"
 			});
 		}
-		for (var k = 0; k < jsonData.children[i].predecessors.length; k++) {
+		/*for (var k = 0; k < jsonData.children[i].predecessors.length; k++) {
 			eles.push({
 				data: {
 					source: jsonData.children[i].predecessors[k], // the source node id (edge comes from this node)
@@ -45,7 +45,7 @@ ElementCreator.createCyElements = function(jsonData) {
 				},
 				group: "edges"
 			});
-		}
+		}*/
 	}
 	return eles;
 }

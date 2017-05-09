@@ -51,12 +51,6 @@ $(function() {
 
     // Read Json
     readJson(function (jsonData) {
-
-    $.getJSON("minimal-example.json", function(jsonData) {
-        console.log(jsonData);
-
-
-    $.getJSON("minimal-example.json", function(jsonData) {
         console.log(jsonData);
         json = jsonData;
         eles = ElementCreator.createCyElements(jsonData);
@@ -68,6 +62,13 @@ $(function() {
 
         showData(cy.$("node#" + jsonData.name).data());
         ElementCreator.createForm($(".form"), cy.$("node#" + jsonData.name), submitFunction, []);
+
+
+        $('.downloadJson').show().click(function(){
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+            $('.downloadJson').prop("href", "data:" + data);
+            $('.downloadJson').prop("download", "data.json");
+        })
     });
 
 

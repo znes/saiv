@@ -15,15 +15,16 @@ function readJson(readyFunction) {
 			var dataURL = reader.result;
 			var json = JSON.parse(dataURL);
 			readyFunction(json);
+
 		};
 
 		reader.readAsText(input.files[0]);
   	});
 
-  	$("#useDefault").on('click', function() {
+  	$("#useDefault").click(function() {
   		$.getJSON("minimal-example.json", function(jsonData) {
 			console.log(jsonData);
 			readyFunction(jsonData);
-	    })
+	    });
   	});
 }
