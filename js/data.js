@@ -11,8 +11,6 @@ function jsonmanager () {
 	}
 
 	this.updateScenario = function(data) {
-		console.log(description);
-		console.log(this.json);
 		this.json.name = data.name;
 		this.json.tags.description = data.tags.description;
 	}
