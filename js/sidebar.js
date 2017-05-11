@@ -7,7 +7,7 @@ function sidebar() {
 	        $("body").toggleClass("sidebar-closed");
 	        cy.resize();
 	    });
-
+	    
 	})()
 
 	this.showData = function (data) {

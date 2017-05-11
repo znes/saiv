@@ -39,7 +39,6 @@ $(function() {
 
     document.addEventListener("dataReceived", function(e) {
         datam.newData(e.detail);
-        console.log(datam.json);
 
         var eles = ElementCreator.createCyElements(datam.json);
         cy.add(eles);
@@ -56,11 +55,12 @@ $(function() {
 
     document.addEventListener("formSubmit", function(e) {
         var data = e.detail;
+        console.log(data);
         if(data.type == "scenario") {
-
+            datam.updateScenario(data);
         }
         else {
-            datam.updateChildren(e.detail);
+            datam.updateChildren(data);
 
             var eles = ElementCreator.createCyElements(datam.json);
             cy.$("*").remove();

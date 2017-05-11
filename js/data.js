@@ -10,6 +10,13 @@ function jsonmanager () {
 
 	}
 
+	this.updateScenario = function(data) {
+		console.log(description);
+		console.log(this.json);
+		this.json.name = data.name;
+		this.json.tags.description = data.tags.description;
+	}
+
 	this.updateRelationNames = function(newName, oldName) {
 		for (var i = 0; i < this.json.children.length; i++) {
 			for (var j = 0; j < this.json.children[i].predecessors.length; j++) {
