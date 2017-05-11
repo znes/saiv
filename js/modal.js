@@ -7,6 +7,7 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 	// Get the <span> element that closes the modal
 	modal.show();
 
+	
 	modal.find(".close").click(function() {
 		abortFunction();
 	    hideModal();

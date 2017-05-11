@@ -1,4 +1,4 @@
-function readJson(readyFunction) {
+function getData() {
     var content = "Select File<br>";
     content += "<input id='selectFile' type='file'><br>";
     content += "<br>";
@@ -14,8 +14,9 @@ function readJson(readyFunction) {
 		reader.onload = function() {
 			var dataURL = reader.result;
 			var json = JSON.parse(dataURL);
-			readyFunction(json);
 
+			var event = new CustomEvent("dataReceived", {"detail": json});
+			document.dispatchEvent(event);
 		};
 
 		reader.readAsText(input.files[0]);
@@ -23,8 +24,8 @@ function readJson(readyFunction) {
 
   	$("#useDefault").click(function() {
   		$.getJSON("minimal-example.json", function(jsonData) {
-			console.log(jsonData);
-			readyFunction(jsonData);
+			var event = new CustomEvent("dataReceived", {"detail": jsonData});
+			document.dispatchEvent(event);
 	    });
   	});
 }

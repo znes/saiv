@@ -2,80 +2,48 @@
  * DOM Ready
  */
 $(function() {
-    var cy,eles,json;
-    $(".sidebar-toggle").on("click", function() {
-        $("body").toggleClass("sidebar-closed");
-        cy.resize();
-    });
-
-    cy = cytoscape({
-        container: $(".container"),
-        layout: {
-            name: "dagre",
-            fit: true
-        },
-        style: [{
-            selector: "node",
-            style: {
-                "content": "data(id)",
-                "text-opacity": 0.5,
-                "text-valign": "center",
-                "text-halign": "right",
-                "background-color": "#11479e"
-            }
-        }, {
-            selector: "edge",
-            style: {
-                "width": 4,
-                "target-arrow-shape": "triangle",
-                "line-color": "#9dbaea",
-                "target-arrow-color": "#9dbaea",
-                "curve-style": "bezier"
-            }
-        }, {
-            selector: ":selected",
-            style: {
-                "background-color": "#000"
-            }
-        }]
-    });
+    var json;
+    var sb = new sidebar();
+    var cy = new createCy();
 
     cy.on("tap", "node", {}, function(evt) {
-        console.log(evt.cyTarget.data());
-        $("body").toggleClass("sidebar-closed", false);
-        showData(evt.cyTarget.data());
+        sb.showData(evt.cyTarget.data());
         // Create Node List
-        var eles = cy.elements("node");
-        ElementCreator.createForm($(".form"), evt.cyTarget, submitFunction, eles);
+        sb.createForm($(".form"), evt.cyTarget, cy.elements("node"));
     });
+    
 
     // Read Json
-    readJson(function (jsonData) {
-        console.log(jsonData);
-        json = jsonData;
-        eles = ElementCreator.createCyElements(jsonData);
-        cy.add(eles);
+    getData();
 
+
+    $('.downloadJson').click(function(){
+        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+        $('.downloadJson').prop("href", "data:" + data);
+        $('.downloadJson').prop("download", "data.json");
+    });
+
+    $('.changeJson').click(function(){
+        getData();
+    })
+
+
+    document.addEventListener("dataReceived", function(e) {
+        json = e.detail;
+
+        var eles = ElementCreator.createCyElements(json);
+        cy.add(eles);
         cy.makeLayout({
             name: "dagre"
         }).run();
 
-        showData(cy.$("node#" + jsonData.name).data());
-        ElementCreator.createForm($(".form"), cy.$("node#" + jsonData.name), submitFunction, []);
-
-
-        $('.downloadJson').show().click(function(){
-            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
-            $('.downloadJson').prop("href", "data:" + data);
-            $('.downloadJson').prop("download", "data.json");
-        })
+        sb.showData(cy.$("node#" + json.name).data());
+        sb.createForm($(".form"), cy.$("node#" + json.name), []);
     });
 
 
-
-    function submitFunction (e) {
-        var data = readData(e);
-        //console.log(data);
+    document.addEventListener("formSubmit", function(e) {
+        var data = e.detail;
         if(data.type == "scenario") {
 
         }
@@ -84,41 +52,17 @@ $(function() {
                 return child.name != data.currentid;
             });
             delete data['currentid'];
-
             json.children.push(data);
 
-            eles = ElementCreator.createCyElements(json);
+
+            var eles = ElementCreator.createCyElements(json);
             cy.$("*").remove();
             cy.add(eles);
             cy.makeLayout({
                 name: "dagre"
             }).run();
 
-            // Create Node List
-            var eles = cy.elements("node");
-            ElementCreator.createForm($(".form"), cy.$("node#" + data.name), submitFunction, eles);
+            sb.createForm($(".form"), cy.$("node#" + data.name), cy.elements("node"));
         }
-    }
-});
-
-function showData(text) {
-    $(".head").html(JSON.stringify(text));
-}
-
-function readData(e) {
-    var formData = {};
-    $.each($(".form input").serializeArray(), function(i, field) {
-        if (field.name.substring(0, 5) == "tags_") {
-            if (typeof(formData.tags) === "undefined")
-                formData.tags = {};
-            formData.tags[field.name.substring(5, field.name.length)] = field.value;
-        } else {
-            formData[field.name] = field.value;
-        }
-    }); 
-    $(".form select").val(function( index, value ) {
-        formData[this.name] = value;
     });
-    console.log(formData);
-    return formData;
-}
+});
