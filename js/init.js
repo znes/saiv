@@ -2,23 +2,31 @@
  * DOM Ready
  */
 $(function() {
-    var json;
+    var datam = new jsonmanager();
     var sb = new sidebar();
     var cy = new createCy();
+    window.csy = cy;
 
-    cy.on("tap", "node", {}, function(evt) {
+    cy.on("click", "node", {}, function(evt) {
+        console.log(evt);
+           if (evt.originalEvent.which == 3) {  
+              alert("rechtsklick");  
+           }  
+
         sb.showData(evt.cyTarget.data());
-        // Create Node List
         sb.createForm($(".form"), evt.cyTarget, cy.elements("node"));
     });
-    
 
+    cy.on("cxttap", "node", {}, function(evt) {
+        alert("rechtsklick");
+    });
+    
     // Read Json
     getData();
 
 
     $('.downloadJson').click(function(){
-        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json));
         $('.downloadJson').prop("href", "data:" + data);
         $('.downloadJson').prop("download", "data.json");
     });
@@ -30,16 +38,19 @@ $(function() {
 
 
     document.addEventListener("dataReceived", function(e) {
-        json = e.detail;
+        datam.newData(e.detail);
+        console.log(datam.json);
 
-        var eles = ElementCreator.createCyElements(json);
+        var eles = ElementCreator.createCyElements(datam.json);
         cy.add(eles);
         cy.makeLayout({
             name: "dagre"
         }).run();
 
-        sb.showData(cy.$("node#" + json.name).data());
-        sb.createForm($(".form"), cy.$("node#" + json.name), []);
+        sb.showData(cy.$("node#" + datam.json.name).data());
+        sb.createForm($(".form"), cy.$("node#" + datam.json.name), []);
+
+        hideModal();
     });
 
 
@@ -49,21 +60,16 @@ $(function() {
 
         }
         else {
-            json.children = $.grep(json.children, function (child) {
-                return child.name != data.currentid;
-            });
-            delete data['currentid'];
-            json.children.push(data);
+            datam.updateChildren(e.detail);
 
-
-            var eles = ElementCreator.createCyElements(json);
+            var eles = ElementCreator.createCyElements(datam.json);
             cy.$("*").remove();
             cy.add(eles);
             cy.makeLayout({
                 name: "dagre"
             }).run();
 
-            sb.createForm($(".form"), cy.$("node#" + data.name), cy.elements("node"));
+            sb.createForm($(".form"), cy.$("node#" + datam.json.name), cy.elements("node"));
         }
     });
 });
