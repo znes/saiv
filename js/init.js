@@ -25,7 +25,8 @@ $(function() {
 
     $('.changeJson').click(function(){
         getData();
-    })
+        return false;
+    });
 
 
     document.addEventListener("dataReceived", function(e) {

@@ -1,6 +1,5 @@
 function createCy() {
 	var cy;
-
 	cy = cytoscape({
         container: $(".container"),
         layout: {
@@ -32,10 +31,6 @@ function createCy() {
             }
         }]
     });
-
-    
-
-
 
     return cy;
 }

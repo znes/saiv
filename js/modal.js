@@ -14,8 +14,6 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 	});
 
 	$('html').click(function(event) {
-		console.log("dada");
-		console.log(event.target);
 	    if (!$.contains(modal[0], event.target) && event.target != modal[0]) {
 	    	abortFunction();
 	    	hideModal();

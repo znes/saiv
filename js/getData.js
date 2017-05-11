@@ -1,4 +1,5 @@
 function getData() {
+	
     var content = "Select File<br>";
     content += "<input id='selectFile' type='file'><br>";
     content += "<br>";
