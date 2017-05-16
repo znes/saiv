@@ -6,11 +6,7 @@ function jsonmanager () {
 		this.json = _data;
 	}
 
-	this.removeElement = function() {
-
-	}
-
-	this.updateScenario = function(data) {
+	this.updateScenario = function(data) {	
 		this.json.name = data.name;
 		this.json.tags.description = data.tags.description;
 	}
@@ -28,6 +24,35 @@ function jsonmanager () {
 				}
 			}
 		}
+	}
+
+	/**
+	 * [addEdge description]
+	 * Adds predecessors and successors
+	 * Return boolean of success 
+	 * @param {[type]} predecessors [description]
+	 * @param {[type]} successors   [description]
+	 */
+	this.addEdge = function(predecessors, successors) {
+		// Add Successor
+		var index = this.json.children.findIndex(x => x.name==predecessors);
+		if (index !== -1) {
+			this.json.children[index].successors.indexOf(successors) === -1 ? this.json.children[index].successors.push(successors) : console.log("This item already exists");
+		}
+		// Add Predecessor
+		index = this.json.children.findIndex(x => x.name==successors);
+		if (index !== -1) {
+			this.json.children[index].predecessors.indexOf(predecessors) === -1 ? this.json.children[index].predecessors.push(predecessors) : console.log("This item already exists");
+		}
+		return 
+	}
+
+	this.deleteItem = function(name) {
+		this.json.children = $.grep(this.json.children, function (child) {
+            return child.name != name;
+        });
+
+		deleteRelationNames(name);
 	}
 
 	this.updateChildren = function(updateData) {
@@ -71,5 +96,20 @@ function jsonmanager () {
         	}
         }
         this.json.children.push(updateData);
+    }
+
+    var deleteRelationNames = function(name) {
+    	for (var i = 0; i < that.json.children.length; i++) {
+			for (var j = 0; j < that.json.children[i].predecessors.length; j++) {
+				if(that.json.children[i].predecessors[j] == name) {
+					that.json.children[i].predecessors.splice(j,1);
+				}
+			}
+			for (var j = 0; j < that.json.children[i].successors.length; j++) {
+				if(that.json.children[i].successors[j] == name) {
+					that.json.children[i].successors.splice(j,1);
+				}
+			}
+		}
     }
 }
