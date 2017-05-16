@@ -52,7 +52,9 @@ $(function() {
                       { group: "nodes", data: { id: "n1" }, position: { x: pos.x, y: pos.y } },
                       { group: "edges", data: { id: "e012", source: evtFromTarget.data().id, target: "n1" } }
                     ]);*/
-                    cy.add([{ group: "edges", data: { id: "testedge", source: evtFromTarget.data().id, target: evtFromTarget.data().id}}]);
+                    cy.add([{ group: "edges", data: { 
+                        id: "testedge", source: evtFromTarget.data().id, 
+                        target: evtFromTarget.data().id}}]);
 
 
                     cy.on("mouseover", "node", {}, function(_event) {
@@ -75,8 +77,11 @@ $(function() {
                             modal("Error", "Cant be connected to type scenario");
                         }
                         else {
-                            cy.add([{ group: "edges", data: { source: evtFromTarget.data().id, target: evtToTarget.data().id}}]);
-                            datam.addEdge(evtFromTarget.data().id, evtToTarget.data().id);
+                            if(datam.addEdge(evtFromTarget.data().id, evtToTarget.data().id)) {
+                                cy.add([{ group: "edges", data: { source: evtFromTarget.data().id, target: evtToTarget.data().id}}]);
+                            } else {
+                                modal("Error", "Already exists");
+                            }
                             showNode(_event);
                         }
                         cy.$('#testedge').remove();

@@ -37,14 +37,18 @@ function jsonmanager () {
 		// Add Successor
 		var index = this.json.children.findIndex(x => x.name==predecessors);
 		if (index !== -1) {
-			this.json.children[index].successors.indexOf(successors) === -1 ? this.json.children[index].successors.push(successors) : console.log("This item already exists");
+			if(this.json.children[index].successors.indexOf(successors) === -1) {
+				this.json.children[index].successors.push(successors);
+			} else {
+				return false;
+			}
 		}
 		// Add Predecessor
 		index = this.json.children.findIndex(x => x.name==successors);
 		if (index !== -1) {
 			this.json.children[index].predecessors.indexOf(predecessors) === -1 ? this.json.children[index].predecessors.push(predecessors) : console.log("This item already exists");
 		}
-		return 
+		return true;
 	}
 
 	this.deleteItem = function(name) {

@@ -25,6 +25,12 @@ function createCy() {
                 "curve-style": "bezier"
             }
         }, {
+            selector: "#testedge",
+            style: {
+                "line-color": "rgba(0, 0, 0, 0.75)",
+                "target-arrow-color": "rgba(0, 0, 0, 0.75)",
+            }
+        }, {
             selector: ":selected",
             style: {
                 "background-color": "#000"
