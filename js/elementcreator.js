@@ -50,16 +50,17 @@ ElementCreator.createCyElements = function(jsonData) {
 	return eles;
 }
 
-ElementCreator.createInput = function(key, currentValue, type) {
+ElementCreator.createInput = function(name, key, currentValue, type) {
 	var html = "";
 	if (type == "hidden") {
 		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
 	} else {
-		html += '<label for="' + key + '">' + key + '</label>';
-		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" placeholder="Current: ' + currentValue + '" value="' + currentValue + '"/>';
+		html += '<label for="' + key + '">' + name + '</label>';
+		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
 	}
 	return html;
 }
+
 ElementCreator.createSelect = function(key, currentValue, options) {
 	var html = "";
 	html += '<label for="' + key + '">' + key + '</label>';

@@ -52,7 +52,7 @@ $(function() {
                       { group: "nodes", data: { id: "n1" }, position: { x: pos.x, y: pos.y } },
                       { group: "edges", data: { id: "e012", source: evtFromTarget.data().id, target: "n1" } }
                     ]);*/
-                    cy.add([{ group: "edges", data: { 
+                    cy.add([{ group: "edges", data: {
                         id: "testedge", source: evtFromTarget.data().id, 
                         target: evtFromTarget.data().id}}]);
 
@@ -161,6 +161,22 @@ $(function() {
     function showNode(evt) {
         sb.showData(evt.cyTarget.data());
         sb.createForm($(".form"), evt.cyTarget, cy.elements("node"));
+
+        $('.editForm .addTag').on("click", function(){
+            sb.addTag($(".form"), function(newTag) {
+                console.log(newTag);
+                console.log(evt.cyTarget.data().data.name);
+                datam.addTag(evt.cyTarget.data().data.name, newTag);
+
+                showNode(evt);
+            });
+        });
+
+        $('.editForm .removeTag').on("click", function(){
+            var tag = $(this).text().substring(7, $(this).text().length);
+            datam.removeTag(evt.cyTarget.data().data.name, tag);
+            showNode(evt);
+        });
     }
 });
 

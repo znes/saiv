@@ -102,6 +102,23 @@ function jsonmanager () {
         this.json.children.push(updateData);
     }
 
+    this.addTag = function(name, tagName) {
+    	var index = that.json.children.findIndex(x => x.name==name);
+    	if( index !== -1)
+    	{
+    		this.json.children[index].tags[tagName] = "";
+    	}
+    }
+
+    this.removeTag = function(name, tagName) {
+    	console.log(name, tagName);
+    	var index = that.json.children.findIndex(x => x.name==name);
+    	if( index !== -1)
+    	{
+    		delete this.json.children[index].tags[tagName];
+    	}
+    }
+
     var deleteRelationNames = function(name) {
     	for (var i = 0; i < that.json.children.length; i++) {
 			for (var j = 0; j < that.json.children[i].predecessors.length; j++) {

@@ -15,6 +15,22 @@ function sidebar() {
 		$(".head").html(JSON.stringify(data));
 	}
 
+	this.addTag = function (element, ready) {
+		element.html("");
+		form = $('<form class="editForm"></form>');
+
+		form.append(ElementCreator.createInput("Tag name", "tag", "", "text"));
+
+		form.append('<input type="submit" value="Save">');
+
+		form.submit(function(e) {
+			e.preventDefault();
+			ready(that.readForm().tag);
+		});
+
+		element.append(form);
+	}
+
 	this.readForm = function () {
 	    var formData = {};
 	    $.each($(".form input").serializeArray(), function(i, field) {
@@ -39,23 +55,25 @@ function sidebar() {
 
 		var objData = object.data();
 		// current ID
-		form.append(ElementCreator.createInput("currentid", objData.id, "hidden"));
+		form.append(ElementCreator.createInput("currentid", "currentid", objData.id, "hidden"));
 
 		if (objData.type == 'scenario') {
-			form.append(ElementCreator.createInput("name", objData.id, "text"));
-			form.append(ElementCreator.createInput("type", objData.type, "hidden"));
+			form.append(ElementCreator.createInput("name", "name", objData.id, "text"));
+			form.append(ElementCreator.createInput("type", "type", objData.type, "hidden"));
 		}
 		$.each(objData.data, function(key, value) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>');
+				form.append('<a href="#" class="addTag">Add Tag</label><br/>');
 				$.each(objData.data[key], function(tag, tagValue) {
-					form.append(ElementCreator.createInput("tags_" + tag, tagValue, "text"));
+					form.append('<a href="#" class="removeTag">Remove ' + tag + '</a><br/>');
+					form.append(ElementCreator.createInput(tag, "tags_" + tag, tagValue, "text"));
 				});
 			} else if (key == "predecessors" || key == "successors") {
 				form.append(ElementCreator.createSelect(key, value, nodes));
 				$('.js-example-basic-multiple', form).select2();
 			} else {
-				form.append(ElementCreator.createInput(key, value, "text"));
+				form.append(ElementCreator.createInput(key, key, value, "text"));
 			}
 		});
 
