@@ -31,33 +31,37 @@ ElementCreator.createCyElements = function(jsonData) {
 		for (var j = 0; j < jsonData.children[i].successors.length; j++) {
 			eles.push({
 				data: {
-					source: jsonData.children[i].name, // the source node id (edge comes from this node)
-					target: jsonData.children[i].successors[j] // the target node id (edge goes to this node)
+					source: jsonData.children[i].name,
+					target: jsonData.children[i].successors[j]
 				},
 				group: "edges"
 			});
 		}
-		/*for (var k = 0; k < jsonData.children[i].predecessors.length; k++) {
-			eles.push({
-				data: {
-					source: jsonData.children[i].predecessors[k], // the source node id (edge comes from this node)
-					target: jsonData.children[i].name // the target node id (edge goes to this node)
-				},
-				group: "edges"
-			});
-		}*/
 	}
 	return eles;
 }
 
-ElementCreator.createInput = function(name, key, currentValue, type) {
+/*ElementCreator.getStylesForm = function(styles, selected) {
+	var form = $('<form class="editForm"></form>');
+	form.append(ElementCreator.createSelect(key, value, nodes));
+	$('.js-example-basic-multiple', form).select2();
+
+	return form;
+}*/
+
+ElementCreator.createInput = function(name, key, currentValue, type, required=false) {
 	var html = "";
-	if (type == "hidden") {
-		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
-	} else {
+	
+	if (type != "hidden") {
 		html += '<label for="' + key + '">' + name + '</label>';
+	}
+	if(required) {
+		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
+	}
+	else {
 		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
 	}
+
 	return html;
 }
 

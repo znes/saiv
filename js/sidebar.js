@@ -20,7 +20,6 @@ function sidebar() {
 		form = $('<form class="editForm"></form>');
 
 		form.append(ElementCreator.createInput("Tag name", "tag", "", "text"));
-
 		form.append('<input type="submit" value="Save">');
 
 		form.submit(function(e) {
@@ -54,7 +53,6 @@ function sidebar() {
 
 
 		var objData = object.data();
-		// current ID
 		form.append(ElementCreator.createInput("currentid", "currentid", objData.id, "hidden"));
 
 		if (objData.type == 'scenario') {
@@ -82,7 +80,7 @@ function sidebar() {
 		form.submit(function(e) {
 			e.preventDefault();
 
-			var event = new CustomEvent("formSubmit", {"detail": that.readForm()});
+			var event = new CustomEvent("updateNode", {"detail": that.readForm()});
 			document.dispatchEvent(event);
 		});
 		element.append(form);
@@ -91,15 +89,12 @@ function sidebar() {
 	this.addNode = function(element, pos, nodes) {
 		element.html("");
 		form = $('<form class="editForm"></form>');
-		form.append(ElementCreator.createInput("name", "name", "", "text"));
-		form.append(ElementCreator.createInput("type", "type", "", "text"));
+		form.append(ElementCreator.createInput("name", "name", "", "text", true));
+		form.append(ElementCreator.createInput("type", "type", "", "text", true));
 		form.append(ElementCreator.createInput("posx", "posx", pos.x, "hidden"));
 		form.append(ElementCreator.createInput("posy", "posy", pos.y, "hidden"));
 
-		form.append(ElementCreator.createSelect("predecessors", "", nodes));
-		form.append(ElementCreator.createSelect("successors", "", nodes));
-
-		form.append('<input type="submit" value="Save">');
+		form.append('<input type="submit" value="Add Node">');
 
 
 		form.submit(function(e) {

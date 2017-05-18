@@ -6,18 +6,22 @@ $(function() {
     var sb = new sidebar();
     var cy = new createCy();
 
+    //debug
     window.cy = cy;
 
-    cy.on("click", "node", {}, showNode);
-
-    // Read Json
     getData();
 
+    cy.on("click", "node", {}, showNode);
 
     $('.downloadJson').click(function(){
         var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json));
         $('.downloadJson').prop("href", "data:" + data);
         $('.downloadJson').prop("download", "data.json");
+    });
+
+    $('.setStyle').click(function() {
+        modal("Set Style", "form");
+        return false;
     });
 
     $('.changeJson').click(function(){
@@ -31,7 +35,6 @@ $(function() {
                 id: 'remove',
                 title: 'Remove',
                 selector: 'node',
-                //selector: 'node, edge',
                 onClickFunction: function (event) {
                     var target = event.target || event.cyTarget;
                     datam.deleteItem(target.data().data.name)
@@ -44,31 +47,20 @@ $(function() {
                 selector: 'node',
                 onClickFunction: function (event) {
                     var evtFromTarget = event.target || event.cyTarget;
-                    console.log(evtFromTarget.data().id);
                     var pos = event.position || event.cyPosition;
 
-                    /*cy.add([
-                      { group: "nodes", data: { id: "n1" }, position: { x: pos.x, y: pos.y } },
-                      { group: "edges", data: { id: "e012", source: evtFromTarget.data().id, target: "n1" } }
-                    ]);*/
                     cy.add([{ group: "edges", data: {
                         id: "testedge", source: evtFromTarget.data().id, 
                         target: evtFromTarget.data().id}}]);
 
 
                     cy.on("mouseover", "node", {}, function(_event) {
-                        console.log("mouseover");
                         var evtToTarget = _event.target || _event.cyTarget;
-                        /*var pos = event.position || event.cyPosition;*/
                         cy.$('#testedge').move({target: evtToTarget.data().id});
-                        /*cy.$('e012').show();*/
                     });
 
                     cy.on("click", "node", {}, function(_event) {
-                        console.log("mouseclick");
                         var evtToTarget = _event.target || _event.cyTarget; 
-                        console.log(evtToTarget.data().type);
-                        /*var pos = event.position || event.cyPosition;*/
                         if(evtFromTarget == evtToTarget ) {
                             modal("Error", "Cant connect to same node");
                         }
@@ -93,25 +85,7 @@ $(function() {
                 title: 'add node',
                 coreAsWell: true,
                 onClickFunction: function (event) {
-                    /*var data = {
-                        group: 'nodes',
-                        data: {
-                            name: "",
-                            type: "",
-                            tags: []
-                        }
-                    };*/
-                  
                     var pos = event.position || event.cyPosition;
-                  
-                    /*cy.add({
-                        data: data,
-                        position: {
-                            x: pos.x,
-                            y: pos.y
-                        }
-                    });*/
-
                     sb.addNode($(".form"), pos, cy.elements("node"));
                 }
             }]
@@ -140,14 +114,13 @@ $(function() {
             name: data.name,
             type: data.type,
             tags: {},
-            predecessors: data.predecessors,
-            successors: data.successors
+            predecessors: [],
+            successors: []
         };
 
         datam.addNode(
             formdata
         );
-
         cy.add({
             data: {
                 group: "nodes",
@@ -159,12 +132,14 @@ $(function() {
                 y: parseInt(data.posy)
             }
         });
+
+        sb.createForm($(".form"), cy.$("node#" + data.name), cy.elements("node"));
     });
 
 
-    document.addEventListener("formSubmit", function(e) {
+    document.addEventListener("updateNode", function(e) {
         var data = e.detail;
-        console.log(data);
+        
         if(data.type == "scenario") {
             datam.updateScenario(data);
         }
