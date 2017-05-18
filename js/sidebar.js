@@ -64,7 +64,8 @@ function sidebar() {
 		$.each(objData.data, function(key, value) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>');
-				form.append('<a href="#" class="addTag">Add Tag</label><br/>');
+				if(objData.type != "scenario")
+					form.append('<a href="#" class="addTag">Add Tag</label><br/>');
 				$.each(objData.data[key], function(tag, tagValue) {
 					form.append('<a href="#" class="removeTag">Remove ' + tag + '</a><br/>');
 					form.append(ElementCreator.createInput(tag, "tags_" + tag, tagValue, "text"));
@@ -83,7 +84,29 @@ function sidebar() {
 
 			var event = new CustomEvent("formSubmit", {"detail": that.readForm()});
 			document.dispatchEvent(event);
-			//submitFunction(e);
+		});
+		element.append(form);
+	}
+
+	this.addNode = function(element, pos, nodes) {
+		element.html("");
+		form = $('<form class="editForm"></form>');
+		form.append(ElementCreator.createInput("name", "name", "", "text"));
+		form.append(ElementCreator.createInput("type", "type", "", "text"));
+		form.append(ElementCreator.createInput("posx", "posx", pos.x, "hidden"));
+		form.append(ElementCreator.createInput("posy", "posy", pos.y, "hidden"));
+
+		form.append(ElementCreator.createSelect("predecessors", "", nodes));
+		form.append(ElementCreator.createSelect("successors", "", nodes));
+
+		form.append('<input type="submit" value="Save">');
+
+
+		form.submit(function(e) {
+			e.preventDefault();
+
+			var event = new CustomEvent("addNode", {"detail": that.readForm()});
+			document.dispatchEvent(event);
 		});
 		element.append(form);
 	}

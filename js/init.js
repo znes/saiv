@@ -36,8 +36,7 @@ $(function() {
                     var target = event.target || event.cyTarget;
                     datam.deleteItem(target.data().data.name)
                     target.remove();
-                },
-                hasTrailingDivider: true
+                }
             },
             {
                 id: 'add-successors',
@@ -87,27 +86,33 @@ $(function() {
                         cy.$('#testedge').remove();
                         unbind();
                     });
-                },
-                hasTrailingDivider: true
+                }            
             },
             {
                 id: 'add-node',
                 title: 'add node',
                 coreAsWell: true,
                 onClickFunction: function (event) {
-                    var data = {
-                        group: 'nodes'
-                    };
+                    /*var data = {
+                        group: 'nodes',
+                        data: {
+                            name: "",
+                            type: "",
+                            tags: []
+                        }
+                    };*/
                   
                     var pos = event.position || event.cyPosition;
                   
-                    cy.add({
+                    /*cy.add({
                         data: data,
                         position: {
                             x: pos.x,
                             y: pos.y
                         }
-                    });
+                    });*/
+
+                    sb.addNode($(".form"), pos, cy.elements("node"));
                 }
             }]
           });
@@ -126,6 +131,34 @@ $(function() {
         sb.createForm($(".form"), cy.$("node#" + datam.json.name), []);
 
         hideModal();
+    });
+
+
+    document.addEventListener("addNode", function(e) {
+        var data = e.detail;
+        var formdata = {
+            name: data.name,
+            type: data.type,
+            tags: {},
+            predecessors: data.predecessors,
+            successors: data.successors
+        };
+
+        datam.addNode(
+            formdata
+        );
+
+        cy.add({
+            data: {
+                group: "nodes",
+                id: data.name,
+                data: formdata
+            },
+            position: {
+                x: parseInt(data.posx),
+                y: parseInt(data.posy)
+            }
+        });
     });
 
 

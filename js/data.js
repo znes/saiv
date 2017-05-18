@@ -26,6 +26,10 @@ function jsonmanager () {
 		}
 	}
 
+	this.addNode = function(child) {
+		this.json.children.push(child);
+	}
+
 	/**
 	 * [addEdge description]
 	 * Adds predecessors and successors
