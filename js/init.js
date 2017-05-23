@@ -9,21 +9,33 @@ $(function() {
     //debug
     window.cy = cy;
 
-    getData();
+
+    // Opens Page Select Json
+    selectJson();
 
 
-    cy.on("click", "node", {}, showNode);
-
+    /**
+     * init Menu Listener
+     */
     $('.changeJson').click(function(){
-        getData();
-        return false;
+        selectJson();
     });
 
-    $('.setStyle').click(function() {
-        modal("Set Style", "form");
-        return false;
+    $('.home').click(function(){
+        home();
     });
 
+    $('.styleSettings').click(function(){
+        selectStyle();
+    });
+
+    $('.jsonSettings').click(function(){
+        jsonSettings();
+    });
+
+
+
+    // Add Context Menu to Canvas
     cy.contextMenus({
         menuItems: [
             {
@@ -76,7 +88,7 @@ $(function() {
                             showNode(_event);
                         }
                         cy.$('#testedge').remove();
-                        unbind();
+                        unbindCy();
                     });
                 }            
             },
@@ -92,6 +104,8 @@ $(function() {
           });
 
 
+
+    // Init Event Reciver 
     document.addEventListener("dataReceived", function(e) {
         hideContentPage();
         initListenerDataRevieved();
@@ -105,7 +119,7 @@ $(function() {
             name: "dagre"
         }).run();
 
-        //sb.showData(cy.$("node#" + datam.json.name).data());
+        sb.showData(cy.$("node#" + datam.json.name).data());
         sb.createForm($(".form"), cy.$("node#" + datam.json.name), []);
     });
 
@@ -160,7 +174,7 @@ $(function() {
     });
 
 
-    function unbind() {
+    function unbindCy() {
         cy.off('mouseover');
         cy.off('click');
 
@@ -188,18 +202,15 @@ $(function() {
     }
 
     function initListenerDataRevieved() {
-        setActiveMenuItem("Explorer");
-
         $(".navbar .shoWExplorer").click(function(){
+            setActiveMenuItem("Explorer");
             hideContentPage();
-        });
+        }).click();
 
         $(".navbar .downloadJson").click(function(){
             var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json));
             $('.downloadJson').prop("href", "data:" + data);
             $('.downloadJson').prop("download", "data.json");
         }).parent("li").removeClass("disabled");
-
-
     }
 });
