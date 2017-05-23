@@ -113,7 +113,7 @@ $(function() {
         hideContentPage();
         initListenerDataRevieved();
 
-        datam.newData(e.detail);
+        datam.json = e.detail;
 
         var eles = createCyElements(datam.json);
         cy.$("*").remove();
