@@ -49,7 +49,7 @@ class DataManager {
 		if (index !== -1) {
 			this._json.children[index].predecessors.indexOf(predecessors) === -1 ? this._json.children[index].predecessors.push(predecessors) : console.log("This item already exists");
 		}
-		return true;
+		return true
 	}
 
 	deleteItem (name) {
@@ -57,7 +57,7 @@ class DataManager {
             return child.name != name
         });
 
-		deleteRelationNames(name)
+		this.deleteRelationNames(name)
 	}
 
 	updateChildren (updateData) {
