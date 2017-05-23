@@ -1,6 +1,29 @@
-function ElementCreator() {};
+function setActiveMenuItem(href) {
+	$(".navbar-nav .active").removeClass("active")
+	$("a[href='#"+href+"']").parent("li").attr("class", "active");
+}
 
-ElementCreator.createCyElements = function(jsonData) {
+function createContentPage(heading, content) {
+	$(".sidebar").hide();
+	$(".containerContent .page-header h1").text(heading);
+	$(".containerContent .page-content").html(content);
+	showContentPage();
+}
+
+function showContentPage() {
+	$(".containerContent").show();
+	$(".containerCanvas").css("z-index", "-200");
+	$(".containerCanvas").css("visibility", "hidden");
+}
+
+function hideContentPage() {
+	$(".sidebar").show();
+	$(".containerContent").hide();
+	$(".containerCanvas").css("z-index", "0");
+	$(".containerCanvas").css("visibility", "visible");
+}
+
+function createCyElements(jsonData) {
 	var eles = [];
 
 	// Add Scenario Node
@@ -41,15 +64,7 @@ ElementCreator.createCyElements = function(jsonData) {
 	return eles;
 }
 
-/*ElementCreator.getStylesForm = function(styles, selected) {
-	var form = $('<form class="editForm"></form>');
-	form.append(ElementCreator.createSelect(key, value, nodes));
-	$('.js-example-basic-multiple', form).select2();
-
-	return form;
-}*/
-
-ElementCreator.createInput = function(name, key, currentValue, type, required=false) {
+function createInput(name, key, currentValue, type, required=false) {
 	var html = "";
 	
 	if (type != "hidden") {
@@ -65,7 +80,7 @@ ElementCreator.createInput = function(name, key, currentValue, type, required=fa
 	return html;
 }
 
-ElementCreator.createSelect = function(key, currentValue, options) {
+function createSelect(key, currentValue, options) {
 	var html = "";
 	html += '<label for="' + key + '">' + key + '</label>';
 	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">';

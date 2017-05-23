@@ -8,21 +8,25 @@ body {
 	height: 100%;
 	overflow: hidden;
   word-break:  break-all;
+  min-height: 2000px;
 }
-.container {
+.navbar-static-top {
+  margin-bottom: 50px;
+}
+.containerCanvas {
 	position: absolute;
 	left: 0;
-	top: 0;
+	top: 50px;
 	bottom: 0;
 	right: 20em;
 }
-.sidebar-closed .container {
+.sidebar-closed .containerCanvas {
   right: 0;
 }
 .sidebar {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 50px;
   bottom: 0;
   width: 20em;
   background: rgba(0, 0, 0, 0.75);
@@ -62,6 +66,7 @@ body {
 .sidebar .form input,
 .sidebar .form select {
   display: block;
+  color:#000;
 }
 
 
@@ -70,7 +75,7 @@ a:hover {
 }
 
 @media (max-width: 600px){
-  .container {
+  .containerCy {
     right: 0;
   }
 }

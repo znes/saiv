@@ -1,7 +1,7 @@
 function createCy() {
 	var cy;
 	cy = cytoscape({
-        container: $(".container"),
+        container: $(".containerCanvas"),
         layout: {
             name: "dagre",
             fit: true

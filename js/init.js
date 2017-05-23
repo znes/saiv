@@ -11,21 +11,16 @@ $(function() {
 
     getData();
 
+
     cy.on("click", "node", {}, showNode);
 
-    $('.downloadJson').click(function(){
-        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json));
-        $('.downloadJson').prop("href", "data:" + data);
-        $('.downloadJson').prop("download", "data.json");
+    $('.changeJson').click(function(){
+        getData();
+        return false;
     });
 
     $('.setStyle').click(function() {
         modal("Set Style", "form");
-        return false;
-    });
-
-    $('.changeJson').click(function(){
-        getData();
         return false;
     });
 
@@ -48,6 +43,11 @@ $(function() {
                 onClickFunction: function (event) {
                     var evtFromTarget = event.target || event.cyTarget;
                     var pos = event.position || event.cyPosition;
+
+                    if(evtFromTarget.data().type == "scenario") {
+                        modal("Error", "Cant be connected to type scenario");
+                        return false;
+                    }
 
                     cy.add([{ group: "edges", data: {
                         id: "testedge", source: evtFromTarget.data().id, 
@@ -93,18 +93,20 @@ $(function() {
 
 
     document.addEventListener("dataReceived", function(e) {
+        hideContentPage();
+        initListenerDataRevieved();
+
         datam.newData(e.detail);
 
-        var eles = ElementCreator.createCyElements(datam.json);
+        var eles = createCyElements(datam.json);
+        cy.$("*").remove();
         cy.add(eles);
         cy.makeLayout({
             name: "dagre"
         }).run();
 
-        sb.showData(cy.$("node#" + datam.json.name).data());
+        //sb.showData(cy.$("node#" + datam.json.name).data());
         sb.createForm($(".form"), cy.$("node#" + datam.json.name), []);
-
-        hideModal();
     });
 
 
@@ -146,7 +148,7 @@ $(function() {
         else {
             datam.updateChildren(data);
 
-            var eles = ElementCreator.createCyElements(datam.json);
+            var eles = createCyElements(datam.json);
             cy.$("*").remove();
             cy.add(eles);
             cy.makeLayout({
@@ -170,10 +172,8 @@ $(function() {
         sb.showData(evt.cyTarget.data());
         sb.createForm($(".form"), evt.cyTarget, cy.elements("node"));
 
-        $('.editForm .addTag').on("click", function(){
+        $(".editForm .addTag").on("click", function(){
             sb.addTag($(".form"), function(newTag) {
-                console.log(newTag);
-                console.log(evt.cyTarget.data().data.name);
                 datam.addTag(evt.cyTarget.data().data.name, newTag);
 
                 showNode(evt);
@@ -186,5 +186,20 @@ $(function() {
             showNode(evt);
         });
     }
-});
 
+    function initListenerDataRevieved() {
+        setActiveMenuItem("Explorer");
+
+        $(".navbar .shoWExplorer").click(function(){
+            hideContentPage();
+        });
+
+        $(".navbar .downloadJson").click(function(){
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json));
+            $('.downloadJson').prop("href", "data:" + data);
+            $('.downloadJson').prop("download", "data.json");
+        }).parent("li").removeClass("disabled");
+
+
+    }
+});

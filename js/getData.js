@@ -1,11 +1,11 @@
 function getData() {
-	
     var content = "Select File<br>";
     content += "<input id='selectFile' type='file'><br>";
     content += "<br>";
     content += "<button id='useDefault'>Use default</button>";
     
-  	modal("Add Json File", content );
+  	createContentPage("Add Json File", content );
+  	setActiveMenuItem("UploadJson")
 
 
   	$("#selectFile").on('change', function(event) {
