@@ -2,7 +2,7 @@
  * DOM Ready
  */
 $(function() {
-    var datam = new jsonmanager();
+    var datam = new DataManager();
     var sb = new sidebar();
     var cy = new createCy();
 
@@ -34,7 +34,10 @@ $(function() {
     });
 
 
-
+    /**
+     * Add cytoscape events
+     */
+    cy.on("click", "node", {}, showNode);
     // Add Context Menu to Canvas
     cy.contextMenus({
         menuItems: [

@@ -12,14 +12,12 @@ function createContentPage(heading, content) {
 
 function showContentPage() {
 	$(".containerContent").show();
-	$(".containerCanvas").css("z-index", "-200");
 	$(".containerCanvas").css("visibility", "hidden");
 }
 
 function hideContentPage() {
 	$(".sidebar").show();
 	$(".containerContent").hide();
-	$(".containerCanvas").css("z-index", "0");
 	$(".containerCanvas").css("visibility", "visible");
 }
 

@@ -1,32 +1,30 @@
-function jsonmanager () {
-	var that = this;
-	this.json = null;
+class DataManager {
+	constructor() {
+        var that = this
+		this.json = null
+    }
 
-	this.newData = function(_data) {
-		this.json = _data;
+	newData (_data) {
+		this.json = _data
 	}
 
-	this.updateScenario = function(data) {	
-		this.json.name = data.name;
-		this.json.tags.description = data.tags.description;
+	updateScenario (data) {	
+		this.json.name = data.name
+		this.json.tags.description = data.tags.description
 	}
 
-	this.updateRelationNames = function(newName, oldName) {
-		for (var i = 0; i < this.json.children.length; i++) {
-			for (var j = 0; j < this.json.children[i].predecessors.length; j++) {
-				if(this.json.children[i].predecessors[j] == oldName) {
-					this.json.children[i].predecessors[j] = newName;
-				}
-			}
-			for (var j = 0; j < this.json.children[i].successors.length; j++) {
-				if(this.json.children[i].successors[j] == oldName) {
-					this.json.children[i].successors[j] = newName;
-				}
-			}
-		}
+	updateRelationNames (newName, oldName) {
+		this.json.children.forEach(child => {
+			child.predecessors.forEach(pred => {
+				if(pred == oldName) pred = newName
+			})
+			child.successors.forEach(succ => {
+				if(succ == oldName) succ = newName
+			})
+		})
 	}
 
-	this.addNode = function(child) {
+	addNode (child) {
 		this.json.children.push(child);
 	}
 
@@ -37,7 +35,7 @@ function jsonmanager () {
 	 * @param {[type]} predecessors [description]
 	 * @param {[type]} successors   [description]
 	 */
-	this.addEdge = function(predecessors, successors) {
+	addEdge (predecessors, successors) {
 		// Add Successor
 		var index = this.json.children.findIndex(x => x.name==predecessors);
 		if (index !== -1) {
@@ -55,7 +53,7 @@ function jsonmanager () {
 		return true;
 	}
 
-	this.deleteItem = function(name) {
+	deleteItem (name) {
 		this.json.children = $.grep(this.json.children, function (child) {
             return child.name != name;
         });
@@ -63,14 +61,14 @@ function jsonmanager () {
 		deleteRelationNames(name);
 	}
 
-	this.updateChildren = function(updateData) {
+	updateChildren (updateData) {
 		this.json.children = $.grep(this.json.children, function (child) {
             return child.name != updateData.currentid;
         });
 
         // if name(id) changes
         if(updateData.currentid != updateData.name) {
-        	that.updateRelationNames(updateData.name, updateData.currentid);
+        	this.updateRelationNames(updateData.name, updateData.currentid);
         }
         delete updateData['currentid'];
 
@@ -106,33 +104,33 @@ function jsonmanager () {
         this.json.children.push(updateData);
     }
 
-    this.addTag = function(name, tagName) {
-    	var index = that.json.children.findIndex(x => x.name==name);
+    addTag (name, tagName) {
+    	var index = this.json.children.findIndex(x => x.name==name);
     	if( index !== -1)
     	{
     		this.json.children[index].tags[tagName] = "";
     	}
     }
 
-    this.removeTag = function(name, tagName) {
+    removeTag (name, tagName) {
     	console.log(name, tagName);
-    	var index = that.json.children.findIndex(x => x.name==name);
+    	var index = this.json.children.findIndex(x => x.name==name);
     	if( index !== -1)
     	{
     		delete this.json.children[index].tags[tagName];
     	}
     }
 
-    var deleteRelationNames = function(name) {
-    	for (var i = 0; i < that.json.children.length; i++) {
-			for (var j = 0; j < that.json.children[i].predecessors.length; j++) {
-				if(that.json.children[i].predecessors[j] == name) {
-					that.json.children[i].predecessors.splice(j,1);
+    deleteRelationNames (name) {
+    	for (var i = 0; i < this.json.children.length; i++) {
+			for (var j = 0; j < this.json.children[i].predecessors.length; j++) {
+				if(this.json.children[i].predecessors[j] == name) {
+					this.json.children[i].predecessors.splice(j,1);
 				}
 			}
-			for (var j = 0; j < that.json.children[i].successors.length; j++) {
-				if(that.json.children[i].successors[j] == name) {
-					that.json.children[i].successors.splice(j,1);
+			for (var j = 0; j < this.json.children[i].successors.length; j++) {
+				if(this.json.children[i].successors[j] == name) {
+					this.json.children[i].successors.splice(j,1);
 				}
 			}
 		}
