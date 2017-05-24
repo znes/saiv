@@ -22,7 +22,7 @@ class sidebar{
 
 		form.submit(function(e) {
 			e.preventDefault()
-			ready(that.readForm().tag)
+			ready(this.readForm().tag)
 		})
 
 		element.append(form)
@@ -78,7 +78,7 @@ class sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var event = new CustomEvent("updateNode", {"detail": that.readForm()})
+			var event = new CustomEvent("updateNode", {"detail": this.readForm()})
 			document.dispatchEvent(event)
 		})
 		element.append(form)
@@ -86,7 +86,7 @@ class sidebar{
 
 	addNode (element, pos, nodes) {
 		element.html("")
-		form = $('<form class="editForm"></form>')
+		var form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
 		form.append(createInput("type", "type", "", "text", true))
 		form.append(createInput("posx", "posx", pos.x, "hidden"))
@@ -98,7 +98,7 @@ class sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var event = new CustomEvent("addNode", {"detail": that.readForm()})
+			var event = new CustomEvent("addNode", {"detail": this.readForm()})
 			document.dispatchEvent(event)
 		})
 		element.append(form)
