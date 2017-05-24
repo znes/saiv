@@ -97,13 +97,23 @@ $(function() {
             },
             {
                 id: 'add-node',
-                title: 'add node',
+                title: 'Add node',
                 coreAsWell: true,
                 onClickFunction: function (event) {
                     var pos = event.position || event.cyPosition;
                     sb.addNode($(".form"), pos, cy.elements("node"));
                 }
-            }]
+            },
+            {
+                id: 'center-map',
+                title: 'Center Map',
+                coreAsWell: true,
+                onClickFunction: function (event) {
+                    cy.reset()
+                    cy.center()
+                }
+            }
+            ]
           });
 
 
