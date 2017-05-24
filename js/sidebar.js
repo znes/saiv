@@ -15,7 +15,7 @@ class sidebar{
 
 	addTag (element, ready) {
 		element.html("")
-		form = $('<form class="editForm"></form>')
+		var form = $('<form class="editForm"></form>')
 
 		form.append(createInput("Tag name", "tag", "", "text"))
 		form.append('<input type="submit" value="Save">')
@@ -47,7 +47,7 @@ class sidebar{
 
 	createForm (element, object, nodes) {
 		element.html("")
-		form = $('<form class="editForm"></form>')
+		var form = $('<form class="editForm"></form>')
 
 
 		var objData = object.data()
