@@ -1,5 +1,5 @@
 function createCy() {
-	var cy;
+	var cy
 	cy = cytoscape({
         container: $(".containerCanvas"),
         layout: {
@@ -36,9 +36,9 @@ function createCy() {
                 "background-color": "#000"
             }
         }]
-    });
+    })
 
     
 
-    return cy;
+    return cy
 }

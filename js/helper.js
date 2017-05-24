@@ -1,28 +1,28 @@
 function setActiveMenuItem(href) {
 	$(".navbar-nav .active").removeClass("active")
-	$("a[href='#"+href+"']").parent("li").attr("class", "active");
+	$("a[href='#"+href+"']").parent("li").attr("class", "active")
 }
 
 function createContentPage(heading, content) {
-	$(".sidebar").hide();
-	$(".containerContent .page-header h1").text(heading);
-	$(".containerContent .page-content").html(content);
-	showContentPage();
+	$(".sidebar").hide()
+	$(".containerContent .page-header h1").text(heading)
+	$(".containerContent .page-content").html(content)
+	showContentPage()
 }
 
 function showContentPage() {
-	$(".containerContent").show();
-	$(".containerCanvas").css("visibility", "hidden");
+	$(".containerContent").show()
+	$(".containerCanvas").css("visibility", "hidden")
 }
 
 function hideContentPage() {
-	$(".sidebar").show();
-	$(".containerContent").hide();
-	$(".containerCanvas").css("visibility", "visible");
+	$(".sidebar").show()
+	$(".containerContent").hide()
+	$(".containerCanvas").css("visibility", "visible")
 }
 
 function createCyElements(jsonData) {
-	var eles = [];
+	var eles = []
 
 	// Add Scenario Node
 	eles.push({
@@ -35,7 +35,7 @@ function createCyElements(jsonData) {
 				tags: jsonData.tags
 			}
 		},
-	});
+	})
 
 	for (var i = 0; i < jsonData.children.length; i++) {
 		eles.push({
@@ -44,7 +44,7 @@ function createCyElements(jsonData) {
 				id: jsonData.children[i].name,
 				data: jsonData.children[i]
 			}
-		});
+		})
 	}
 
 	// Add edges when nodes loaded
@@ -56,39 +56,39 @@ function createCyElements(jsonData) {
 					target: jsonData.children[i].successors[j]
 				},
 				group: "edges"
-			});
+			})
 		}
 	}
-	return eles;
+	return eles
 }
 
 function createInput(name, key, currentValue, type, required=false) {
-	var html = "";
+	var html = ""
 	
 	if (type != "hidden") {
-		html += '<label for="' + key + '">' + name + '</label>';
+		html += '<label for="' + key + '">' + name + '</label>'
 	}
 	if(required) {
-		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
+		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>'
 	}
 	else {
-		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>';
+		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>'
 	}
 
-	return html;
+	return html
 }
 
 function createSelect(key, currentValue, options) {
-	var html = "";
-	html += '<label for="' + key + '">' + key + '</label>';
-	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">';
+	var html = ""
+	html += '<label for="' + key + '">' + key + '</label>'
+	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">'
 	for (var i = 0; i < options.length; i++) {
 		if ($.inArray(options[i].data().id, currentValue) > -1) {
-			html += '<option selected value="' + options[i].data().id + '">' + options[i].data().id + '</option>';
+			html += '<option selected value="' + options[i].data().id + '">' + options[i].data().id + '</option>'
 		} else {
-			html += '<option value="' + options[i].data().id + '">' + options[i].data().id + '</option>';
+			html += '<option value="' + options[i].data().id + '">' + options[i].data().id + '</option>'
 		}
 	}
-	html += '</select>';
-	return html;
+	html += '</select>'
+	return html
 }

@@ -17,10 +17,10 @@ class sidebar{
 		element.html("")
 		var form = $('<form class="editForm"></form>')
 
-		form.append(createInput("Tag name", "tag", "", "text"))
+		form.append(createInput("Tag name", "tag", "", "text", true))
 		form.append('<input type="submit" value="Save">')
 
-		form.submit(function(e) {
+		form.submit((e) => {
 			e.preventDefault()
 			ready(this.readForm().tag)
 		})
@@ -30,15 +30,17 @@ class sidebar{
 
 	readForm () {
 	    var formData = {}
-	    $.each($(".form input").serializeArray(), function(i, field) {
-	        if (field.name.substring(0, 5) == "tags_") {
-	            if (typeof(formData.tags) === "undefined")
-	                formData.tags = {}
+	    $(".form input").serializeArray().forEach(field => {
+	    	if (field.name.substring(0, 5) == "tags_") {
+	            if (typeof(formData.tags) === "undefined") formData.tags = {}
+
 	            formData.tags[field.name.substring(5, field.name.length)] = field.value
-	        } else {
+	        } 
+	        else {
 	            formData[field.name] = field.value
 	        }
 	    })
+
 	    $(".form select").val(function( index, value ) {
 	        formData[this.name] = value
 	    })

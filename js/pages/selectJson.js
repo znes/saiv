@@ -11,7 +11,7 @@ function selectJson() {
     var input = event.target;
     var reader = new FileReader();
 
-    reader.onload = function() {
+    reader.onload = function(dataURL) {
       var dataURL = reader.result;
       var json = JSON.parse(dataURL);
 
