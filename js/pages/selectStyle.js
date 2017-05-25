@@ -1,6 +1,6 @@
 function selectStyle() {
-  var content = "dada";
+  var content = "dada"
   
-  createContentPage("Set Explorer Styles", content );
-  setActiveMenuItem("setStyle");
+  createContentPage("Set Explorer Styles", content )
+  setActiveMenuItem("setStyle")
 }

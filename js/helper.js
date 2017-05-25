@@ -37,28 +37,30 @@ function createCyElements(jsonData) {
 		},
 	})
 
-	for (var i = 0; i < jsonData.children.length; i++) {
+	jsonData.children.forEach(child => {
 		eles.push({
 			group: "nodes",
 			data: {
-				id: jsonData.children[i].name,
-				data: jsonData.children[i]
+				id: child.name,
+				data: child
 			}
 		})
-	}
+	})
 
 	// Add edges when nodes loaded
-	for (var i = 0; i < jsonData.children.length; i++) {
-		for (var j = 0; j < jsonData.children[i].successors.length; j++) {
+	// Only add Successors 
+	jsonData.children.forEach(child => {
+		child.successors.forEach(succ => {
 			eles.push({
 				data: {
-					source: jsonData.children[i].name,
-					target: jsonData.children[i].successors[j]
+					source: child.name,
+					target: succ
 				},
 				group: "edges"
 			})
-		}
-	}
+		})
+	})
+
 	return eles
 }
 

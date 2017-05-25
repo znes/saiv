@@ -41,7 +41,7 @@ class sidebar{
 	        }
 	    })
 
-	    $(".form select").val(function( index, value ) {
+	    $(".form select").val(( index, value ) => {
 	        formData[this.name] = value
 	    })
 	    return formData
@@ -59,7 +59,7 @@ class sidebar{
 			form.append(createInput("name", "name", objData.id, "text"))
 			form.append(createInput("type", "type", objData.type, "hidden"))
 		}
-		$.each(objData.data, function(key, value) {
+		$.each( objData.data, (key, value) => {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>')
 				if(objData.type != "scenario")

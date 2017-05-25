@@ -125,17 +125,5 @@ class DataManager {
     		})
 
     	})
-    	/*for (var i = 0; i < this._json.children.length; i++) {
-			for (var j = 0; j < this._json.children[i].predecessors.length; j++) {
-				if(this._json.children[i].predecessors[j] == name) {
-					this._json.children[i].predecessors.splice(j,1)
-				}
-			}
-			for (var j = 0; j < this._json.children[i].successors.length; j++) {
-				if(this._json.children[i].successors[j] == name) {
-					this._json.children[i].successors.splice(j,1)
-				}
-			}
-		}*/
     }
 }
