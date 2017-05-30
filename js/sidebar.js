@@ -41,7 +41,7 @@ class sidebar{
 	        }
 	    })
 
-	    $(".form select").val(( index, value ) => {
+	    $(".form select").val(function( index, value ) {
 	        formData[this.name] = value
 	    })
 	    return formData
@@ -59,22 +59,24 @@ class sidebar{
 			form.append(createInput("name", "name", objData.id, "text"))
 			form.append(createInput("type", "type", objData.type, "hidden"))
 		}
-		$.each( objData.data, (key, value) => {
+
+		for (let [key, value] of Object.entries(objData.data)) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>')
 				if(objData.type != "scenario")
 					form.append('<a href="#" class="addTag">Add Tag</label><br/>')
-				$.each(objData.data[key], function(tag, tagValue) {
-					form.append('<a href="#" class="removeTag">Remove ' + tag + '</a><br/>')
-					form.append(createInput(tag, "tags_" + tag, tagValue, "text"))
-				})
+
+				for (let [tagKey, tagValue] of Object.entries(objData.data[key])) {
+					form.append('<a href="#" class="removeTag">Remove ' + tagKey + '</a><br/>')
+					form.append(createInput(tagKey, "tags_" + tagKey, tagValue, "text"))
+				}
 			} else if (key == "predecessors" || key == "successors") {
 				form.append(createSelect(key, value, nodes))
 				$('.js-example-basic-multiple', form).select2()
 			} else {
 				form.append(createInput(key, key, value, "text"))
 			}
-		})
+		}
 
 		form.append('<input type="submit" value="Save">')
 		form.submit(e => {

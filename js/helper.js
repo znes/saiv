@@ -80,17 +80,21 @@ function createInput(name, key, currentValue, type, required=false) {
 	return html
 }
 
-function createSelect(key, currentValue, options) {
+function createSelect(key, currentValues, options) {
 	var html = ""
 	html += '<label for="' + key + '">' + key + '</label>'
 	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">'
-	for (var i = 0; i < options.length; i++) {
-		if ($.inArray(options[i].data().id, currentValue) > -1) {
-			html += '<option selected value="' + options[i].data().id + '">' + options[i].data().id + '</option>'
+
+	options.forEach(opt => {
+		var optData = opt.data();
+
+        if( currentValues.indexOf(optData.id) !== -1) {
+			html += '<option selected value="' + optData.id + '">' + optData.id + '</option>'
 		} else {
-			html += '<option value="' + options[i].data().id + '">' + options[i].data().id + '</option>'
+			html += '<option>' + optData.id + '</option>'
 		}
-	}
+	})
+	
 	html += '</select>'
 	return html
 }

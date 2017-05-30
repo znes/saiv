@@ -17,19 +17,19 @@ $(function() {
     /**
      * init Menu Listener
      */
-    $('.changeJson').click(function(){
+    $('.changeJson').click(() => {
         selectJson()
     })
 
-    $('.home').click(function(){
+    $('.home').click(() => {
         home()
     })
 
-    $('.styleSettings').click(function(){
+    $('.styleSettings').click(() => {
         selectStyle()
     })
 
-    $('.jsonSettings').click(function(){
+    $('.jsonSettings').click(() => {
         jsonSettings()
     })
 
@@ -45,7 +45,7 @@ $(function() {
                 id: 'remove',
                 title: 'Remove',
                 selector: 'node',
-                onClickFunction: function (event) {
+                onClickFunction: (event) => {
                     var target = event.target || event.cyTarget
                     datam.deleteItem(target.data().data.name)
                     target.remove()
@@ -55,7 +55,7 @@ $(function() {
                 id: 'add-successors',
                 title: 'Connect successors',
                 selector: 'node',
-                onClickFunction: function (event) {
+                onClickFunction: (event) => {
                     var evtFromTarget = event.target || event.cyTarget
                     var pos = event.position || event.cyPosition
 
@@ -69,12 +69,12 @@ $(function() {
                         target: evtFromTarget.data().id}}])
 
 
-                    cy.on("mouseover", "node", {}, function(_event) {
+                    cy.on("mouseover", "node", {}, (_event) => {
                         var evtToTarget = _event.target || _event.cyTarget
                         cy.$('#testedge').move({target: evtToTarget.data().id})
                     })
 
-                    cy.on("click", "node", {}, function(_event) {
+                    cy.on("click", "node", {}, (_event) => {
                         var evtToTarget = _event.target || _event.cyTarget 
                         if(evtFromTarget == evtToTarget ) {
                             modal("Error", "Cant connect to same node")
@@ -99,7 +99,7 @@ $(function() {
                 id: 'add-node',
                 title: 'Add node',
                 coreAsWell: true,
-                onClickFunction: function (event) {
+                onClickFunction: (event) => {
                     var pos = event.position || event.cyPosition
                     sb.addNode($(".form"), pos, cy.elements("node"))
                 }
@@ -108,7 +108,7 @@ $(function() {
                 id: 'center-map',
                 title: 'Center Map',
                 coreAsWell: true,
-                onClickFunction: function (event) {
+                onClickFunction: (event) => {
                     cy.reset()
                     cy.center()
                 }
@@ -119,7 +119,7 @@ $(function() {
 
 
     // Init Event Reciver 
-    document.addEventListener("dataReceived", function(e) {
+    document.addEventListener("dataReceived", (e) => {
         hideContentPage()
         initListenerDataRevieved()
 
@@ -137,7 +137,7 @@ $(function() {
     })
 
 
-    document.addEventListener("addNode", function(e) {
+    document.addEventListener("addNode", (e) => {
         var data = e.detail
         var formdata = {
             name: data.name,
@@ -165,8 +165,16 @@ $(function() {
         sb.createForm($(".form"), cy.$("node#" + data.name), cy.elements("node"))
     })
 
+    document.addEventListener("addEdge", (e) => {
+        var data = e.detail
 
-    document.addEventListener("updateNode", function(e) {
+        cy.add([{ group: "edges", data: { source: data.from, target: data.to}}])
+
+        //sb.createForm($(".form"), cy.$("node#" + data.to), cy.elements("node"))
+    })
+
+
+    document.addEventListener("updateNode", (e) => {
         var data = e.detail
         
         if(data.type == "scenario") {
@@ -175,12 +183,12 @@ $(function() {
         else {
             datam.updateChildren(data)
 
-            var eles = createCyElements(datam.json)
+            /*var eles = createCyElements(datam.json)
             cy.$("*").remove()
             cy.add(eles)
             cy.makeLayout({
                 name: "dagre"
-            }).run()
+            }).run()*/
 
             sb.createForm($(".form"), cy.$("node#" + datam.json.name), cy.elements("node"))
         }
@@ -199,15 +207,15 @@ $(function() {
         sb.showData(evt.cyTarget.data())
         sb.createForm($(".form"), evt.cyTarget, cy.elements("node"))
 
-        $(".editForm .addTag").on("click", function(){
-            sb.addTag($(".form"), function(newTag) {
+        $(".editForm .addTag").on("click", () => {
+            sb.addTag($(".form"), (newTag) => {
                 datam.addTag(evt.cyTarget.data().data.name, newTag)
 
                 showNode(evt)
             })
         })
 
-        $('.editForm .removeTag').on("click", function(){
+        $('.editForm .removeTag').on("click", () => {
             var tag = $(this).text().substring(7, $(this).text().length)
             datam.removeTag(evt.cyTarget.data().data.name, tag)
             showNode(evt)
@@ -215,13 +223,13 @@ $(function() {
     }
 
     function initListenerDataRevieved() {
-        $(".navbar .shoWExplorer").click(function(){
+        $(".navbar .shoWExplorer").click(() => {
             setActiveMenuItem("Explorer")
             hideContentPage()
         }).click()
 
-        $(".navbar .downloadJson").click(function(){
-            var data = "text/jsoncharset=utf-8," + encodeURIComponent(JSON.stringify(datam.json))
+        $(".navbar .downloadJson").click(() => {
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json))
             $('.downloadJson').prop("href", "data:" + data)
             $('.downloadJson').prop("download", "data.json")
         }).parent("li").removeClass("disabled")

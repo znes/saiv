@@ -25,6 +25,7 @@ class DataManager {
 
 	addNode (child) {
 		this._json.children.push(child)
+		console.log(this._json.children)	
 	}
 
 	/**
@@ -69,18 +70,35 @@ class DataManager {
 
         delete updateData['currentid']
 
+   		console.log(updateData);
 
         // Add Successor and Predecessors to other
         updateData.successors.forEach(child => {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
-				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) this._json.children[index].predecessors.push(updateData.name)
+				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
+					this._json.children[index].predecessors.push(updateData.name)
+
+					let event = new CustomEvent("addEdge", {"detail": {
+						from: updateData.name,
+						to: this._json.children[index].id
+					}})
+					document.dispatchEvent(event)
+				}
 			}
         })
         updateData.predecessors.forEach(child => {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
-				if(this._json.children[index].successors.indexOf(updateData.name) === -1) this._json.children[index].successors.push(updateData.name)
+				if(this._json.children[index].successors.indexOf(updateData.name) === -1) {
+					this._json.children[index].successors.push(updateData.name)
+
+					let event = new CustomEvent("addEdge", {"detail": {
+						from: this._json.children[index].id,
+						to: updateData.name
+					}})
+					document.dispatchEvent(event)
+				}
 			}
         })
 
