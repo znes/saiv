@@ -24,25 +24,12 @@ function hideContentPage() {
 function createCyElements(jsonData) {
 	var eles = []
 
-	// Add Scenario Node
-	eles.push({
-		group: "nodes",
-		data: {
-			id: jsonData.name,
-			type: "scenario",
-			api_parameters: jsonData.api_parameters,
-			data: {
-				tags: jsonData.tags
-			}
-		},
-	})
-
 	jsonData.children.forEach(child => {
 		eles.push({
 			group: "nodes",
 			data: {
 				id: child.name,
-				data: child
+			//	data: child
 			}
 		})
 	})
@@ -63,6 +50,7 @@ function createCyElements(jsonData) {
 
 	return eles
 }
+
 
 function createInput(name, key, currentValue, type, required=false) {
 	var html = ""
@@ -86,12 +74,10 @@ function createSelect(key, currentValues, options) {
 	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">'
 
 	options.forEach(opt => {
-		var optData = opt.data();
-
-        if( currentValues.indexOf(optData.id) !== -1) {
-			html += '<option selected value="' + optData.id + '">' + optData.id + '</option>'
+        if( currentValues.indexOf(opt.name) !== -1) {
+			html += '<option selected value="' + opt.name + '">' + opt.name + '</option>'
 		} else {
-			html += '<option>' + optData.id + '</option>'
+			html += '<option>' + opt.name + '</option>'
 		}
 	})
 	

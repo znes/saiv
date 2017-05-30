@@ -47,26 +47,25 @@ class sidebar{
 	    return formData
 	}
 
-	createForm (element, object, nodes) {
+	createForm (element, data, nodes) {
 		element.html("")
 		var form = $('<form class="editForm"></form>')
 
 
-		var objData = object.data()
-		form.append(createInput("currentid", "currentid", objData.id, "hidden"))
+		form.append(createInput("currentid", "currentid", data.name, "hidden"))
 
-		if (objData.type == 'scenario') {
-			form.append(createInput("name", "name", objData.id, "text"))
-			form.append(createInput("type", "type", objData.type, "hidden"))
+		if (data.type == 'scenario') {
+			//form.append(createInput("name", "name", data.id, "text"))
+			form.append(createInput("type", "type", data.type, "hidden"))
 		}
 
-		for (let [key, value] of Object.entries(objData.data)) {
+		for (let [key, value] of Object.entries(data)) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>')
-				if(objData.type != "scenario")
+				if(data.type != "scenario")
 					form.append('<a href="#" class="addTag">Add Tag</label><br/>')
 
-				for (let [tagKey, tagValue] of Object.entries(objData.data[key])) {
+				for (let [tagKey, tagValue] of Object.entries(data[key])) {
 					form.append('<a href="#" class="removeTag">Remove ' + tagKey + '</a><br/>')
 					form.append(createInput(tagKey, "tags_" + tagKey, tagValue, "text"))
 				}

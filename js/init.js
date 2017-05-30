@@ -46,9 +46,8 @@ $(function() {
                 title: 'Remove',
                 selector: 'node',
                 onClickFunction: (event) => {
-                    var target = event.target || event.cyTarget
-                    datam.deleteItem(target.data().data.name)
-                    target.remove()
+                    datam.deleteItem(event.cyTarget.id())
+                    event.cyTarget.remove()
                 }
             },
             {
@@ -136,6 +135,60 @@ $(function() {
         sb.createForm($(".form"), cy.$("node#" + datam.json.name), [])
     })
 
+    document.addEventListener("renameNode", (e) => {
+        console.log("renameNode")
+        var ele = cy.$("node#" + e.detail.oldName),
+            eleData = ele.data().data;
+
+        let newEle = {
+            group: "nodes",
+            data: {
+                id: e.detail.newName,
+                data: {
+                    name: e.detail.newName,
+                    type: eleData.type,
+                    tags: eleData.tags,
+                    predecessors: eleData.predecessors,
+                    successors: eleData.successors                   
+                }
+            },
+            position: ele.position()
+        }
+        cy.add(newEle)
+        //console.log(newEle)
+        
+
+        var edgesToUpdate = cy.edges("[source='" + e.detail.oldName + "'], [target='" + e.detail.oldName + "']");
+        //replace Nodes
+       /* let edges = []
+        edgesToUpdate.forEach(edge => {
+            let target = edge.target().id(),
+                source = edge.source().id(),
+                ele = {
+                    group: "edges",
+                    data: {
+                        source: "",
+                        target: ""
+                    }
+                }
+
+            
+            if(target == e.detail.oldName) {
+                ele.data.source = source
+                ele.data.target = e.detail.newName
+            }
+            else {
+                ele.data.source = e.detail.newName
+                ele.data.target = target
+            }
+
+            edges.push(ele)
+        })*/
+        ele.remove();
+        edgesToUpdate.remove();
+        //cy.add(edges)
+    })
+
 
     document.addEventListener("addNode", (e) => {
         var data = e.detail
@@ -151,10 +204,9 @@ $(function() {
             formdata
         )
         cy.add({
+            group: "nodes",
             data: {
-                group: "nodes",
                 id: data.name,
-                data: formdata
             },
             position: {
                 x: parseInt(data.posx),
@@ -166,32 +218,19 @@ $(function() {
     })
 
     document.addEventListener("addEdge", (e) => {
-        var data = e.detail
-
-        cy.add([{ group: "edges", data: { source: data.from, target: data.to}}])
-
-        //sb.createForm($(".form"), cy.$("node#" + data.to), cy.elements("node"))
+        console.log("addEdge")
+        cy.add([{ group: "edges", data: { source: e.detail.from, target: e.detail.to}}])
     })
 
+    document.addEventListener("removeEdge", (e) => {
+        cy.edges("[source='" + e.detail.from + "'][target='" + e.detail.to + "']").remove();
+    })
 
     document.addEventListener("updateNode", (e) => {
         var data = e.detail
         
-        if(data.type == "scenario") {
-            datam.updateScenario(data)
-        }
-        else {
-            datam.updateChildren(data)
-
-            /*var eles = createCyElements(datam.json)
-            cy.$("*").remove()
-            cy.add(eles)
-            cy.makeLayout({
-                name: "dagre"
-            }).run()*/
-
-            sb.createForm($(".form"), cy.$("node#" + datam.json.name), cy.elements("node"))
-        }
+        datam.updateChildren(data)
+        sb.createForm($(".form"), datam.getElement(e.detail.name), datam.json.children)
     })
 
 
@@ -204,20 +243,24 @@ $(function() {
     }
 
     function showNode(evt) {
-        sb.showData(evt.cyTarget.data())
-        sb.createForm($(".form"), evt.cyTarget, cy.elements("node"))
+        var id = evt.cyTarget.id();
+        var data = datam.getElement(id);
+
+        console.log(data)
+        sb.showData(data)
+        sb.createForm($(".form"), data, datam.json.children)
 
         $(".editForm .addTag").on("click", () => {
             sb.addTag($(".form"), (newTag) => {
-                datam.addTag(evt.cyTarget.data().data.name, newTag)
+                datam.addTag(id, newTag)
 
                 showNode(evt)
             })
         })
 
-        $('.editForm .removeTag').on("click", () => {
+        $('.editForm .removeTag').on("click", function(){
             var tag = $(this).text().substring(7, $(this).text().length)
-            datam.removeTag(evt.cyTarget.data().data.name, tag)
+            datam.removeTag(id, tag)
             showNode(evt)
         })
     }

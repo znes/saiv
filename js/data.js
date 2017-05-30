@@ -1,11 +1,22 @@
 class DataManager {
 	constructor() {
 		this._json = null
+		// debug	
+	    window.json = () => {
+	    	return this._json.children
+	    }
     }
 
     set json  (paraJson)  { this._json = paraJson }
     get json  ()       { return this._json }
 
+
+    getElement(id) {
+    	let index = this._json.children.findIndex(x => x.name==id)
+		if (index !== -1) {
+			return this._json.children[index]
+		}
+    }
 
 	updateScenario (data) {	
 		this._json.name = data.name
@@ -24,8 +35,8 @@ class DataManager {
 	}
 
 	addNode (child) {
+		console.log(child)	
 		this._json.children.push(child)
-		console.log(this._json.children)	
 	}
 
 	/**
@@ -54,9 +65,13 @@ class DataManager {
 	}
 
 	deleteItem (name) {
-		this._json.children = $.grep(this._json.children, function (child) {
+		console.log("deleteItem") 
+		console.log(name)
+		this._json.children = this._json.children.filter(child => {
             return child.name != name
         });
+
+        //console.log(this._json.children)
 
 		this.deleteRelationNames(name)
 	}
@@ -65,7 +80,15 @@ class DataManager {
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 
         // if name(id) changes
-        if(updateData.currentid != updateData.name) this.updateRelationNames(updateData.name, updateData.currentid)
+        if(updateData.currentid != updateData.name) {
+        	this.updateRelationNames(updateData.name, updateData.currentid)
+
+        	let event = new CustomEvent("renameNode", {"detail": {
+				oldName: updateData.currentid,
+				newName: updateData.name
+			}})
+			document.dispatchEvent(event)
+        }
 
 
         delete updateData['currentid']
@@ -81,12 +104,13 @@ class DataManager {
 
 					let event = new CustomEvent("addEdge", {"detail": {
 						from: updateData.name,
-						to: this._json.children[index].id
+						to: this._json.children[index].name
 					}})
 					document.dispatchEvent(event)
 				}
 			}
         })
+
         updateData.predecessors.forEach(child => {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
@@ -94,7 +118,7 @@ class DataManager {
 					this._json.children[index].successors.push(updateData.name)
 
 					let event = new CustomEvent("addEdge", {"detail": {
-						from: this._json.children[index].id,
+						from: this._json.children[index].name,
 						to: updateData.name
 					}})
 					document.dispatchEvent(event)
@@ -103,17 +127,33 @@ class DataManager {
         })
 
         // Check if something has been removed
-        this._json.children.forEach(child => {
+        this._json.children.forEach((child, id, arr)=> {
         	let index = child.predecessors.indexOf(updateData.name)
         	if( index !== -1)
         	{
-        		if(updateData.successors.indexOf(child.name) === -1) delete child.predecessors[index]
+        		if(updateData.successors.indexOf(child.name) === -1) {
+        			delete arr[id].predecessors[index]
+
+        			let event = new CustomEvent("removeEdge", {"detail": {
+						from: updateData.name,
+						to: child.name
+					}})
+					document.dispatchEvent(event)
+        		}
         	}
 
         	index = child.successors.indexOf(updateData.name)
         	if( index !== -1)
         	{
-        		if(updateData.predecessors.indexOf(child.name) === -1) delete child.successors[index]
+        		if(updateData.predecessors.indexOf(child.name) === -1) {
+        			delete arr[id].successors[index]
+
+        			let event = new CustomEvent("removeEdge", {"detail": {
+						from: child.name,
+						to: updateData.name
+					}})
+					document.dispatchEvent(event)
+        		}
         	}
         })
         this._json.children.push(updateData)
@@ -136,10 +176,14 @@ class DataManager {
     deleteRelationNames (name) {
     	this._json.children.forEach(child => {
     		child.predecessors.forEach((pred, index) =>  {
-				child.predecessors.splice(index,1);
+    			if(pred == name) {
+					child.predecessors.splice(index,1);
+				}
     		})
     		child.successors.forEach((succ, index) =>  {
-				child.successors.splice(index,1);
+    			if(succ == name) {
+					child.successors.splice(index,1);
+				}
     		})
 
     	})
