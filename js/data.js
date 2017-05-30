@@ -24,19 +24,25 @@ class DataManager {
 	}
 
 	updateRelationNames (newName, oldName) {
-		this._json.children.forEach(child => {
-			child.predecessors.forEach(pred => {
-				if(pred == oldName) pred = newName
+		this._json.children.forEach((child,index) => {
+			child.predecessors.forEach((pred,j) => {
+				if(pred == oldName) this._json.children[index].predecessors[j] = newName
 			})
-			child.successors.forEach(succ => {
-				if(succ == oldName) succ = newName
+			child.successors.forEach((succ,j) => {
+				if(succ == oldName)  this._json.children[index].successors[j] = newName
 			})
 		})
 	}
 
-	addNode (child) {
-		console.log(child)	
-		this._json.children.push(child)
+	addNode (data) {
+		var formdata = {
+            name: data.name,
+            type: data.type,
+            tags: {},
+            predecessors: [],
+            successors: []
+        }
+		this._json.children.push(formdata)
 	}
 
 	/**
@@ -100,7 +106,14 @@ class DataManager {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
 				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
+					console.log("neue Edge")
+					console.log("old")
+					console.log(this._json.children[index].predecessors)
+					
 					this._json.children[index].predecessors.push(updateData.name)
+					console.log("new")
+					console.log(this._json.children[index].predecessors)
+
 
 					let event = new CustomEvent("addEdge", {"detail": {
 						from: updateData.name,

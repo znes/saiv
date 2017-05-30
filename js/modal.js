@@ -22,7 +22,6 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 	},100)
 }
 function hideModal() {
-	console.log("hide")
     $('.modal').hide()
     $('html').off('click')
 }

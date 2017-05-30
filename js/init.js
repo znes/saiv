@@ -111,6 +111,16 @@ $(function() {
                     cy.reset()
                     cy.center()
                 }
+            },
+            {
+                id: 'relayout-elements',
+                title: 'Reorder Elements',
+                coreAsWell: true,
+                onClickFunction: (event) => {
+                    cy.makeLayout({
+                        name: "dagre"
+                    }).run()
+                }
             }
             ]
           })
@@ -136,31 +146,22 @@ $(function() {
     })
 
     document.addEventListener("renameNode", (e) => {
-        console.log("renameNode")
         var ele = cy.$("node#" + e.detail.oldName),
             eleData = ele.data().data;
 
         let newEle = {
             group: "nodes",
             data: {
-                id: e.detail.newName,
-                data: {
-                    name: e.detail.newName,
-                    type: eleData.type,
-                    tags: eleData.tags,
-                    predecessors: eleData.predecessors,
-                    successors: eleData.successors                   
-                }
+                id: e.detail.newName
             },
             position: ele.position()
         }
         cy.add(newEle)
-        //console.log(newEle)
         
 
         var edgesToUpdate = cy.edges("[source='" + e.detail.oldName + "'], [target='" + e.detail.oldName + "']");
         //replace Nodes
-       /* let edges = []
+        let edges = []
         edgesToUpdate.forEach(edge => {
             let target = edge.target().id(),
                 source = edge.source().id(),
@@ -183,26 +184,20 @@ $(function() {
             }
 
             edges.push(ele)
-        })*/
+        })
         ele.remove();
         edgesToUpdate.remove();
-        //cy.add(edges)
+        cy.add(edges)
     })
 
 
     document.addEventListener("addNode", (e) => {
         var data = e.detail
-        var formdata = {
-            name: data.name,
-            type: data.type,
-            tags: {},
-            predecessors: [],
-            successors: []
-        }
 
         datam.addNode(
-            formdata
+            data
         )
+
         cy.add({
             group: "nodes",
             data: {
@@ -218,7 +213,6 @@ $(function() {
     })
 
     document.addEventListener("addEdge", (e) => {
-        console.log("addEdge")
         cy.add([{ group: "edges", data: { source: e.detail.from, target: e.detail.to}}])
     })
 
