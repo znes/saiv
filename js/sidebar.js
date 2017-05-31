@@ -48,6 +48,8 @@ class sidebar{
 	}
 
 	createForm (element, data, nodes) {
+		console.log("createForm")
+		console.log(data)
 		element.html("")
 		var form = $('<form class="editForm"></form>')
 
@@ -99,6 +101,7 @@ class sidebar{
 
 
 		form.submit(e => {
+			console.log("submit")
 			e.preventDefault()
 
 			var event = new CustomEvent("addNode", {"detail": this.readForm()})

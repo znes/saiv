@@ -37,7 +37,7 @@ $(function() {
     /**
      * Add cytoscape events
      */
-    cy.on("click", "node", {}, showNode)
+    cy.on("click", "node", {}, showNodeEvt)
     // Add Context Menu to Canvas
     cy.contextMenus({
         menuItems: [
@@ -46,7 +46,7 @@ $(function() {
                 title: 'Remove',
                 selector: 'node',
                 onClickFunction: (event) => {
-                    datam.deleteItem(event.cyTarget.id())
+                    datam.deleteNode(event.cyTarget.id())
                     event.cyTarget.remove()
                 }
             },
@@ -87,12 +87,21 @@ $(function() {
                             } else {
                                 modal("Error", "Already exists")
                             }
-                            showNode(_event)
+                            showId(_event.cyTarget.id())
                         }
                         cy.$('#testedge').remove()
                         unbindCy()
                     })
                 }            
+            },
+            {
+                id: 'remove',
+                title: 'Remove',
+                selector: 'edge',
+                onClickFunction: (event) => {
+                    datam.deleteEdge(event.cyTarget.source().id(), event.cyTarget.target().id()) 
+                    event.cyTarget.remove()
+                }
             },
             {
                 id: 'add-node',
@@ -141,8 +150,7 @@ $(function() {
             name: "dagre"
         }).run()
 
-        sb.showData(cy.$("node#" + datam.json.name).data())
-        sb.createForm($(".form"), cy.$("node#" + datam.json.name), [])
+        showId(datam.json.children[0].name)
     })
 
     document.addEventListener("renameNode", (e) => {
@@ -209,7 +217,7 @@ $(function() {
             }
         })
 
-        sb.createForm($(".form"), cy.$("node#" + data.name), cy.elements("node"))
+        showId(data.name)
     })
 
     document.addEventListener("addEdge", (e) => {
@@ -233,14 +241,15 @@ $(function() {
         cy.off('click')
 
         // Add default listener
-        cy.on("click", "node", {}, showNode)
+        cy.on("click", "node", {}, showNodeEvt)
     }
 
-    function showNode(evt) {
-        var id = evt.cyTarget.id();
+    function showNodeEvt(evt) {
+        showId(evt.cyTarget.id())
+    }
+    function showId(id) {        
         var data = datam.getElement(id);
 
-        console.log(data)
         sb.showData(data)
         sb.createForm($(".form"), data, datam.json.children)
 
@@ -248,14 +257,14 @@ $(function() {
             sb.addTag($(".form"), (newTag) => {
                 datam.addTag(id, newTag)
 
-                showNode(evt)
+                showId(id)
             })
         })
 
         $('.editForm .removeTag').on("click", function(){
             var tag = $(this).text().substring(7, $(this).text().length)
             datam.removeTag(id, tag)
-            showNode(evt)
+            showId(id)
         })
     }
 

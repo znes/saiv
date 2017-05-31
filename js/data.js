@@ -48,9 +48,6 @@ class DataManager {
 	/**
 	 * [addEdge description]
 	 * Adds predecessors and successors
-	 * Return boolean of success 
-	 * @param {[type]} predecessors [description]
-	 * @param {[type]} successors   [description]
 	 */
 	addEdge (predecessors, successors) {
 		// Add Successor
@@ -70,14 +67,26 @@ class DataManager {
 		return true
 	}
 
-	deleteItem (name) {
-		console.log("deleteItem") 
-		console.log(name)
+	deleteEdge(src, target) {
+		console.log("deleteEdge")
+		console.log(src, target)
+		var srcI = this._json.children.findIndex(x => x.name==src),
+			targetI = this._json.children.findIndex(x => x.name==target);
+
+		if (srcI !== -1 && targetI !== -1) {
+			this._json.children[srcI].successors = this._json.children[srcI].successors.filter(succ =>{
+				return succ != target
+			})
+			this._json.children[targetI].predecessors = this._json.children[targetI].predecessors.filter(pred =>{
+				return pred != src
+			})
+		}
+	}
+
+	deleteNode (name) {
 		this._json.children = this._json.children.filter(child => {
             return child.name != name
         });
-
-        //console.log(this._json.children)
 
 		this.deleteRelationNames(name)
 	}
