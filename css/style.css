@@ -57,14 +57,14 @@ body {
   opacity: 0;
   pointer-events: none;
 }
-.sidebar .form {
+.sidebar .body {
   margin-top: 20px;
 }
-.sidebar .form .select2-container{
+.sidebar .body .select2-container {
   display: block;
 }
-.sidebar .form input,
-.sidebar .form select {
+.sidebar .body input,
+.sidebar .body select {
   display: block;
   color:#000;
 }

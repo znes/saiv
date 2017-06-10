@@ -3,7 +3,7 @@
  */
 $(function() {
     var datam = new DataManager()
-    var sb = new sidebar()
+    var sb = new sidebar(config.dom.sidebar)
     var cy = new createCy()
 
     //debug
@@ -17,19 +17,19 @@ $(function() {
     /**
      * init Menu Listener
      */
-    $('.changeJson').click(() => {
+    $(config.dom.links.json).click(() => {
         selectJson()
     })
 
-    $('.home').click(() => {
+    $(config.dom.links.home).click(() => {
         home()
     })
 
-    $('.styleSettings').click(() => {
+    $(config.dom.links.style).click(() => {
         selectStyle()
     })
 
-    $('.jsonSettings').click(() => {
+    $(config.dom.links.jsonSettings).click(() => {
         jsonSettings()
     })
 
@@ -64,13 +64,13 @@ $(function() {
                     }
 
                     cy.add([{ group: "edges", data: {
-                        id: "testedge", source: evtFromTarget.data().id, 
+                        id: "shadowEdge", source: evtFromTarget.data().id, 
                         target: evtFromTarget.data().id}}])
 
 
                     cy.on("mouseover", "node", {}, (_event) => {
                         var evtToTarget = _event.target || _event.cyTarget
-                        cy.$('#testedge').move({target: evtToTarget.data().id})
+                        cy.$('#shadowEdge').move({target: evtToTarget.data().id})
                     })
 
                     cy.on("click", "node", {}, (_event) => {
@@ -89,7 +89,7 @@ $(function() {
                             }
                             showId(_event.cyTarget.id())
                         }
-                        cy.$('#testedge').remove()
+                        cy.$('#shadowEdge').remove()
                         unbindCy()
                     })
                 }            
@@ -109,7 +109,7 @@ $(function() {
                 coreAsWell: true,
                 onClickFunction: (event) => {
                     var pos = event.position || event.cyPosition
-                    sb.addNode($(".form"), pos, cy.elements("node"))
+                    sb.addNode(pos, cy.elements("node"))
                 }
             },
             {
@@ -123,11 +123,11 @@ $(function() {
             },
             {
                 id: 'relayout-elements',
-                title: 'Reorder Elements',
+                title: 'Relayout Elements',
                 coreAsWell: true,
                 onClickFunction: (event) => {
                     cy.makeLayout({
-                        name: "dagre"
+                        name: localStorage.getItem("style") || config.cytoscape.styles[0]
                     }).run()
                 }
             }
@@ -138,19 +138,20 @@ $(function() {
 
     // Init Event Reciver 
     document.addEventListener("dataReceived", (e) => {
-        hideContentPage()
         initListenerDataRevieved()
 
         datam.json = e.detail
+
 
         var eles = createCyElements(datam.json)
         cy.$("*").remove()
         cy.add(eles)
         cy.makeLayout({
-            name: "dagre"
+            name: localStorage.getItem("style") || config.cytoscape.styles[0]
         }).run()
 
         showId(datam.json.children[0].name)
+        hideContentPage();
     })
 
     document.addEventListener("renameNode", (e) => {
@@ -232,7 +233,20 @@ $(function() {
         var data = e.detail
         
         datam.updateChildren(data)
-        sb.createForm($(".form"), datam.getElement(e.detail.name), datam.json.children)
+        sb.createForm(datam.getElement(e.detail.name), datam.json.children)
+    })
+
+
+    document.addEventListener("setStyle", (e) => {
+        var data = e.detail
+        
+        if(datam.json != null) {
+            cy.makeLayout({
+                name: localStorage.getItem("style") || config.cytoscape.styles[0]
+            }).run()
+
+            hideContentPage();
+        }
     })
 
 
@@ -251,10 +265,10 @@ $(function() {
         var data = datam.getElement(id);
 
         sb.showData(data)
-        sb.createForm($(".form"), data, datam.json.children)
+        sb.createForm(data, datam.json.children)
 
         $(".editForm .addTag").on("click", () => {
-            sb.addTag($(".form"), (newTag) => {
+            sb.addTag((newTag) => {
                 datam.addTag(id, newTag)
 
                 showId(id)

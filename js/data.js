@@ -68,8 +68,6 @@ class DataManager {
 	}
 
 	deleteEdge(src, target) {
-		console.log("deleteEdge")
-		console.log(src, target)
 		var srcI = this._json.children.findIndex(x => x.name==src),
 			targetI = this._json.children.findIndex(x => x.name==target);
 
@@ -92,6 +90,9 @@ class DataManager {
 	}
 
 	updateChildren (updateData) {
+		console.log("updateChildren")
+		console.log("updateData")
+		console.log(updateData)
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 
         // if name(id) changes
@@ -108,21 +109,12 @@ class DataManager {
 
         delete updateData['currentid']
 
-   		console.log(updateData);
-
         // Add Successor and Predecessors to other
         updateData.successors.forEach(child => {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
 				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
-					console.log("neue Edge")
-					console.log("old")
-					console.log(this._json.children[index].predecessors)
-					
 					this._json.children[index].predecessors.push(updateData.name)
-					console.log("new")
-					console.log(this._json.children[index].predecessors)
-
 
 					let event = new CustomEvent("addEdge", {"detail": {
 						from: updateData.name,

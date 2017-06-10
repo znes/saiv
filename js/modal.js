@@ -1,8 +1,8 @@
 function modal(head = "", content = "", abortFunction = function(){} ) {
 	// Get the modal
-	var modal = $('.modal')
-	$('.modal-content .modal-header h2').html(head)
-	$('.modal-content .modal-body').html(content)
+	var modal = $(config.dom.modal.container);
+	$(config.dom.modal.heading).text(head)
+	$(config.dom.modal.body).html(content)
 
 	// Get the <span> element that closes the modal
 	modal.show()
@@ -22,6 +22,6 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 	},100)
 }
 function hideModal() {
-    $('.modal').hide()
+    $(config.dom.modal.container).hide()
     $('html').off('click')
 }

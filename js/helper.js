@@ -4,21 +4,21 @@ function setActiveMenuItem(href) {
 }
 
 function createContentPage(heading, content) {
-	$(".sidebar").hide()
-	$(".containerContent .page-header h1").text(heading)
-	$(".containerContent .page-content").html(content)
+	$(config.dom.sidebar).hide()
+	$(config.dom.content.heading).text(heading)
+	$(config.dom.content.body).html(content)
 	showContentPage()
 }
 
 function showContentPage() {
-	$(".containerContent").show()
-	$(".containerCanvas").css("visibility", "hidden")
+	$(config.dom.content.container).show()
+	$(config.dom.canvasContainer).css("visibility", "hidden")
 }
 
 function hideContentPage() {
-	$(".sidebar").show()
-	$(".containerContent").hide()
-	$(".containerCanvas").css("visibility", "visible")
+	$(config.dom.sidebar).show()
+	$(config.dom.content.container).hide()
+	$(config.dom.canvasContainer).css("visibility", "visible")
 }
 
 function createCyElements(jsonData) {
@@ -67,20 +67,46 @@ function createInput(name, key, currentValue, type, required=false) {
 
 	return html
 }
-
-function createSelect(key, currentValues, options) {
+function createSelect(key, currentValues, options, additionalTags = "multiple=\"multiple\"") {
 	var html = ""
 	html += '<label for="' + key + '">' + key + '</label>'
-	html += '<select class="js-example-basic-multiple ' + key + '" multiple="multiple" name="' + key + '">'
+	html += '<select class="js-example-basic-multiple ' + key + '" ' + additionalTags + ' name="' + key + '">'
 
 	options.forEach(opt => {
-        if( currentValues.indexOf(opt.name) !== -1) {
-			html += '<option selected value="' + opt.name + '">' + opt.name + '</option>'
-		} else {
-			html += '<option>' + opt.name + '</option>'
-		}
+		var name =  opt.name ? opt.name : opt;
+
+        if( currentValues.indexOf(name) !== -1) {
+			html += '<option selected value="' + name + '">' + name + '</option>'
+			} else {
+				html += '<option>' + name + '</option>'
+			}	
 	})
 	
 	html += '</select>'
 	return html
+}
+
+function readForm (form) {
+    var formData = {}
+    $(form).serializeArray().forEach(field => {
+    	if (field.name.substring(0, 5) == "tags_") {
+            if (typeof(formData.tags) === "undefined") formData.tags = {}
+
+            formData.tags[field.name.substring(5, field.name.length)] = field.value
+        }
+        else if (field.name == "predecessors" || field.name == "successors") {
+        	formData[field.name] = $( form + " [name=\"" + field.name + "\"]").val();
+        }
+        else {
+            formData[field.name] = field.value
+        }
+    })
+
+
+    $(form + " select").val(function( index, value ) {
+    	if(this.name != "")
+        	formData[this.name] = value
+    })
+
+    return formData
 }

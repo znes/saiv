@@ -7,14 +7,22 @@ class sidebar{
 	    })
 	    
 	})()*/
+	constructor(selector) {
+		this.container = $(selector)
+		this.head = $('<div class="head"></div>')
+		this.body = $('<div class="body"></div>')
+		this.container.append(this.head);
+		this.container.append(this.body);
+	}
+
 
 	showData (data) {
 		this.open()
-		$(".head").html(JSON.stringify(data))
+		this.head.html(JSON.stringify(data))
 	}
 
-	addTag (element, ready) {
-		element.html("")
+	addTag (ready) {
+		this.body.html("")
 		var form = $('<form class="editForm"></form>')
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
@@ -22,35 +30,14 @@ class sidebar{
 
 		form.submit((e) => {
 			e.preventDefault()
-			ready(this.readForm().tag)
+			ready(readForm(".editForm").tag)
 		})
 
-		element.append(form)
+		this.body.append(form)
 	}
 
-	readForm () {
-	    var formData = {}
-	    $(".form input").serializeArray().forEach(field => {
-	    	if (field.name.substring(0, 5) == "tags_") {
-	            if (typeof(formData.tags) === "undefined") formData.tags = {}
-
-	            formData.tags[field.name.substring(5, field.name.length)] = field.value
-	        } 
-	        else {
-	            formData[field.name] = field.value
-	        }
-	    })
-
-	    $(".form select").val(function( index, value ) {
-	        formData[this.name] = value
-	    })
-	    return formData
-	}
-
-	createForm (element, data, nodes) {
-		console.log("createForm")
-		console.log(data)
-		element.html("")
+	createForm (data, nodes) {
+		this.body.html("")
 		var form = $('<form class="editForm"></form>')
 
 
@@ -83,14 +70,14 @@ class sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var event = new CustomEvent("updateNode", {"detail": this.readForm()})
+			var event = new CustomEvent("updateNode", {"detail": readForm(".editForm")})
 			document.dispatchEvent(event)
 		})
-		element.append(form)
+		this.body.append(form)
 	}
 
-	addNode (element, pos, nodes) {
-		element.html("")
+	addNode (pos, nodes) {
+		this.body.html("")
 		var form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
 		form.append(createInput("type", "type", "", "text", true))
@@ -101,16 +88,15 @@ class sidebar{
 
 
 		form.submit(e => {
-			console.log("submit")
 			e.preventDefault()
 
-			var event = new CustomEvent("addNode", {"detail": this.readForm()})
+			var event = new CustomEvent("addNode", {"detail": readForm(".editForm")})
 			document.dispatchEvent(event)
 		})
-		element.append(form)
+		this.body.append(form)
 	}
 
 	open () {
-		$("body").toggleClass("sidebar-closed", false)
+		$("body").removeClass("sidebar-closed")
 	}
 }

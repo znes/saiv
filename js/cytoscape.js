@@ -1,9 +1,9 @@
 function createCy() {
 	var cy
+
 	cy = cytoscape({
-        container: $(".containerCanvas"),
+        container: $(config.dom.canvasContainer),
         layout: {
-            name: "dagre",
             fit: true
         },
         style: [{
@@ -25,10 +25,10 @@ function createCy() {
                 "curve-style": "bezier"
             }
         }, {
-            selector: "#testedge",
+            selector: "#shadowEdge",
             style: {
-                "line-color": "rgba(0, 0, 0, 0.75)",
-                "target-arrow-color": "rgba(0, 0, 0, 0.75)",
+                "line-color": "rgba(0, 0, 0, 0.50)",
+                "target-arrow-color": "rgba(0, 0, 0, 0.50)",
             }
         }, {
             selector: ":selected",
