@@ -3,7 +3,12 @@ var config = {
 		styles: [
 			"dagre",
 			"circle",
-			"cose-bilkent"
+			"cose-bilkent",
+			"preset",
+			"grid",
+			"concentric",
+			"breadthfirst",
+			"cose"
 		]
 	},
 	dom: {
