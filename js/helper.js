@@ -12,14 +12,26 @@ function createContentPage(heading, content) {
 
 function showContentPage() {
 	$(config.dom.content.container).show()
+	$("#"+config.dom.mapContainerId).css("visibility", "hidden")
 	$(config.dom.canvasContainer).css("visibility", "hidden")
+	$(config.dom.sidebar).hide()
 }
 
-function hideContentPage() {
+function showGraph() {
 	$(config.dom.sidebar).show()
 	$(config.dom.content.container).hide()
+	$("#"+config.dom.mapContainerId).css("visibility", "hidden")
 	$(config.dom.canvasContainer).css("visibility", "visible")
 }
+
+function showMap() {
+	$(config.dom.content.container).hide()
+	$(config.dom.canvasContainer).css("visibility", "hidden")
+	$(config.dom.sidebar).show()
+	$("#"+config.dom.mapContainerId).css("visibility", "visible")
+	L.map(config.dom.mapContainerId).setView([51.505, -0.09], 13)
+}
+
 
 function createCyElements(jsonData) {
 	var eles = []

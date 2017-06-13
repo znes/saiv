@@ -3,8 +3,9 @@
  */
 $(function() {
     var datam = new DataManager()
-    var sb = new sidebar(config.dom.sidebar)
+    var sb = new Sidebar(config.dom.sidebar)
     var cy = new createCy()
+    var map = new LeafleatMap(config.dom.mapContainerId)
 
     //debug
     window.cy = cy
@@ -19,6 +20,10 @@ $(function() {
      */
     $(config.dom.links.json).click(() => {
         selectJson()
+    })
+
+    $(config.dom.links.map).click(() => {
+        showMap()
     })
 
     $(config.dom.links.home).click(() => {
@@ -151,7 +156,7 @@ $(function() {
         }).run()
 
         showId(datam.json.children[0].name)
-        hideContentPage();
+        showGraph();
     })
 
     document.addEventListener("renameNode", (e) => {
@@ -245,7 +250,7 @@ $(function() {
                 name: localStorage.getItem("style") || config.cytoscape.styles[0]
             }).run()
 
-            hideContentPage();
+            showGraph();
         }
     })
 
@@ -283,15 +288,20 @@ $(function() {
     }
 
     function initListenerDataRevieved() {
-        $(".navbar .shoWExplorer").click(() => {
+        $(config.dom.links.graph).click(() => {
             setActiveMenuItem("Explorer")
-            hideContentPage()
+            showGraph()
         }).click()
 
-        $(".navbar .downloadJson").click(() => {
+        $(config.dom.links.map).click(() => {
+            setActiveMenuItem("Map")
+            showMap()
+        }).parent("li").removeClass("disabled")
+
+        $(config.dom.links.download).click(() => {
             var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json))
-            $('.downloadJson').prop("href", "data:" + data)
-            $('.downloadJson').prop("download", "data.json")
+            $(config.dom.links.download).prop("href", "data:" + data)
+            $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")
     }
 })

@@ -1,4 +1,4 @@
-class sidebar{
+class Sidebar{
 	/*(function init (){
 
 		$(".sidebar-toggle").on("click", function() {

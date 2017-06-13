@@ -13,6 +13,7 @@ var config = {
 	},
 	dom: {
 		canvasContainer: ".containerCanvas",
+		mapContainerId: "map",
 		content: {
 			container: ".containerContent",
 			heading: ".containerContent .page-header h1",
@@ -23,7 +24,10 @@ var config = {
 			json: ".changeJson",
 			home: ".home",
 			style: ".styleSettings",
-			jsonSetting: ".jsonSettings"
+			graph: ".navbar .shoWExplorer",
+			jsonSetting: ".jsonSettings",
+			map: ".showMap",
+			download: ".navbar .downloadJson"
 		},
 		modal: {
 			container: ".modal",

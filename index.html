@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Saiv</title>
 	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/leaflet.css">
 	<link rel="stylesheet" href="css/fontawesome.css">
 	<link rel="stylesheet" href="css/select2.min.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -26,7 +27,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="disabled"><a href="#Explorer" class="shoWExplorer">Explorer</a></li>
+            <li class="disabled"><a href="#Explorer" class="shoWExplorer">Graph Explorer</a></li>
+            <li class="disabled"><a href="#Map" class="showMap">Map</a></li>
             <li class="active"><a href="#UploadJson" class="changeJson">Select Json</a></li>
             <li class="disabled"><a href="#DownloadJson" class="downloadJson">Download current Json</a></li>
             <li class="dropdown">
@@ -44,12 +46,12 @@
 
 	<!--span class="fa fa-bars sidebar-toggle"></span-->
 	<div class="sidebar">
-		<!--<div class="head"></div>
-		<div class="body"></div>-->
 	</div>
 
 	<div class="containerCanvas">
-		
+	</div>
+	
+	<div id="map">
 	</div>
 
 	<div class="container containerContent">
@@ -80,6 +82,7 @@
 	<script src="js/lib/cytoscape-cose-bilkent.js"></script>
 	<script src="js/lib/cytoscape-context-menus.js"></script>
 	<script src="js/lib/bootstrap.min.js"></script>
+	<script src="js/lib/leaflet.js"></script>
 
 
 	<!-- Custom Files -->
@@ -93,5 +96,6 @@
 	<script src="js/pages/selectStyle.js"></script>
 	<script src="js/pages/jsonSettings.js"></script>
 	<script src="js/pages/home.js"></script>
+	<script src="js/map.js"></script>
 	<script src="js/init.js"></script>
 </html>

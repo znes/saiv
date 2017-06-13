@@ -25,7 +25,11 @@
         "installed_power": "251"
       },
       "predecessors": [],
-      "successors": ["hub1"]
+      "successors": ["hub1"],
+      "pos": {
+        "long":51.5,
+        "lat":-0.09
+      }
     },
     {
       "name": "solar",

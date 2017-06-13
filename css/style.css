@@ -13,14 +13,14 @@ body {
 .navbar-static-top {
   margin-bottom: 50px;
 }
-.containerCanvas {
+.containerCanvas, #map{
 	position: absolute;
 	left: 0;
 	top: 50px;
 	bottom: 0;
 	right: 20em;
 }
-.sidebar-closed .containerCanvas {
+.sidebar-closed .containerCanvas, .sidebar-closed #map {
   right: 0;
 }
 .sidebar {
