@@ -13,6 +13,8 @@ class Sidebar{
 		this.body = $('<div class="body"></div>')
 		this.container.append(this.head);
 		this.container.append(this.body);
+
+
 	}
 
 
@@ -43,10 +45,10 @@ class Sidebar{
 
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
 
-		if (data.type == 'scenario') {
+		/*if (data.type == 'scenario') {
 			//form.append(createInput("name", "name", data.id, "text"))
 			form.append(createInput("type", "type", data.type, "hidden"))
-		}
+		}*/
 
 		for (let [key, value] of Object.entries(data)) {
 			if (key == "tags") {
@@ -65,6 +67,28 @@ class Sidebar{
 				form.append(createInput(key, key, value, "text"))
 			}
 		}
+
+
+		form.find(".addTag").on("click", () => {
+            this.addTag((newTag) => {
+                //datam.addTag(data.name, newTag)
+
+                sendEvent("data", {
+                	task: "addTag",
+                	data: {
+                		id: data.name,
+                		tag: newTag
+                	}
+                })
+            })
+        })
+
+
+        form.find('.removeTag').on("click", function(){
+            var tag = $(this).text().substring(7, $(this).text().length)
+            datam.removeTag(data.name, tag)
+        })
+
 
 		form.append('<input type="submit" value="Save">')
 		form.submit(e => {
@@ -90,8 +114,10 @@ class Sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var event = new CustomEvent("addNode", {"detail": readForm(".editForm")})
-			document.dispatchEvent(event)
+			sendEvent("data", {
+				task: "addNode",
+				data: readForm(".editForm")
+			})
 		})
 		this.body.append(form)
 	}

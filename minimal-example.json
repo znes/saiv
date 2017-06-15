@@ -39,7 +39,11 @@
         "installed_power": "251"
       },
       "predecessors": [],
-      "successors": ["hub2"]
+      "successors": ["hub2"],
+      "pos": {
+        "long":51.5062793,
+        "lat":-0.13158
+      }
     },
     {
       "name": "demand",
@@ -48,7 +52,11 @@
         "amount": "100000"
       },
       "predecessors": ["hub2"],
-      "successors": []
+      "successors": [],
+      "pos": {
+        "long":51.4062793,
+        "lat":-0.12158
+      }
     },
     {
       "name": "line",
@@ -58,7 +66,11 @@
         "efficiency": "0.9"
       },
       "predecessors": ["hub1"],
-      "successors": ["hub2"]
+      "successors": ["hub2"],
+      "pos": {
+        "long":51.5262793,
+        "lat":-0.14158
+      }
     },
     {
       "name": "hub1",
@@ -67,7 +79,11 @@
         "sector": "electricity"
       },
       "predecessors": ["wind"],
-      "successors": ["line"]
+      "successors": ["line"],
+      "pos": {
+        "long":51.4862793,
+        "lat":-0.13858
+      }
     },
     {
       "name": "hub2",
@@ -76,7 +92,11 @@
         "sector": "electricity"
       },
       "predecessors": ["line", "solar"],
-      "successors": ["demand"]
+      "successors": ["demand"],
+      "pos": {
+        "long":51.4762793,
+        "lat":-0.12058
+      }
     }
   ],
   "tags": {

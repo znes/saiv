@@ -29,7 +29,6 @@ function showMap() {
 	$(config.dom.canvasContainer).css("visibility", "hidden")
 	$(config.dom.sidebar).show()
 	$("#"+config.dom.mapContainerId).css("visibility", "visible")
-	L.map(config.dom.mapContainerId).setView([51.505, -0.09], 13)
 }
 
 
@@ -121,4 +120,9 @@ function readForm (form) {
     })
 
     return formData
+}
+
+function sendEvent (name, data) {
+	let event = new CustomEvent(name, {"detail": data})
+	document.dispatchEvent(event)
 }

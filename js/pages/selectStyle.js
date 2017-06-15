@@ -13,8 +13,9 @@ function selectStyle() {
 
 		localStorage.setItem("style", data.style)
 
-		var event = new CustomEvent("setStyle", {"detail": data})
-		document.dispatchEvent(event)
+		sendEvent("explorer", {
+			task: "updateStyle"
+		})
 	})
 
 	createContentPage("Set Explorer Styles", form )

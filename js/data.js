@@ -5,6 +5,10 @@ class DataManager {
 	    window.json = () => {
 	    	return this._json.children
 	    }
+
+	    document.addEventListener("data", (e) => {
+	        this.updateData(e.detail);
+	    })
     }
 
     set json  (paraJson)  { this._json = paraJson }
@@ -21,6 +25,32 @@ class DataManager {
 	updateScenario (data) {	
 		this._json.name = data.name
 		this._json.tags.description = data.tags.description
+	}
+
+
+	updateData (detail) {
+		switch(detail.task) {
+			case "addNode":
+				this.addNode(detail.data)
+			case "addEdge":
+				this.addEdge(detail.data.from, detail.data.to)
+				break
+			case "deleteNode":
+				this.deleteNode(detail.data)
+				break
+			case "deleteEdge":
+				this.deleteEdge(detail.data.from, detail.data.to)
+				break
+			case "addTag":
+				this.addTag(detail.data.id, detail.data.tag)
+				break
+			case "removeTag":
+				this.removeTag(detail.data.id, detail.data.tag)
+				break
+			case "updateNode":
+				this.updateNode(detail.data)
+				break
+		}
 	}
 
 	updateRelationNames (newName, oldName) {
@@ -43,6 +73,17 @@ class DataManager {
             successors: []
         }
 		this._json.children.push(formdata)
+
+		sendEvent("explorer", {
+			task: "addNode",
+			data: {
+				name: data.name,
+				additional: {
+					x: data.posx,
+					y: data.posy
+				}
+			}
+		})
 	}
 
 	/**
@@ -56,7 +97,8 @@ class DataManager {
 			if(this._json.children[index].successors.indexOf(successors) === -1) {
 				this._json.children[index].successors.push(successors)
 			} else {
-				return false
+				modal("Error", "Already exists")
+				return false;
 			}
 		}
 		// Add Predecessor
@@ -64,7 +106,15 @@ class DataManager {
 		if (index !== -1) {
 			this._json.children[index].predecessors.indexOf(predecessors) === -1 ? this._json.children[index].predecessors.push(predecessors) : console.log("This item already exists");
 		}
-		return true
+
+		
+		sendEvent("explorer", {
+			task: "addEdge",
+			data: {
+				from: predecessors,
+				to: successors
+			}
+		})
 	}
 
 	deleteEdge(src, target) {
@@ -79,6 +129,14 @@ class DataManager {
 				return pred != src
 			})
 		}
+
+		sendEvent("explorer", {
+			task: "deleteEdge",
+			data: {
+				from: src,
+				to: target
+			}
+		})
 	}
 
 	deleteNode (name) {
@@ -87,23 +145,27 @@ class DataManager {
         });
 
 		this.deleteRelationNames(name)
+
+		sendEvent("explorer", {
+			task: "deleteNode",
+			data: name
+		})
 	}
 
-	updateChildren (updateData) {
-		console.log("updateChildren")
-		console.log("updateData")
-		console.log(updateData)
+	updateNode (updateData) {
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 
         // if name(id) changes
         if(updateData.currentid != updateData.name) {
         	this.updateRelationNames(updateData.name, updateData.currentid)
 
-        	let event = new CustomEvent("renameNode", {"detail": {
-				oldName: updateData.currentid,
-				newName: updateData.name
-			}})
-			document.dispatchEvent(event)
+        	sendEvent("explorer", {
+        		task: "renameNode",
+        		data: {
+					oldName: updateData.currentid,
+					newName: updateData.name
+				}
+			})
         }
 
 
@@ -116,11 +178,17 @@ class DataManager {
 				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
 					this._json.children[index].predecessors.push(updateData.name)
 
-					let event = new CustomEvent("addEdge", {"detail": {
+					sendEvent("explorer", {
+						task: "addEdge",
+		        		data: {
+							from: updateData.name,
+							to: this._json.children[index].name
+						}
+					})
+					/*sendEvent("addEdge", {
 						from: updateData.name,
 						to: this._json.children[index].name
-					}})
-					document.dispatchEvent(event)
+					})*/
 				}
 			}
         })
@@ -131,11 +199,14 @@ class DataManager {
 				if(this._json.children[index].successors.indexOf(updateData.name) === -1) {
 					this._json.children[index].successors.push(updateData.name)
 
-					let event = new CustomEvent("addEdge", {"detail": {
-						from: this._json.children[index].name,
-						to: updateData.name
-					}})
-					document.dispatchEvent(event)
+
+					sendEvent("explorer", {
+						task: "addEdge",
+		        		data: {
+							from: this._json.children[index].name,
+							to: updateData.name
+						}
+					})
 				}
 			}
         })
@@ -148,11 +219,13 @@ class DataManager {
         		if(updateData.successors.indexOf(child.name) === -1) {
         			delete arr[id].predecessors[index]
 
-        			let event = new CustomEvent("removeEdge", {"detail": {
-						from: updateData.name,
-						to: child.name
-					}})
-					document.dispatchEvent(event)
+        			sendEvent("explorer", {
+        				task: "removeEdge",
+						data : { 
+							from: updateData.name,
+							to: child.name
+						}
+        			})
         		}
         	}
 
@@ -161,12 +234,6 @@ class DataManager {
         	{
         		if(updateData.predecessors.indexOf(child.name) === -1) {
         			delete arr[id].successors[index]
-
-        			let event = new CustomEvent("removeEdge", {"detail": {
-						from: child.name,
-						to: updateData.name
-					}})
-					document.dispatchEvent(event)
         		}
         	}
         })
