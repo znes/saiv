@@ -7,16 +7,13 @@ $(function() {
     var cy = new CyptoScape(config.dom.canvasContainer)
     var map = new LeafleatMap(config.dom.mapContainerId)
 
-    //debug
-    window.cy = cy
 
-
-    // Opens Page Select Json
+    // Opens Page "Select Json"
     selectJson()
 
 
     /**
-     * init Menu Listener
+     * init menu listener
      */
     $(config.dom.links.json).click(() => {
         selectJson()
@@ -38,33 +35,7 @@ $(function() {
         jsonSettings()
     })
 
-    document.addEventListener("explorer", (e)=> {
-        switch(e.detail.task) {
-            case "updateStyle": 
-                if(datam.json != null) {
-                    cy.updateLayout()
-
-                    showGraph()
-                }
-                break;
-            case "renameNode":
-                cy.renameNode(e.detail.data.oldName, e.detail.data.newName)
-                //sb.showId(e.detail.data)
-                break
-            case "addNode":
-                cy.addNode(e.detail.data.name, e.detail.data.additional)
-                //sb.addNode(e.detail.data.pos, e.detail.data.eles)
-                break
-            case "deleteNode":
-                cy.deleteNode(e.detail.data)
-                break
-            case "addEdge":
-                cy.addEdge(e.detail.data.from, e.detail.data.to)
-                break;
-            case "deleteEdge":
-                cy.deleteEdge(e.detail.data.from, e.detail.data.to)
-        }
-    })
+    
 
 
     document.addEventListener("sidebar", (e) => {
@@ -83,7 +54,11 @@ $(function() {
         initListenerDataRevieved()
         datam.json = e.detail
 
-        cy.initElements(createCyElements(datam.json))       
+        sendEvent("explorer", {
+            task: "initElements",
+            data: datam.json
+        })
+
         showId(datam.json.children[0].name)
         showGraph();
     })

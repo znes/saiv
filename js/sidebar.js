@@ -86,6 +86,14 @@ class Sidebar{
 
         form.find('.removeTag').on("click", function(){
             var tag = $(this).text().substring(7, $(this).text().length)
+
+            sendEvent("data", {
+            	task: "removeTag",
+            	data: {
+            		id: data.name,
+            		tag: tag
+            	}
+            })
             datam.removeTag(data.name, tag)
         })
 
@@ -94,8 +102,10 @@ class Sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var event = new CustomEvent("updateNode", {"detail": readForm(".editForm")})
-			document.dispatchEvent(event)
+			sendEvent("data", {
+				task: "updateNode",
+				data: readForm(".editForm")
+			})
 		})
 		this.body.append(form)
 	}

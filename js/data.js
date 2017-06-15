@@ -220,7 +220,7 @@ class DataManager {
         			delete arr[id].predecessors[index]
 
         			sendEvent("explorer", {
-        				task: "removeEdge",
+        				task: "deleteEdge",
 						data : { 
 							from: updateData.name,
 							to: child.name
@@ -234,6 +234,14 @@ class DataManager {
         	{
         		if(updateData.predecessors.indexOf(child.name) === -1) {
         			delete arr[id].successors[index]
+        			
+        			sendEvent("explorer", {
+        				task: "deleteEdge",
+						data : { 
+							from: child.name,
+							to: updateData.name
+						}
+        			})
         		}
         	}
         })

@@ -2,7 +2,14 @@ class CyptoScape {
 
     constructor(selector) {
         this.cy = null
+
         this.init(selector)
+        this.registerEvents()
+
+        // debug
+        window.cy = () => {
+            return this.cy
+        }
     }
 
     init (selector) {
@@ -44,6 +51,38 @@ class CyptoScape {
         })
 
         this.initEvents()
+    }
+
+    registerEvents() {
+         document.addEventListener("explorer", (e)=> {
+            switch(e.detail.task) {
+                case "initElements": 
+                    this.initElements(createCyElements(e.detail.data))
+                    break
+                case "updateStyle": 
+                    if(this.cy.$("nodes").length > 0) {
+                        this.updateLayout()
+
+                        showGraph()
+                    }
+                    break
+                case "renameNode":
+                    this.renameNode(e.detail.data.oldName, e.detail.data.newName)
+                    break
+                case "addNode":
+                    this.addNode(e.detail.data.name, e.detail.data.additional)
+                    break
+                case "deleteNode":
+                    this.deleteNode(e.detail.data)
+                    break
+                case "addEdge":
+                    this.addEdge(e.detail.data.from, e.detail.data.to)
+                    break
+                case "deleteEdge":
+                    this.deleteEdge(e.detail.data.from, e.detail.data.to)
+                    break
+            }
+        })
     }
 
     initEvents() {
