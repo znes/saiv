@@ -102,9 +102,12 @@ class Sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
+			var test = readForm('.editForm')
+			console.log(test)
+			
 			sendEvent("data", {
 				task: "updateNode",
-				data: readForm(".editForm")
+				data: test
 			})
 		})
 		this.body.append(form)

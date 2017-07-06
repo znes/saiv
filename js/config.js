@@ -32,7 +32,7 @@ var config = {
 		modal: {
 			container: ".modal",
 			heading: ".modal .modal-header h2",
-			content: ".modal .modal-body"
+			body: ".modal .modal-body"
 		}
 	}
 }

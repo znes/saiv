@@ -290,7 +290,7 @@ class CyptoScape {
     }
 
     deleteEdge(from, to) {
-        this.cy.edges("[source='" + e.detail.from + "'][target='" + e.detail.to + "']").remove()
+        this.cy.edges("[source='" + from + "'][target='" + to + "']").remove()
     }
 
     addEdge(from, to) {
