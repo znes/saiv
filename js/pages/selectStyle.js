@@ -13,7 +13,7 @@ function selectStyle() {
 
 		localStorage.setItem("style", data.style)
 
-		sendEvent("explorer", {
+		sendEvent("dataChanged", {
 			task: "updateStyle"
 		})
 	})
