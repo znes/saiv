@@ -50,9 +50,6 @@ class DataManager {
 			case "updateNode":
 				this.updateNode(detail.data)
 				break
-			case "updateNode":
-				this.updateNode(detail.data)
-				break
 		}
 	}
 

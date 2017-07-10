@@ -8,7 +8,7 @@ class LeafleatMap {
 		
 		// debug	
 	    window.map = () => {
-	    	return this.map
+	    	return this.mapEle
 	    }
     }
 
@@ -126,7 +126,7 @@ class LeafleatMap {
         if (typeof pos.long != undefined) {
             this.mapEle[name] = {
                 successors: {},
-                marker: L.marker([pos.long, pos.lat],  {
+                marker: L.marker([pos.lat, pos.long],  {
                     contextmenu: true,
                     contextmenuItems: [{
                         text: 'Delete Node',
@@ -232,7 +232,7 @@ class LeafleatMap {
             if(prob == name) {
                 for (let [succ, obj] of Object.entries(data.successors)) {
                     var latlngs = obj.arrow.getLatLngs()
-                    latlngs.splice(0, 1, this.mapEle[name].marker.getLatLng())
+                    latlngs.splice(0, 1, [newLat,newLong])
 
                     obj.arrow.setLatLngs(latlngs)
                 }
@@ -241,7 +241,7 @@ class LeafleatMap {
                 for (let [succ, obj] of Object.entries(data.successors)) {
                     if(succ == name) { 
                         var latlngs = obj.arrow.getLatLngs()
-                        latlngs.splice(1, 1, this.mapEle[name].marker.getLatLng())
+                        latlngs.splice(1, 1, [newLat,newLong])
 
                         obj.arrow.setLatLngs(latlngs)
                     }
