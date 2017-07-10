@@ -33,7 +33,7 @@ function showMap() {
 
 
 function createCyElements(jsonData) {
-	var eles = []
+	let eles = []
 
 	jsonData.children.forEach(child => {
 		eles.push({
@@ -63,11 +63,11 @@ function createCyElements(jsonData) {
 }
 
 
-function createInput(name, key, currentValue, type, required=false) {
-	var html = ""
+function createInput(label, key, currentValue, type, required=false) {
+	let html = ""
 	
 	if (type != "hidden") {
-		html += '<label for="' + key + '">' + name + '</label>'
+		html += '<label for="' + key + '">' + label + '</label>'
 	}
 	if(required) {
 		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>'
@@ -79,18 +79,18 @@ function createInput(name, key, currentValue, type, required=false) {
 	return html
 }
 function createSelect(key, currentValues, options, additionalTags = "multiple=\"multiple\"") {
-	var html = ""
+	let html = ""
 	html += '<label for="' + key + '">' + key + '</label>'
 	html += '<select class="js-example-basic-multiple ' + key + '" ' + additionalTags + ' name="' + key + '">'
 
 	options.forEach(opt => {
-		var name =  opt.name ? opt.name : opt;
+		let name =  opt.name ? opt.name : opt
 
         if( currentValues.indexOf(name) !== -1) {
 			html += '<option selected value="' + name + '">' + name + '</option>'
-			} else {
-				html += '<option>' + name + '</option>'
-			}	
+		} else {
+			html += '<option>' + name + '</option>'
+		}	
 	})
 	
 	html += '</select>'
@@ -98,7 +98,7 @@ function createSelect(key, currentValues, options, additionalTags = "multiple=\"
 }
 
 function readForm (form) {
-    var formData = {}
+    let formData = {}
     $(form).serializeArray().forEach(field => {
     	if (field.name.substring(0, 5) == "tags_") {
             if (typeof(formData.tags) === "undefined") formData.tags = {}
@@ -106,7 +106,12 @@ function readForm (form) {
             formData.tags[field.name.substring(5, field.name.length)] = field.value
         }
         else if (field.name == "predecessors" || field.name == "successors") {
-        	formData[field.name] = $( form + " [name=\"" + field.name + "\"]").val();
+        	formData[field.name] = $( form + " [name=\"" + field.name + "\"]").val()
+        }
+        else if(field.name.substring(0, 4) == "pos_") {
+        	if (typeof(formData.pos) === "undefined") formData.pos = {}
+
+        	formData.pos[field.name.substring(4, field.name.length)] = field.value
         }
         else {
             formData[field.name] = field.value

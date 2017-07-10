@@ -1,4 +1,4 @@
-function selectJson() {
+function openJsonSelection() {
   var content = "Select File<br>";
   content += "<input id='selectFile' type='file'><br>";
   content += "<button id='useDefault'>Use default</button>";

@@ -2,21 +2,21 @@
  * DOM Ready
  */
 $(function() {
-    var datam = new DataManager()
+    var dataManager = new DataManager()
     var sb = new Sidebar(config.dom.sidebar)
     var cy = new CyptoScape(config.dom.canvasContainer)
     var map = new LeafleatMap(config.dom.mapContainerId)
 
 
     // Opens Page "Select Json"
-    selectJson()
+    openJsonSelection()
 
 
     /**
      * init menu listener
      */
     $(config.dom.links.json).click(() => {
-        selectJson()
+        openJsonSelection()
     })
 
     $(config.dom.links.map).click(() => {
@@ -52,23 +52,23 @@ $(function() {
     // Init Event Reciver 
     document.addEventListener("dataReceived", (e) => {
         initListenerDataRevieved()
-        datam.json = e.detail
+        dataManager.json = e.detail
 
-        sendEvent("explorer", {
+        sendEvent("dataChanged", {
             task: "initElements",
-            data: datam.json
+            data: dataManager.json
         })
 
-        showId(datam.json.children[0].name)
+        showId(dataManager.json.children[0].name)
         showGraph();
     })
 
 
     function showId(id) {        
-        var data = datam.getElement(id)
+        var data = dataManager.getElement(id)
 
         sb.showData(data)
-        sb.createForm(data, datam.json.children)
+        sb.createForm(data, dataManager.json.children)
     }
 
     function initListenerDataRevieved() {
@@ -83,7 +83,7 @@ $(function() {
         }).parent("li").removeClass("disabled")
 
         $(config.dom.links.download).click(() => {
-            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(datam.json))
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
             $(config.dom.links.download).prop("href", "data:" + data)
             $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")

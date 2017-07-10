@@ -63,7 +63,18 @@ class Sidebar{
 			} else if (key == "predecessors" || key == "successors") {
 				form.append(createSelect(key, value, nodes))
 				$('.js-example-basic-multiple', form).select2()
-			} else {
+			}
+			else if (key == "pos")  {
+				for (let [prop, val] of Object.entries(value)) {
+					if(prop == "lat") {
+						form.append(createInput("Latitude", "pos_"+prop, val, "text"))
+					}
+					else if(prop == "long") {
+						form.append(createInput("Longitude", "pos_"+prop, val, "text"))
+					}
+				}
+			}
+			else {
 				form.append(createInput(key, key, value, "text"))
 			}
 		}
@@ -103,7 +114,8 @@ class Sidebar{
 			e.preventDefault()
 
 			var test = readForm('.editForm')
-			console.log(test)
+			
+			//console.log(test)
 			
 			sendEvent("data", {
 				task: "updateNode",

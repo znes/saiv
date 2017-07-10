@@ -50,6 +50,9 @@ class DataManager {
 			case "updateNode":
 				this.updateNode(detail.data)
 				break
+			case "updateNode":
+				this.updateNode(detail.data)
+				break
 		}
 	}
 
@@ -74,7 +77,7 @@ class DataManager {
         }
 		this._json.children.push(formdata)
 
-		sendEvent("explorer", {
+		sendEvent("dataChanged", {
 			task: "addNode",
 			data: {
 				name: data.name,
@@ -108,7 +111,7 @@ class DataManager {
 		}
 
 		
-		sendEvent("explorer", {
+		sendEvent("dataChanged", {
 			task: "addEdge",
 			data: {
 				from: predecessors,
@@ -130,7 +133,7 @@ class DataManager {
 			})
 		}
 
-		sendEvent("explorer", {
+		sendEvent("dataChanged", {
 			task: "deleteEdge",
 			data: {
 				from: src,
@@ -146,20 +149,36 @@ class DataManager {
 
 		this.deleteRelationNames(name)
 
-		sendEvent("explorer", {
+		sendEvent("dataChanged", {
 			task: "deleteNode",
 			data: name
 		})
 	}
 
 	updateNode (updateData) {
+		// check if pos changed
+        if(typeof updateData.pos.lat != undefined && typeof updateData.pos.long != undefined) {
+        	let ele = this._json.children.filter(child => child.name == updateData.currentid)[0]
+        	
+        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.long != ele.pos.long) {
+        		sendEvent("dataChanged", {
+					task: "positionUpdate",
+					data: {
+						name: updateData.currentid,
+						lat: updateData.pos.lat,
+						long: updateData.pos.long
+					}
+				})
+        	}
+        }
+
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 
         // if name(id) changes
         if(updateData.currentid != updateData.name) {
         	this.updateRelationNames(updateData.name, updateData.currentid)
 
-        	sendEvent("explorer", {
+        	sendEvent("dataChanged", {
         		task: "renameNode",
         		data: {
 					oldName: updateData.currentid,
@@ -170,6 +189,7 @@ class DataManager {
 
 
         delete updateData['currentid']
+        
 
         // Add Successor and Predecessors to other
         updateData.successors.forEach(child => {
@@ -178,7 +198,7 @@ class DataManager {
 				if(this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
 					this._json.children[index].predecessors.push(updateData.name)
 
-					sendEvent("explorer", {
+					sendEvent("dataChanged", {
 						task: "addEdge",
 		        		data: {
 							from: updateData.name,
@@ -200,7 +220,7 @@ class DataManager {
 					this._json.children[index].successors.push(updateData.name)
 
 
-					sendEvent("explorer", {
+					sendEvent("dataChanged", {
 						task: "addEdge",
 		        		data: {
 							from: this._json.children[index].name,
@@ -219,7 +239,7 @@ class DataManager {
         		if(updateData.successors.indexOf(child.name) === -1) {
         			delete arr[id].predecessors[index]
 
-        			sendEvent("explorer", {
+        			sendEvent("dataChanged", {
         				task: "deleteEdge",
 						data : { 
 							from: updateData.name,
@@ -235,7 +255,7 @@ class DataManager {
         		if(updateData.predecessors.indexOf(child.name) === -1) {
         			delete arr[id].successors[index]
         			
-        			sendEvent("explorer", {
+        			sendEvent("dataChanged", {
         				task: "deleteEdge",
 						data : { 
 							from: child.name,

@@ -42,7 +42,7 @@ class LeafleatMap {
     }
     
     registerEvents() {
-         document.addEventListener("explorer", (e)=> {
+         document.addEventListener("dataChanged", (e)=> {
             switch(e.detail.task) {
                 case "initElements": 
                     this.initElements(e.detail.data)
@@ -66,6 +66,9 @@ class LeafleatMap {
                 case "deleteEdge":
                     this.deleteEdge(e.detail.data.from, e.detail.data.to)
                     break
+                case "positionUpdate":
+                    this.updatePosition(e.detail.data.name, e.detail.data.lat, e.detail.data.long)
+                    break
             }
         })
     }
@@ -79,10 +82,10 @@ class LeafleatMap {
 
         json.children.forEach(child => {
             child.successors.forEach( succ => {
-                    let index = json.children.findIndex(x => x.name==succ)
-                    if (index !== -1) {
-                        this.addEdge(child.name, succ)
-                     }
+                let index = json.children.findIndex(x => x.name==succ)
+                if (index !== -1) {
+                    this.addEdge(child.name, succ)
+                 }
             })
         })
 
@@ -175,7 +178,6 @@ class LeafleatMap {
     }
 
     addEdge(from, to) {
-
         if(typeof this.mapEle[from] != undefined && typeof this.mapEle[to] != undefined ) {
             var arrow = L.polyline([this.mapEle[from].marker.getLatLng(), this.mapEle[to].marker.getLatLng()], {
                 weight: 10,
@@ -219,6 +221,36 @@ class LeafleatMap {
         this.map.removeLayer(this.mapEle[from].successors[to].arrow)
         this.map.removeLayer(this.mapEle[from].successors[to].head)
         delete this.mapEle[from].successors[to]
+    }
+
+    updatePosition(name, newLat, newLong) {
+        console.log(name, newLat)
+
+        this.mapEle[name].marker.setLatLng([newLat,newLong]);
+
+        for (let [prob, data] of Object.entries(this.mapEle)) {
+            if(prob == name) {
+                for (let [succ, obj] of Object.entries(data.successors)) {
+                    var latlngs = obj.arrow.getLatLngs()
+                    latlngs.splice(0, 1, this.mapEle[name].marker.getLatLng())
+
+                    obj.arrow.setLatLngs(latlngs)
+                }
+            }
+            else {
+                for (let [succ, obj] of Object.entries(data.successors)) {
+                    if(succ == name) { 
+                        var latlngs = obj.arrow.getLatLngs()
+                        latlngs.splice(1, 1, this.mapEle[name].marker.getLatLng())
+
+                        obj.arrow.setLatLngs(latlngs)
+                    }
+                }
+            }
+        }
+        //this.map.removeLayer(this.mapEle[name].successors[to].arrow)
+        //this.map.removeLayer(this.mapEle[name].successors[to].head)
+        //delete this.mapEle[from].successors[to]
     }
 
     showCoordinates (e) {

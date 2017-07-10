@@ -54,7 +54,7 @@ class CyptoScape {
     }
 
     registerEvents() {
-         document.addEventListener("explorer", (e)=> {
+         document.addEventListener("dataChanged", (e)=> {
             switch(e.detail.task) {
                 case "initElements": 
                     this.initElements(createCyElements(e.detail.data))
