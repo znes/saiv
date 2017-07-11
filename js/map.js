@@ -17,6 +17,16 @@ class LeafleatMap {
             contextmenu: true,
             contextmenuWidth: 140,
             contextmenuItems: [{
+                text: 'Add Node',
+                callback: e => { 
+                    sendEvent("sidebar", {
+                        task: "addNode",
+                        data: {
+                            pos: e.latlng
+                        }
+                    }) 
+                }
+            },{
                 text: 'Show coordinates',
                 callback: e => { this.showCoordinates(e) }
             }, {
@@ -55,7 +65,7 @@ class LeafleatMap {
                     this.renameNode(e.detail.data.oldName, e.detail.data.newName)
                     break
                 case "addNode":
-                    this.addNode(e.detail.data.name, e.detail.data.additional)
+                    this.addNode(e.detail.data.name, e.detail.data.pos)
                     break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
@@ -122,8 +132,11 @@ class LeafleatMap {
     }
 
     addNode(name, pos = null) {
+        console.log("MapMap")
+        console.log("drin")
+        console.log(pos)
         //console.log(additional)
-        if (typeof pos.long != "undefined") {
+        if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
             this.mapEle[name] = {
                 successors: {},
                 marker: L.marker([pos.lat, pos.long],  {

@@ -125,13 +125,17 @@ class Sidebar{
 		this.body.append(form)
 	}
 
-	addNode (pos, nodes) {
+
+	addNode (pos) {
 		this.body.html("")
 		var form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
 		form.append(createInput("type", "type", "", "text", true))
-		form.append(createInput("posx", "posx", pos.x, "hidden"))
-		form.append(createInput("posy", "posy", pos.y, "hidden"))
+
+		for (let [property, val] of Object.entries(pos)) {
+			form.append(createInput("pos_" + property, "pos_" + property, val, "hidden"))
+		}
+		//form.append(createInput("posy", "posy", pos.y, "hidden"))
 
 		form.append('<input type="submit" value="Add Node">')
 

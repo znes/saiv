@@ -44,8 +44,11 @@ $(function() {
                 showId(e.detail.data)
                 break
             case "addNode":
-                sb.addNode(e.detail.data.pos, e.detail.data.eles)
+                sb.addNode(e.detail.data.pos)
                 break
+            /*case "addNodeMap":
+                sb.addNode(e.detail.data.pos)
+                break*/
         }
     })
 

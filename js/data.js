@@ -66,25 +66,40 @@ class DataManager {
 	}
 
 	addNode (data) {
-		var formdata = {
+		console.log("addNode")
+		console.log(data)
+		let formdata = {
             name: data.name,
             type: data.type,
             tags: {},
             predecessors: [],
             successors: []
         }
-		this._json.children.push(formdata)
-
-		sendEvent("dataChanged", {
-			task: "addNode",
-			data: {
-				name: data.name,
-				additional: {
-					x: data.posx,
-					y: data.posy
+        if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
+        	formdata.pos = {
+        		lat: data.pos.lat,
+        		long: data.pos.lng
+        	}
+        
+        	sendEvent("dataChanged", {
+				task: "addNode",
+				data: {
+					name: data.name,
+					pos: formdata.pos
 				}
-			}
-		})
+			})
+        }
+        else {
+        	sendEvent("dataChanged", {
+				task: "addNode",
+				data: {
+					name: data.name,
+					pos: data.pos
+				}
+			})
+        }
+
+		this._json.children.push(formdata)
 	}
 
 	/**
@@ -92,7 +107,6 @@ class DataManager {
 	 * Adds predecessors and successors
 	 */
 	addEdge (predecessors, successors) {
-		console.log(pred,succ)
 		// Add Successor
 		var index = this._json.children.findIndex(x => x.name==predecessors)
 		if (index !== -1) {

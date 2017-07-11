@@ -76,7 +76,7 @@ class CyptoScape {
                     this.renameNode(e.detail.data.oldName, e.detail.data.newName)
                     break
                 case "addNode":
-                    this.addNode(e.detail.data.name, e.detail.data.additional)
+                    this.addNode(e.detail.data.name, e.detail.data.pos)
                     break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
@@ -91,13 +91,8 @@ class CyptoScape {
         })
     }
 
-    createElementsCy(jsonData) {
-        
-    }
-
     initEvents() {
         this.updateBind()
-
 
         this.cy.contextMenus({
             menuItems: [
@@ -190,11 +185,9 @@ class CyptoScape {
                     sendEvent("sidebar", {
                         task: "addNode",
                         data: {
-                            pos: pos,
-                            eles: this.cy.elements("node")
+                            pos: pos
                         }
                     })
-                    //sb.addNode(pos, this.cy.elements("node"))
                 }
             },
             {
@@ -282,17 +275,27 @@ class CyptoScape {
         }
     }
 
-    addNode(name, additional) {
-        this.cy.add({
-            group: "nodes",
-            data: {
-                id: name,
-            },
-            position: {
-                x: parseInt(additional.x),
-                y: parseInt(additional.y)
-            }
-        })
+    addNode(name, pos) {
+        if(typeof pos.x != "undefined" && typeof pos.y != "undefined") {
+            this.cy.add({
+                group: "nodes",
+                data: {
+                    id: name
+                },
+                position: {
+                    x: parseInt(pos.x),
+                    y: parseInt(pos.y)
+                }
+            })
+        }
+        else {
+            this.cy.add({
+                group: "nodes",
+                data: {
+                    id: name,
+                }
+            })
+        }
     }
 
     renameNode(oldName, newName) {
