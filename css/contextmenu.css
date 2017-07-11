@@ -95,3 +95,7 @@
     content:"\2630";
 }
 
+.leaflet-contextmenu-separator,
+.cy-context-menus-divider {
+  border-bottom:1px solid #A0A0A0;
+}
