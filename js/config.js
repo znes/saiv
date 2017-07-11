@@ -27,7 +27,8 @@ var config = {
 			graph: ".navbar .shoWExplorer",
 			jsonSetting: ".jsonSettings",
 			map: ".showMap",
-			download: ".navbar .downloadJson"
+			download: ".navbar .downloadJson",
+			downloadJsonPos: ".navbar .downloadJsonWithPositions"
 		},
 		modal: {
 			container: ".modal",

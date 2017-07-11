@@ -31,38 +31,6 @@ function showMap() {
 	$("#"+config.dom.mapContainerId).css("visibility", "visible")
 }
 
-
-function createCyElements(jsonData) {
-	let eles = []
-
-	jsonData.children.forEach(child => {
-		eles.push({
-			group: "nodes",
-			data: {
-				id: child.name,
-			//	data: child
-			}
-		})
-	})
-
-	// Add edges when nodes loaded
-	// Only add Successors 
-	jsonData.children.forEach(child => {
-		child.successors.forEach(succ => {
-			eles.push({
-				data: {
-					source: child.name,
-					target: succ
-				},
-				group: "edges"
-			})
-		})
-	})
-
-	return eles
-}
-
-
 function createInput(label, key, currentValue, type, required=false) {
 	let html = ""
 	

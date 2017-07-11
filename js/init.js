@@ -87,5 +87,19 @@ $(function() {
             $(config.dom.links.download).prop("href", "data:" + data)
             $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")
+
+
+        $(config.dom.links.downloadJsonPos).click(() => {
+            let data = dataManager.json
+            for (var i = 0; i < data.children.length; i++) {
+                if(typeof data.children[i].pos == "undefined") data.children[i].pos = {}
+
+                Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())
+            }
+            //let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
+            let urlString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data))
+            $(config.dom.links.downloadJsonPos).prop("href", "data:" + urlString)
+            $(config.dom.links.downloadJsonPos).prop("download", "data.json")
+        }).parent("li").removeClass("disabled")
     }
 })

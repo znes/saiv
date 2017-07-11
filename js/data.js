@@ -32,6 +32,7 @@ class DataManager {
 		switch(detail.task) {
 			case "addNode":
 				this.addNode(detail.data)
+				break;
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
 				break
@@ -91,6 +92,7 @@ class DataManager {
 	 * Adds predecessors and successors
 	 */
 	addEdge (predecessors, successors) {
+		console.log(pred,succ)
 		// Add Successor
 		var index = this._json.children.findIndex(x => x.name==predecessors)
 		if (index !== -1) {

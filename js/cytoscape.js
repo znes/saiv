@@ -53,11 +53,17 @@ class CyptoScape {
         this.initEvents()
     }
 
+
+    $(sel) {
+        return this.cy.$(sel)
+    }
+
     registerEvents() {
          document.addEventListener("dataChanged", (e)=> {
             switch(e.detail.task) {
                 case "initElements": 
-                    this.initElements(createCyElements(e.detail.data))
+                    
+                    this.initElements(e.detail.data)
                     break
                 case "updateStyle": 
                     if(this.cy.$("nodes").length > 0) {
@@ -83,6 +89,10 @@ class CyptoScape {
                     break
             }
         })
+    }
+
+    createElementsCy(jsonData) {
+        
     }
 
     initEvents() {
@@ -221,10 +231,55 @@ class CyptoScape {
         })
     }
 
-    initElements(eles) {
+    initElements(jsonData) {
+        let eles = []
+        let customPos = false
+
+        jsonData.children.forEach(child => {
+            let ele = {
+                group: "nodes",
+                data: {
+                    id: child.name
+                }
+            }
+            if(typeof child.pos != "undefined") {
+                if(typeof child.pos.x != "undefined" && typeof child.pos.y != "undefined") {
+                    customPos = true
+                    ele.position = {
+                        x: child.pos.x,
+                        y: child.pos.y,
+                    }
+                }
+            }
+
+            eles.push(ele)
+        })
+
+        // Add edges when nodes loaded
+        // Only add Successors 
+        jsonData.children.forEach(child => {
+            child.successors.forEach(succ => {
+                eles.push({
+                    data: {
+                        source: child.name,
+                        target: succ
+                    },
+                    group: "edges"
+                })
+            })
+        })
+
+
         this.cy.$("*").remove()
         this.cy.add(eles)
-        this.updateLayout()
+
+        if(!customPos) {
+            this.updateLayout()
+        }
+        else {
+            this.cy.reset()
+            this.cy.center()
+        }
     }
 
     addNode(name, additional) {

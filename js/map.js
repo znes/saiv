@@ -75,7 +75,7 @@ class LeafleatMap {
 
     initElements(json) {
     	json.children.forEach(child => {
-    		if(typeof child.pos != undefined) {
+    		if(typeof child.pos != "undefined") {
                 this.addNode(child.name,child.pos);
     		}
     	})
@@ -123,7 +123,7 @@ class LeafleatMap {
 
     addNode(name, pos = null) {
         //console.log(additional)
-        if (typeof pos.long != undefined) {
+        if (typeof pos.long != "undefined") {
             this.mapEle[name] = {
                 successors: {},
                 marker: L.marker([pos.lat, pos.long],  {
@@ -178,7 +178,7 @@ class LeafleatMap {
     }
 
     addEdge(from, to) {
-        if(typeof this.mapEle[from] != undefined && typeof this.mapEle[to] != undefined ) {
+        if(typeof this.mapEle[from] != "undefined" && typeof this.mapEle[to] != "undefined" ) {
             var arrow = L.polyline([this.mapEle[from].marker.getLatLng(), this.mapEle[to].marker.getLatLng()], {
                 weight: 10,
                 contextmenu: true,
