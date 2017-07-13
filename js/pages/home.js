@@ -1,5 +1,5 @@
 function home() {
-  var content = "Home";
+  let content = "Home";
   
   createContentPage("Saiv", content );
   setActiveMenuItem("home");

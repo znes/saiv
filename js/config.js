@@ -1,5 +1,6 @@
-var config = {
+let config = {
 	cytoscape: {
+		defaultStyle: "dagre",
 		styles: [
 			"dagre",
 			"circle",

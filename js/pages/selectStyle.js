@@ -1,6 +1,6 @@
 function selectStyle() {
-	var currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.styles[0]
-	var form = $('<form class="editStyle"></form>')
+	let currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.defaultStyle
+	let form = $('<form class="editStyle"></form>')
 
 
 	form.append(createSelect("style", [currentStyle], config.cytoscape.styles, ""))
@@ -9,7 +9,7 @@ function selectStyle() {
 	form.append('<input type="submit" value="Save">')
 	form.submit(e => {
 		e.preventDefault()
-		var data = readForm(".editStyle")
+		let data = readForm(".editStyle")
 
 		localStorage.setItem("style", data.style)
 

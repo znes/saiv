@@ -2,14 +2,14 @@
  * DOM Ready
  */
 $(function() {
-    var dataManager = new DataManager()
-    var sb = new Sidebar(config.dom.sidebar)
-    var cy = new CyptoScape(config.dom.canvasContainer)
-    var map = new LeafleatMap(config.dom.mapContainerId)
+    let dataManager = new DataManager()
+    let sb = new Sidebar(config.dom.sidebar)
+    let cy = new CyptoScape(config.dom.canvasContainer)
+    let map = new LeafleatMap(config.dom.mapContainerId)
 
 
     // Opens Page "Select Json"
-    openJsonSelection()
+    openJsonSelection(true)
 
 
     /**
@@ -46,6 +46,9 @@ $(function() {
             case "addNode":
                 sb.addNode(e.detail.data.pos)
                 break
+            case "show":
+                sb.show(e.detail.data.head, e.detail.data.body)
+                break;
             /*case "addNodeMap":
                 sb.addNode(e.detail.data.pos)
                 break*/
@@ -68,7 +71,7 @@ $(function() {
 
 
     function showId(id) {        
-        var data = dataManager.getElement(id)
+        let data = dataManager.getElement(id)
 
         sb.showData(data)
         sb.createForm(data, dataManager.json.children)
@@ -86,7 +89,7 @@ $(function() {
         }).parent("li").removeClass("disabled")
 
         $(config.dom.links.download).click(() => {
-            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
+            let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
             $(config.dom.links.download).prop("href", "data:" + data)
             $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")
@@ -94,7 +97,7 @@ $(function() {
 
         $(config.dom.links.downloadJsonPos).click(() => {
             let data = dataManager.json
-            for (var i = 0; i < data.children.length; i++) {
+            for (let i = 0; i < data.children.length; i++) {
                 if(typeof data.children[i].pos == "undefined") data.children[i].pos = {}
 
                 Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())

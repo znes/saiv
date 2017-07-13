@@ -113,8 +113,8 @@ class CyptoScape {
                 title: 'Connect successors',
                 selector: 'node',
                 onClickFunction: (event) => {
-                    var evtFromTarget = event.target || event.cyTarget
-                    var pos = event.position || event.cyPosition
+                    let evtFromTarget = event.target || event.cyTarget
+                    let pos = event.position || event.cyPosition
 
                     if(evtFromTarget.data().type == "scenario") {
                         modal("Error", "Cant be connected to type scenario")
@@ -127,12 +127,12 @@ class CyptoScape {
 
 
                     this.cy.on("mouseover", "node", {}, (_event) => {
-                        var evtToTarget = _event.target || _event.cyTarget
+                        let evtToTarget = _event.target || _event.cyTarget
                         this.cy.$('#shadowEdge').move({target: evtToTarget.data().id})
                     })
 
                     this.cy.on("click", "node", {}, (_event) => {
-                        var evtToTarget = _event.target || _event.cyTarget 
+                        let evtToTarget = _event.target || _event.cyTarget 
                         if(evtFromTarget == evtToTarget ) {
                             modal("Error", "Cant connect to same node")
                         }
@@ -181,7 +181,7 @@ class CyptoScape {
                 title: 'Add node',
                 coreAsWell: true,
                 onClickFunction: (event) => {
-                    var pos = event.position || event.cyPosition
+                    let pos = event.position || event.cyPosition
                     sendEvent("sidebar", {
                         task: "addNode",
                         data: {
@@ -299,9 +299,9 @@ class CyptoScape {
     }
 
     renameNode(oldName, newName) {
-        var ele = this.cy.$("node#" + oldName)
+        const ele = this.cy.$("node#" + oldName)
 
-        var newEle = {
+        let newEle = {
             group: "nodes",
             data: {
                 id: newName
@@ -311,7 +311,7 @@ class CyptoScape {
         this.cy.add(newEle)
         
 
-        var edgesToUpdate = this.cy.edges("[source='" + oldName + "'], [target='" + oldName + "']");
+        let edgesToUpdate = this.cy.edges("[source='" + oldName + "'], [target='" + oldName + "']");
         //replace Nodes
         let edges = []
         edgesToUpdate.forEach(edge => {
@@ -357,7 +357,7 @@ class CyptoScape {
 
     updateLayout() {
         this.cy.makeLayout({
-            name: localStorage.getItem("style") || config.cytoscape.styles[0]
+            name: localStorage.getItem("style") || config.cytoscape.defaultStyle
         }).run()
     }
 }

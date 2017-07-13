@@ -3,6 +3,7 @@ class LeafleatMap {
 		this.mapEle = {
 
 		};
+        this.noPosEles = [];
 		this.init(id)
         this.registerEvents()
 		
@@ -131,37 +132,174 @@ class LeafleatMap {
         delete this.mapEle[oldName]
     }
 
+    createNode(name, pos) {
+        return L.marker([pos.lat, pos.long],  {
+            contextmenu: true,
+            contextmenuItems: [{
+                text: 'Delete Node',
+                index: 0,
+                callback: e => { sendEvent("data", {
+                    task: "deleteNode",
+                    data: name
+                })}
+            }, {
+                separator: true,
+                index: 1
+            }]
+        })
+        .addTo(this.map)
+        .bindPopup(name)
+        .on("click", () => {
+            sendEvent("sidebar", {
+                task: "showId",
+                data: name
+            })
+        })
+    }
+
     addNode(name, pos = null) {
-        console.log("MapMap")
-        console.log("drin")
-        console.log(pos)
         //console.log(additional)
+        this.mapEle[name] = {
+            successors: {},
+            marker: null
+        }
         if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
-            this.mapEle[name] = {
-                successors: {},
-                marker: L.marker([pos.lat, pos.long],  {
-                    contextmenu: true,
-                    contextmenuItems: [{
-                        text: 'Delete Node',
-                        index: 0,
-                        callback: e => { sendEvent("data", {
-                            task: "deleteNode",
-                            data: name
-                        })}
-                    }, {
-                        separator: true,
-                        index: 1
-                    }]
-                })
-                .addTo(this.map)
-                .bindPopup(name)
-                .on("click", () => {
-                    sendEvent("sidebar", {
-                        task: "showId",
-                        data: name
-                    })
-                })
+            this.mapEle[name].marker = this.createNode(name,pos)
+        }
+        else {
+            /*this.noPosEles.push(name)
+
+            if(this.noPosEles.length == 1)*/
+            this.showButtonAddNodes()
+        }
+    }
+
+
+    /**
+     * ERROR WHEN NO ICONS !!!!!!
+     * ERROR WHEN NO ICONS !!!!!!
+     * ERROR WHEN NO ICONS !!!!!!
+     * @return {[type]} [description]
+     */
+    getNoPosDragElements() {
+        let body = $("<div class=\"dragContainer\"></div>")
+        let imgSrc = $(".leaflet-marker-icon").first()
+
+
+        for (let [property, data] of Object.entries(this.mapEle)) {
+            if(data.marker == null) {
+                let letEle = $("<div class=\"dragArticle\"></div>")
+
+                let imgClone = $("<img>")
+                    .prop("src", imgSrc.prop('src'))
+                    .prop("data-name", property)
+                    .prop("class", "dragImg")
+                    .prop("width", imgSrc.prop('width'))
+                    .prop("height", imgSrc.prop('height'))
+                //this.noPosEles[i]
+                //
+                letEle.append('<p class="dragMarkerName">' + property + '</p>')
+                letEle.append(imgClone)
+                body.append(letEle)
             }
+        }
+
+        return body
+    }
+
+    registerDragEvents(eles) {
+        let srcEle = null
+        let srcName = null
+        let that = this
+        let added = false
+
+
+        eles.each((index,item) => {
+            item.addEventListener('dragstart', handleDragStart, false);
+            item.addEventListener('dragend', handleDragEnd, false);
+        })
+
+
+        $("#" + config.dom.mapContainerId)
+            .off('dragenter')
+            .off('drop')
+            .off('dragleave')
+            .on('dragenter', handleDragEnter)
+            .on('drop', handleDrop)
+            .on('dragleave', handleDragLeave)
+
+        function handleDragStart(e) {
+            console.log("handleDragStart")
+            srcEle = $(this)
+            srcName = srcEle.parent().find("p").text()
+            this.style.opacity = '0.4'  // this / e.target is the source node.
+            
+        }
+
+        function handleDragEnter(e) {
+            console.log("handleDragEnter")
+            // this / e.target is the current hover target.
+            this.classList.add('over');
+        }
+
+        function handleDragLeave(e) {
+            console.log("handleDragLeave")
+            this.classList.remove('over');  // this / e.target is previous target element.
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation() // stops the browser from redirecting.
+            }
+            e.preventDefault()
+            // See the section on the DataTransfer object.
+            let pos = that.map.mouseEventToLatLng(e)
+
+            sendEvent("data", {
+                task: "updatePosition",
+                data: {
+                    name: srcName,
+                    lat: pos.lat,
+                    long: pos.lng
+                }
+            })
+
+            added = true
+            this.classList.remove('over')
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            console.log("handleDragEnd")
+            // this/e.target is the source node.
+            srcEle.parent().remove()
+
+            srcEle = null
+            srcName = null
+        }
+    }
+
+    showButtonAddNodes() {
+        if($(".alertMissingPositionBar").length == 0) {
+            const alertButton = $('<div class="alertMissingPositionBar leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Show Nodes" role="button" aria-label="Show Nodes">!</a></div>')
+             $('.leaflet-top.leaflet-right').append(alertButton).on('click', e => {
+            
+                let head = "Elements without Positions"
+                let body = this.getNoPosDragElements()
+
+                this.registerDragEvents(body.find("img"))
+                
+
+
+                sendEvent("sidebar", {
+                    task: "show",
+                    data: {
+                        head: head,
+                        body: body
+                    }
+                })
+            })
         }
     }
 
@@ -187,18 +325,17 @@ class LeafleatMap {
         }
         //this.mapEle[name].
         delete this.mapEle[name]
-
     }
 
     addEdge(from, to) {
-        if(typeof this.mapEle[from] != "undefined" && typeof this.mapEle[to] != "undefined" ) {
-            var arrow = L.polyline([this.mapEle[from].marker.getLatLng(), this.mapEle[to].marker.getLatLng()], {
+        if(this.mapEle[from].marker != null && this.mapEle[to].marker != null ) {
+            let arrow = L.polyline([this.mapEle[from].marker.getLatLng(), this.mapEle[to].marker.getLatLng()], {
                 weight: 10,
                 contextmenu: true,
                 contextmenuItems: [{
                     text: 'Delete Edge',
                     index: 0,
-                    callback: e => { 
+                    callback: e => {
                         sendEvent("data", {
                             task: "deleteEdge",
                             data: {
@@ -213,7 +350,7 @@ class LeafleatMap {
             }).addTo(this.map)
 
 
-            var arrowHead = L.polylineDecorator(arrow).addTo(this.map)
+            let arrowHead = L.polylineDecorator(arrow).addTo(this.map)
             arrowHead.setPatterns([
                 {   offset: '100%', 
                     repeat: 0, 
@@ -227,39 +364,49 @@ class LeafleatMap {
                 head: arrowHead
             }
         }
+        else {
+            this.mapEle[from].successors[to] = {
+                arrow: null,
+                head: null
+            }
+        }
     }
 
     deleteEdge(from, to) {
-        console.log(from, to)
         this.map.removeLayer(this.mapEle[from].successors[to].arrow)
         this.map.removeLayer(this.mapEle[from].successors[to].head)
         delete this.mapEle[from].successors[to]
     }
 
     updatePosition(name, newLat, newLong) {
-        console.log(name, newLat)
+        if(this.mapEle[name].marker != null) {
+            this.mapEle[name].marker.setLatLng([newLat,newLong]);
 
-        this.mapEle[name].marker.setLatLng([newLat,newLong]);
-
-        for (let [prob, data] of Object.entries(this.mapEle)) {
-            if(prob == name) {
-                for (let [succ, obj] of Object.entries(data.successors)) {
-                    var latlngs = obj.arrow.getLatLngs()
-                    latlngs.splice(0, 1, [newLat,newLong])
-
-                    obj.arrow.setLatLngs(latlngs)
-                }
-            }
-            else {
-                for (let [succ, obj] of Object.entries(data.successors)) {
-                    if(succ == name) { 
-                        var latlngs = obj.arrow.getLatLngs()
-                        latlngs.splice(1, 1, [newLat,newLong])
+            for (let [prob, data] of Object.entries(this.mapEle)) {
+                if(prob == name) {
+                    for (let [succ, obj] of Object.entries(data.successors)) {
+                        let latlngs = obj.arrow.getLatLngs()
+                        latlngs.splice(0, 1, [newLat,newLong])
 
                         obj.arrow.setLatLngs(latlngs)
                     }
                 }
+                else {
+                    for (let [succ, obj] of Object.entries(data.successors)) {
+                        if(succ == name) { 
+                            let latlngs = obj.arrow.getLatLngs()
+                            latlngs.splice(1, 1, [newLat,newLong])
+
+                            obj.arrow.setLatLngs(latlngs)
+                        }
+                    }
+                }
             }
+        }
+        else {
+            this.mapEle[name].marker = this.createNode(name, {lat: newLat, long: newLong})
+
+            // check succs
         }
         //this.map.removeLayer(this.mapEle[name].successors[to].arrow)
         //this.map.removeLayer(this.mapEle[name].successors[to].head)
@@ -273,7 +420,8 @@ class LeafleatMap {
     centerMap (e) {
         let markers = []
         for (let [k, v] of Object.entries(this.mapEle)) {
-            markers.push(v.marker)
+            if(v.marker != null)
+                markers.push(v.marker)
         }
         let group = new L.featureGroup(markers);
 

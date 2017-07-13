@@ -51,6 +51,9 @@ class DataManager {
 			case "updateNode":
 				this.updateNode(detail.data)
 				break
+			case "updatePosition":
+				this.updatePosition(detail.data.name, detail.data.lat, detail.data.long)
+				break
 		}
 	}
 
@@ -63,6 +66,23 @@ class DataManager {
 				if(succ == oldName)  this._json.children[index].successors[j] = newName
 			})
 		})
+	}
+
+	updatePosition (name, lat, long) {
+		let index = this._json.children.findIndex(x => x.name==name)
+		if (index !== -1) {
+			this._json.children[index].pos.lat = lat
+			this._json.children[index].pos.long = long
+
+			sendEvent("dataChanged", {
+				task: "positionUpdate",
+				data: {
+					name: name,
+					lat: lat,
+					long: long
+				}
+			})
+		}
 	}
 
 	addNode (data) {
@@ -108,7 +128,7 @@ class DataManager {
 	 */
 	addEdge (predecessors, successors) {
 		// Add Successor
-		var index = this._json.children.findIndex(x => x.name==predecessors)
+		let index = this._json.children.findIndex(x => x.name==predecessors)
 		if (index !== -1) {
 			if(this._json.children[index].successors.indexOf(successors) === -1) {
 				this._json.children[index].successors.push(successors)
@@ -134,7 +154,7 @@ class DataManager {
 	}
 
 	deleteEdge(src, target) {
-		var srcI = this._json.children.findIndex(x => x.name==src),
+		let srcI = this._json.children.findIndex(x => x.name==src),
 			targetI = this._json.children.findIndex(x => x.name==target);
 
 		if (srcI !== -1 && targetI !== -1) {

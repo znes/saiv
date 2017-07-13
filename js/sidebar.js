@@ -23,9 +23,14 @@ class Sidebar{
 		this.head.html(JSON.stringify(data))
 	}
 
+	show($head, $body) {
+		this.head.html("").append($head)
+		this.body.html("").append($body)
+	}
+
 	addTag (ready) {
 		this.body.html("")
-		var form = $('<form class="editForm"></form>')
+		let form = $('<form class="editForm"></form>')
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
 		form.append('<input type="submit" value="Save">')
@@ -40,7 +45,7 @@ class Sidebar{
 
 	createForm (data, nodes) {
 		this.body.html("")
-		var form = $('<form class="editForm"></form>')
+		let form = $('<form class="editForm"></form>')
 
 
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
@@ -96,7 +101,7 @@ class Sidebar{
 
 
         form.find('.removeTag').on("click", function(){
-            var tag = $(this).text().substring(7, $(this).text().length)
+            let tag = $(this).text().substring(7, $(this).text().length)
 
             sendEvent("data", {
             	task: "removeTag",
@@ -113,7 +118,7 @@ class Sidebar{
 		form.submit(e => {
 			e.preventDefault()
 
-			var test = readForm('.editForm')
+			let test = readForm('.editForm')
 			
 			//console.log(test)
 			
@@ -128,7 +133,7 @@ class Sidebar{
 
 	addNode (pos) {
 		this.body.html("")
-		var form = $('<form class="editForm"></form>')
+		let form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
 		form.append(createInput("type", "type", "", "text", true))
 

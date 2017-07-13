@@ -1,5 +1,5 @@
 function jsonSettings() {
-  var content = "dada"
+  let content = "dada"
   
   createContentPage("Set Json Settings", content )
   setActiveMenuItem("JsonSettings")
