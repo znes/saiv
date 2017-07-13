@@ -71,6 +71,9 @@ class DataManager {
 	updatePosition (name, lat, long) {
 		let index = this._json.children.findIndex(x => x.name==name)
 		if (index !== -1) {
+			if(typeof this._json.children[index].pos == "undefined") {
+				this._json.children[index].pos = {}		
+			}
 			this._json.children[index].pos.lat = lat
 			this._json.children[index].pos.long = long
 
@@ -86,8 +89,6 @@ class DataManager {
 	}
 
 	addNode (data) {
-		console.log("addNode")
-		console.log(data)
 		let formdata = {
             name: data.name,
             type: data.type,

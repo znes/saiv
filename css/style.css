@@ -179,8 +179,28 @@ a:hover {
   margin-top: 5px;
   margin-right: 5px;
   flex-basis: 27%;
-
 }
+.dragArticle .dragImg, .dragArticle .dragMarkerName{
+  -webkit-transition: -webkit-transform 0.2s ease-out;
+  -moz-transition: -moz-transform 0.2s ease-out;
+  -o-transition: -o-transform 0.2s ease-out;
+  -ms-transition: -ms-transform 0.2s ease-out;
+}
+.dragArticle.moving .dragImg{
+  opacity: 0.25;
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+  -ms-transform: scale(0.8);
+  -o-transform: scale(0.8);
+}
+.dragArticle.moving .dragMarkerName{
+  -webkit-transform: scale(1.8);
+  -moz-transform: scale(1.8);
+  -ms-transform: scale(1.8);
+  -o-transform: scale(1.8);
+  font-weight: bold;
+}
+
 .dragMarkerName {
   margin: 0;
 }

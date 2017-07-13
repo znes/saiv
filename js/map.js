@@ -229,21 +229,20 @@ class LeafleatMap {
             .on('dragleave', handleDragLeave)
 
         function handleDragStart(e) {
-            console.log("handleDragStart")
+            //console.log("handleDragStart")
             srcEle = $(this)
             srcName = srcEle.parent().find("p").text()
-            this.style.opacity = '0.4'  // this / e.target is the source node.
-            
+            srcEle.parent().addClass('moving');
         }
 
         function handleDragEnter(e) {
-            console.log("handleDragEnter")
+            //console.log("handleDragEnter")
             // this / e.target is the current hover target.
             this.classList.add('over');
         }
 
         function handleDragLeave(e) {
-            console.log("handleDragLeave")
+            //console.log("handleDragLeave")
             this.classList.remove('over');  // this / e.target is previous target element.
         }
 
@@ -252,7 +251,6 @@ class LeafleatMap {
                 e.stopPropagation() // stops the browser from redirecting.
             }
             e.preventDefault()
-            // See the section on the DataTransfer object.
             let pos = that.map.mouseEventToLatLng(e)
 
             sendEvent("data", {
@@ -266,15 +264,18 @@ class LeafleatMap {
 
             added = true
             this.classList.remove('over')
-
             return false;
         }
 
         function handleDragEnd(e) {
-            console.log("handleDragEnd")
+            //console.log("handleDragEnd")
             // this/e.target is the source node.
-            srcEle.parent().remove()
-
+            if(added) {
+                srcEle.parent().remove()
+            }
+            else {
+                srcEle.parent().addClass('moving');
+            }
             srcEle = null
             srcName = null
         }
@@ -323,7 +324,6 @@ class LeafleatMap {
                 delete this.mapEle[name]
             }
         }
-        //this.mapEle[name].
         delete this.mapEle[name]
     }
 
@@ -408,9 +408,6 @@ class LeafleatMap {
 
             // check succs
         }
-        //this.map.removeLayer(this.mapEle[name].successors[to].arrow)
-        //this.map.removeLayer(this.mapEle[name].successors[to].head)
-        //delete this.mapEle[from].successors[to]
     }
 
     showCoordinates (e) {
