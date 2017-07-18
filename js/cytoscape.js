@@ -147,12 +147,6 @@ class CyptoScape {
                                     to: evtToTarget.data().id
                                 }
                             })
-                            //datam.addEdge(, )
-                                
-                            /*sendEvent("sidebar", {
-                                task: "showId",
-                                data: _event.cyTarget.id()
-                            })*/
                         }
                         this.cy.$('#shadowEdge').remove()
                         this.updateBind()

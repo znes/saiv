@@ -136,15 +136,21 @@ class LeafleatMap {
         return L.marker([pos.lat, pos.long],  {
             contextmenu: true,
             contextmenuItems: [{
-                text: 'Delete Node',
+                text: 'Connect successors',
                 index: 0,
+                callback: e => {
+                    this.connectSuccessor(e, name)
+                }
+            },{
+                text: 'Add Node',
+                index: 1,
                 callback: e => { sendEvent("data", {
                     task: "deleteNode",
                     data: name
                 })}
             }, {
                 separator: true,
-                index: 1
+                index: 2
             }]
         })
         .addTo(this.map)
@@ -155,6 +161,57 @@ class LeafleatMap {
                 data: name
             })
         })
+    }
+
+    connectSuccessor(evt, name) {
+        console.log(evt, name)
+        let evtFromTarget = event.target || event.cyTarget
+        let fromPos = this.mapEle[name].marker.getLatLng()
+        let mousePos = evt.latlng
+
+
+        let arrow = L.polyline([fromPos, mousePos], {
+            weight: 15
+        }).addTo(this.map)
+
+
+        let arrowHead = L.polylineDecorator(arrow).addTo(this.map)
+        arrowHead.setPatterns([
+            {   offset: '100%', 
+                repeat: 0, 
+                symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})
+            }
+        ])
+
+
+
+        
+
+        this.map.on("mousemove", e => {
+            console.log("mousemove",e)
+            arrow.setLatLngs([fromPos, e.latlng])
+        })
+
+        /*this.cy.on("click", "node", {}, (_event) => {
+            let evtToTarget = _event.target || _event.cyTarget 
+            if(evtFromTarget == evtToTarget ) {
+                modal("Error", "Cant connect to same node")
+            }
+            else if (evtToTarget.data().type == "scenario") {
+                modal("Error", "Cant be connected to type scenario")
+            }
+            else {
+                sendEvent("data", {
+                    task: "addEdge",
+                    data: {
+                        from: evtFromTarget.data().id,
+                        to: evtToTarget.data().id
+                    }
+                })
+            }
+            this.cy.$('#shadowEdge').remove()
+            this.updateBind()
+        })*/
     }
 
     addNode(name, pos = null) {
@@ -232,13 +289,31 @@ class LeafleatMap {
             //console.log("handleDragStart")
             srcEle = $(this)
             srcName = srcEle.parent().find("p").text()
-            srcEle.parent().addClass('moving');
+            srcEle.parent().addClass('moving')
+
+            let img = new Image()
+            img.crossOrigin="anonymous"
+            img.src = srcEle.prop("src")
+
+            var canvas = document.createElement('canvas');
+            canvas.width = "25";
+            canvas.height = "41";
+            var context = canvas.getContext('2d');
+            context.drawImage(img, 0, 0);
+            var canvasImage = new Image();
+            canvasImage.crossOrigin="anonymous"
+            canvasImage.src = canvas.toDataURL();
+            document.body.append(canvasImage)
+
+            e.dataTransfer.setDragImage(canvasImage, 0, 0)
+            console.log(srcEle.width(), srcEle.prop('height'))
+            //e.dataTransfer.setDragImage(img, -50, -50);
         }
 
         function handleDragEnter(e) {
             //console.log("handleDragEnter")
             // this / e.target is the current hover target.
-            this.classList.add('over');
+            this.classList.add('over')
         }
 
         function handleDragLeave(e) {
@@ -379,6 +454,7 @@ class LeafleatMap {
     }
 
     updatePosition(name, newLat, newLong) {
+        // checck if already on Map
         if(this.mapEle[name].marker != null) {
             this.mapEle[name].marker.setLatLng([newLat,newLong]);
 
@@ -403,10 +479,30 @@ class LeafleatMap {
                 }
             }
         }
+        // create Node and Successors
         else {
             this.mapEle[name].marker = this.createNode(name, {lat: newLat, long: newLong})
 
             // check succs
+            for (let [prob, data] of Object.entries(this.mapEle)) {
+                if(prob == name) {
+                    for (let [succ, obj] of Object.entries(data.successors)) {
+                        // check if marker already exists
+                        if(this.mapEle[succ].marker != null) {
+                            this.addEdge(name, succ)
+                        }
+                    }
+                }
+                else {
+                    for (let [succ, obj] of Object.entries(data.successors)) {
+                        if(succ == name) { 
+                            if(data.marker != null) {
+                                this.addEdge(prob, name)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
