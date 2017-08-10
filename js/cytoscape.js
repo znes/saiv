@@ -136,9 +136,6 @@ class CyptoScape {
                         if(evtFromTarget == evtToTarget ) {
                             modal("Error", "Cant connect to same node")
                         }
-                        else if (evtToTarget.data().type == "scenario") {
-                            modal("Error", "Cant be connected to type scenario")
-                        }
                         else {
                             sendEvent("data", {
                                 task: "addEdge",

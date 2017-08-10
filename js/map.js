@@ -25,8 +25,11 @@ class LeafleatMap {
                         data: {
                             pos: e.latlng
                         }
-                    }) 
+                    })
                 }
+            },{
+                text: 'Add Polygon',
+                callback: e => { this.drawPolygon() }
             },{
                 text: 'Show coordinates',
                 callback: e => { this.showCoordinates(e) }
@@ -142,7 +145,7 @@ class LeafleatMap {
                     this.connectSuccessor(e, name)
                 }
             },{
-                text: 'Add Node',
+                text: 'Delete Node',
                 index: 1,
                 callback: e => { sendEvent("data", {
                     task: "deleteNode",
@@ -163,8 +166,55 @@ class LeafleatMap {
         })
     }
 
+    drawPolygon(e) {
+        let currentPoints = [],
+            ghostPoly = null
+
+
+        this.map.on('click', e => {
+            console.log(e.latlng)
+            currentPoints.push(e.latlng)
+
+            if(currentPoints.length == 2) {
+                ghostPoly = L.polygon(currentPoints);
+                ghostPoly.addTo(mymap)
+            }
+
+
+            if(currentPoints.length >= 2)
+                ghostPoly.setLatLngs(currentPoints)
+        })
+
+        $(".savePoly").on("click", (e) => {
+            this.map.off('click')
+            ghostPoly = null
+            currentPoints = []
+        })
+        $(".clear").on("click", (e) => {
+            this.map.off('click')
+            ghostPoly.remove()
+            ghostPoly = null
+            currentPoints = []
+        })
+    }
+
+    
+
+    addDefaultBind() {
+        for (let [property, data] of Object.entries(this.mapEle)) {
+            if(data.marker != null) {
+                data.marker.off("click")
+                    .on("click", () => {
+                        sendEvent("sidebar", {
+                            task: "showId",
+                            data: property
+                        })
+                    })
+            }
+        }
+    }
+
     connectSuccessor(evt, name) {
-        console.log(evt, name)
         let evtFromTarget = event.target || event.cyTarget
         let fromPos = this.mapEle[name].marker.getLatLng()
         let mousePos = evt.latlng
@@ -181,16 +231,30 @@ class LeafleatMap {
                 repeat: 0, 
                 symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})
             }
-        ])
-
-
-
-        
+        ])        
 
         this.map.on("mousemove", e => {
-            console.log("mousemove",e)
             arrow.setLatLngs([fromPos, e.latlng])
         })
+
+        // add onclick Marker
+        for (let [property, data] of Object.entries(this.mapEle)) {
+            if(property != name) {
+                if(data.marker != null) {
+                    data.marker.on("click", () => {
+                        arrow.remove()
+                        this.addDefaultBind()
+                        sendEvent("data", {
+                            task: "addEdge",
+                            data: {
+                                from: name,
+                                to: property
+                            }
+                        })
+                    })
+                }
+            }
+        }
 
         /*this.cy.on("click", "node", {}, (_event) => {
             let evtToTarget = _event.target || _event.cyTarget 
@@ -207,7 +271,7 @@ class LeafleatMap {
                         from: evtFromTarget.data().id,
                         to: evtToTarget.data().id
                     }
-                })
+                }) 
             }
             this.cy.$('#shadowEdge').remove()
             this.updateBind()
