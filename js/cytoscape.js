@@ -78,6 +78,9 @@ class CyptoScape {
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.pos)
                     break
+                case "addPolygon":
+                    this.addNode(e.detail.data.name)
+                    break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
                     break
@@ -266,7 +269,7 @@ class CyptoScape {
         }
     }
 
-    addNode(name, pos) {
+    addNode(name, pos = {}) {
         if(typeof pos.x != "undefined" && typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",

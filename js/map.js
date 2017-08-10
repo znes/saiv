@@ -29,7 +29,7 @@ class LeafleatMap {
                 }
             },{
                 text: 'Add Polygon',
-                callback: e => { this.drawPolygon() }
+                callback: e => { this.drawPolygon(e) }
             },{
                 text: 'Show coordinates',
                 callback: e => { this.showCoordinates(e) }
@@ -70,6 +70,9 @@ class LeafleatMap {
                     break
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.pos)
+                    break
+                case "addPolygon":
+                    this.addPoly(e.detail.data.name, e.detail.data.wkt)
                     break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
@@ -166,39 +169,111 @@ class LeafleatMap {
         })
     }
 
+    sidebarTextPolyCreation(wktText, name = "") {
+        let form = $('<form class="createPolyForm"></form>')
+        form.append(createInput("name", "name", name, "text", true))
+        form.append(createInput("type", "type", "polygon", "text", true))
+
+        form.append(createInput("wkt", "wkt", wktText, "hidden"))
+
+
+        form.append('<input type="submit" name="Submit" value="Submit"/>')
+        form.append('<button class="resetPoly">Reset</button>')
+        form.append('<button class="revertPoly">Revert</button>')         
+
+
+        sendEvent("sidebar", {
+            task: "show",
+            data: {
+                head: "Crete Polygon",
+                body: form
+            }
+        })
+    } 
+
     drawPolygon(e) {
         let currentPoints = [],
-            ghostPoly = null
+            ghostPoly = null,
+            that = this
 
+
+        sendEvent("sidebar", {
+                task: "show",
+                data: {
+                    head: "Crete Polygon",
+                    body: "ada"
+                }
+            })
+
+
+        updateBodyPoly(currentPoints)
 
         this.map.on('click', e => {
-            console.log(e.latlng)
-            currentPoints.push(e.latlng)
-
-            if(currentPoints.length == 2) {
-                ghostPoly = L.polygon(currentPoints);
-                ghostPoly.addTo(mymap)
+            if(ghostPoly != null) {
+                ghostPoly.remove()
             }
 
 
-            if(currentPoints.length >= 2)
-                ghostPoly.setLatLngs(currentPoints)
+            currentPoints.push(e.latlng.lng + " " + e.latlng.lat)
+            ghostPoly = this.drawPoly('POLYGON (' + currentPoints.toString() + ')')
+
+            updateBodyPoly(currentPoints)
         })
 
-        $(".savePoly").on("click", (e) => {
-            this.map.off('click')
-            ghostPoly = null
-            currentPoints = []
-        })
-        $(".clear").on("click", (e) => {
-            this.map.off('click')
-            ghostPoly.remove()
-            ghostPoly = null
-            currentPoints = []
-        })
+        function updateBodyPoly() {
+            let wktText = 'POLYGON (' + currentPoints.toString() + ')'
+            that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
+
+            $(".createPolyForm").submit((e) => {
+                e.preventDefault()
+                if (currentPoints.length > 2) {
+                    sendEvent("data", {
+                        task: "addPolygon",
+                        data: readForm(".createPolyForm")
+                    })
+
+                    that.map.off('click')
+                    ghostPoly.remove()
+                    ghostPoly = null
+                    currentPoints = []
+                }
+                else {
+                    modal("Alarm", "At least 3 points required")
+                }
+            })
+
+            $(".resetPoly").on("click", (e) => {
+                if (ghostPoly != null)
+                    ghostPoly.remove()
+                
+                ghostPoly = null
+                currentPoints = []
+                return false
+            })
+
+            $(".revertPoly").on("click", (e) => {
+                if(ghostPoly != null)
+                    ghostPoly.remove()
+                if(currentPoints.length >= 1)
+                    currentPoints.pop()
+
+                ghostPoly = that.drawPoly('POLYGON (' + currentPoints.toString() + ')')
+                updateBodyPoly()
+                return false
+            })
+        }
     }
 
-    
+
+    drawPoly(wktString) {
+        let wkt = new Wkt.Wkt()
+        wkt.read(wktString)
+
+        let obj = wkt.toObject()
+        obj.addTo(this.map)
+
+        return obj
+    }
 
     addDefaultBind() {
         for (let [property, data] of Object.entries(this.mapEle)) {
@@ -255,34 +330,14 @@ class LeafleatMap {
                 }
             }
         }
-
-        /*this.cy.on("click", "node", {}, (_event) => {
-            let evtToTarget = _event.target || _event.cyTarget 
-            if(evtFromTarget == evtToTarget ) {
-                modal("Error", "Cant connect to same node")
-            }
-            else if (evtToTarget.data().type == "scenario") {
-                modal("Error", "Cant be connected to type scenario")
-            }
-            else {
-                sendEvent("data", {
-                    task: "addEdge",
-                    data: {
-                        from: evtFromTarget.data().id,
-                        to: evtToTarget.data().id
-                    }
-                }) 
-            }
-            this.cy.$('#shadowEdge').remove()
-            this.updateBind()
-        })*/
     }
 
     addNode(name, pos = null) {
         //console.log(additional)
         this.mapEle[name] = {
             successors: {},
-            marker: null
+            marker: null,
+            type: "node"
         }
         if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
             this.mapEle[name].marker = this.createNode(name,pos)
@@ -293,6 +348,35 @@ class LeafleatMap {
             if(this.noPosEles.length == 1)*/
             this.showButtonAddNodes()
         }
+    }
+
+    addPoly(name, wkt = null) {
+        //console.log(additional)
+        this.mapEle[name] = {
+            successors: {},
+            marker: null,
+            type: "polygon"
+        }
+
+        this.mapEle[name].marker = this.drawPoly(wkt)
+
+        this.mapEle[name].marker.bindPopup(name)
+            .on("click", () => {
+                sendEvent("sidebar", {
+                    task: "showId",
+                    data: name
+                })
+            })
+
+        //if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
+        //    this.mapEle[name].marker = this.createNode(name,pos)
+        //}
+        //else {
+            /*this.noPosEles.push(name)
+
+            if(this.noPosEles.length == 1)*/
+            //this.showButtonAddNodes()
+        //}
     }
 
 

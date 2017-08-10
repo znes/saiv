@@ -33,6 +33,9 @@ class DataManager {
 			case "addNode":
 				this.addNode(detail.data)
 				break;
+			case "addPolygon":
+				this.addPolygon(detail.data)
+				break
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
 				break
@@ -119,6 +122,29 @@ class DataManager {
 				}
 			})
         }
+
+		this._json.children.push(formdata)
+	}
+
+	addPolygon (data) {
+		let formdata = {
+            name: data.name,
+            type: data.type,
+            tags: {},
+            predecessors: [],
+            successors: [],
+            wkt: data.wkt
+        }
+
+        
+    	sendEvent("dataChanged", {
+			task: "addPolygon",
+			data: {
+				name: data.name,
+				wkt: data.wkt
+			}
+		})
+
 
 		this._json.children.push(formdata)
 	}
