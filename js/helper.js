@@ -31,6 +31,14 @@ function showMap() {
 	$("#"+config.dom.mapContainerId).css("visibility", "visible")
 }
 
+function discardChanges() {
+	if(globals.unsavedChanges) {
+		return confirm('You have unsaved changes. You want to discard them?')
+	}
+	
+	return true
+}
+
 function createInput(label, key, currentValue, type, required=false) {
 	let html = ""
 	

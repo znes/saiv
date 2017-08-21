@@ -15,6 +15,8 @@ class LeafleatMap {
 
     init(id) {
     	this.map = L.map(id, {
+            center: [51.505, -0.09],
+            zoom: 13,
             contextmenu: true,
             contextmenuWidth: 140,
             contextmenuItems: [{
@@ -93,8 +95,11 @@ class LeafleatMap {
     initElements(json) {
     	json.children.forEach(child => {
     		if(typeof child.pos != "undefined") {
-                this.addNode(child.name,child.pos);
+                this.addNode(child.name, child.pos)
     		}
+            else {
+                this.addNode(child.name, child.pos)
+            }
     	})
 
         json.children.forEach(child => {
@@ -196,15 +201,8 @@ class LeafleatMap {
             ghostPoly = null,
             that = this
 
-
-        sendEvent("sidebar", {
-                task: "show",
-                data: {
-                    head: "Crete Polygon",
-                    body: "ada"
-                }
-            })
-
+        modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click save when you are done.")
+        globals.unsavedChanges = true
 
         updateBodyPoly(currentPoints)
 
@@ -236,6 +234,8 @@ class LeafleatMap {
                     ghostPoly.remove()
                     ghostPoly = null
                     currentPoints = []
+
+                    globals.unsavedChanges = false
                 }
                 else {
                     modal("Alarm", "At least 3 points required")
@@ -339,12 +339,13 @@ class LeafleatMap {
             marker: null,
             type: "node"
         }
-        if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
-            this.mapEle[name].marker = this.createNode(name,pos)
+        if(pos != null) {
+            if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
+                this.mapEle[name].marker = this.createNode(name,pos)
+            }   
         }
         else {
             /*this.noPosEles.push(name)
-
             if(this.noPosEles.length == 1)*/
             this.showButtonAddNodes()
         }
@@ -381,8 +382,6 @@ class LeafleatMap {
 
 
     /**
-     * ERROR WHEN NO ICONS !!!!!!
-     * ERROR WHEN NO ICONS !!!!!!
      * ERROR WHEN NO ICONS !!!!!!
      * @return {[type]} [description]
      */
@@ -664,9 +663,13 @@ class LeafleatMap {
             if(v.marker != null)
                 markers.push(v.marker)
         }
-        let group = new L.featureGroup(markers);
+        if(markers.length > 0) {
+            let group = new L.featureGroup(markers)
+            this.map.fitBounds(group.getBounds().pad(0.3))
+        }
+        else {
 
-        this.map.fitBounds(group.getBounds().pad(0.3));
+        }
     }
 
     zoomIn (e) {

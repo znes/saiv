@@ -1,5 +1,4 @@
 function modal(head = "", content = "", abortFunction = function(){} ) {
-	console.log(content);
 	// Get the modal
 	const modal = $(config.dom.modal.container)
 	$(config.dom.modal.heading).text(head)

@@ -1,0 +1,3 @@
+let globals = {
+	unsavedChanges: false
+}

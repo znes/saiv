@@ -16,23 +16,23 @@ $(function() {
      * init menu listener
      */
     $(config.dom.links.json).click(() => {
-        openJsonSelection()
-    })
-
-    $(config.dom.links.map).click(() => {
-        showMap()
+        if(discardChanges())
+            openJsonSelection()
     })
 
     $(config.dom.links.home).click(() => {
-        home()
+        if(discardChanges())
+            home()
     })
 
     $(config.dom.links.style).click(() => {
-        selectStyle()
+        if(discardChanges())
+            selectStyle()
     })
 
     $(config.dom.links.jsonSettings).click(() => {
-        jsonSettings()
+        if(discardChanges())
+            jsonSettings()
     })
 
     
@@ -66,7 +66,7 @@ $(function() {
         })
 
         showId(dataManager.json.children[0].name)
-        showGraph();
+        showGraph()
     })
 
 
@@ -79,23 +79,49 @@ $(function() {
 
     function initListenerDataRevieved() {
         $(config.dom.links.graph).click(() => {
-            setActiveMenuItem("Explorer")
-            showGraph()
+            if(discardChanges()) {
+                setActiveMenuItem("Explorer")
+                showGraph()
+            }
         }).click()
 
         $(config.dom.links.map).click(() => {
-            setActiveMenuItem("Map")
-            showMap()
+            if(discardChanges()) {
+                setActiveMenuItem("Map")
+                showMap()
+            }
         }).parent("li").removeClass("disabled")
 
         $(config.dom.links.download).click(() => {
-            let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
-            $(config.dom.links.download).prop("href", "data:" + data)
+            let bool = confirm("Attach Explorer Positions to json?")
+            let data = dataManager.json
+            let urlString = "text/json;charset=utf-8,"
+
+            if(bool) {
+                for (let i = 0; i < data.children.length; i++) {
+                    if(typeof data.children[i].pos == "undefined") 
+                        data.children[i].pos = {}
+                    Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())
+                }
+            }
+            else {
+                for (let i = 0; i < data.children.length; i++) {
+                    if(typeof data.children[i].pos != undefined) {
+                        if(data.children[i].pos.x != undefined)
+                            delete data.children[i].pos.x;
+                        if(data.children[i].pos.y != undefined)
+                            delete data.children[i].pos.y;
+                    }
+                }  
+            }
+            urlString += encodeURIComponent(JSON.stringify(data))
+
+            $(config.dom.links.download).prop("href", "data:" + urlString)
             $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")
 
 
-        $(config.dom.links.downloadJsonPos).click(() => {
+        /*$(config.dom.links.downloadJsonPos).click(() => {
             let data = dataManager.json
             for (let i = 0; i < data.children.length; i++) {
                 if(typeof data.children[i].pos == "undefined") data.children[i].pos = {}
@@ -106,6 +132,6 @@ $(function() {
             let urlString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data))
             $(config.dom.links.downloadJsonPos).prop("href", "data:" + urlString)
             $(config.dom.links.downloadJsonPos).prop("download", "data.json")
-        }).parent("li").removeClass("disabled")
+        }).parent("li").removeClass("disabled")*/
     }
 })

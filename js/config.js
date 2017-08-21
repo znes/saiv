@@ -12,6 +12,13 @@ let config = {
 			"cose"
 		]
 	},
+	types : [
+		"polygon",
+		"volatile_generator",
+		"demand",
+		"transmission",
+		"hub"
+	],
 	dom: {
 		canvasContainer: ".containerCanvas",
 		mapContainerId: "map",
@@ -28,8 +35,7 @@ let config = {
 			graph: ".navbar .shoWExplorer",
 			jsonSetting: ".jsonSettings",
 			map: ".showMap",
-			download: ".navbar .downloadJson",
-			downloadJsonPos: ".navbar .downloadJsonWithPositions"
+			download: ".navbar .downloadJson"
 		},
 		modal: {
 			container: ".modal",

@@ -35,9 +35,17 @@ class DataManager {
 				break;
 			case "addPolygon":
 				this.addPolygon(detail.data)
+				sendEvent("sidebar", {
+                    task: "showId",
+                    data: detail.data.name
+                })
 				break
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
+				sendEvent("sidebar", {
+                    task: "showId",
+                    data: detail.data.name
+                })
 				break
 			case "deleteNode":
 				this.deleteNode(detail.data)
@@ -133,7 +141,9 @@ class DataManager {
             tags: {},
             predecessors: [],
             successors: [],
-            wkt: data.wkt
+            pos: {
+            	wkt: data.wkt
+            }
         }
 
         
