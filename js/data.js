@@ -33,13 +33,13 @@ class DataManager {
 			case "addNode":
 				this.addNode(detail.data)
 				break;
-			case "addPolygon":
+			/*case "addPolygon":
 				this.addPolygon(detail.data)
 				sendEvent("sidebar", {
                     task: "showId",
                     data: detail.data.name
                 })
-				break
+				break*/
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
 				sendEvent("sidebar", {
@@ -64,6 +64,9 @@ class DataManager {
 				break
 			case "updatePosition":
 				this.updatePosition(detail.data.name, detail.data.lat, detail.data.long)
+				break
+			default: 
+				console.log("default case updateData")
 				break
 		}
 	}
@@ -108,34 +111,40 @@ class DataManager {
             successors: [],
             pos: {}
         }
-        if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
+
+        let index = this._json.children.findIndex(x => x.name==data.name)
+		if (index !== -1) {
+			modal("Error", "Element name already exists")
+			return false;
+		}
+
+		if(typeof data.pos != "undefined") {
+			if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
+	        	formdata.pos = {
+	        		lat: parseInt(data.pos.lat),
+	        		long: parseInt(data.pos.lng)
+	        	}
+	        }
+		}
+        else if(typeof data.type != "polygon") {
         	formdata.pos = {
-        		lat: data.pos.lat,
-        		long: data.pos.lng
+        		wkt: data.wkt
         	}
-        
-        	sendEvent("dataChanged", {
-				task: "addNode",
-				data: {
-					name: data.name,
-					pos: formdata.pos
-				}
-			})
         }
-        else {
-        	sendEvent("dataChanged", {
-				task: "addNode",
-				data: {
-					name: data.name,
-					pos: data.pos
-				}
-			})
-        }
+
+        sendEvent("dataChanged", {
+			task: "addNode",
+			data: {
+				name: data.name,
+				pos: formdata.pos,
+				type: data.type
+			}
+		})
 
 		this._json.children.push(formdata)
 	}
 
-	addPolygon (data) {
+	/*addPolygon (data) {
 		let formdata = {
             name: data.name,
             type: data.type,
@@ -146,6 +155,12 @@ class DataManager {
             	wkt: data.wkt
             }
         }
+
+        let index = this._json.children.findIndex(x => x.name==data.name)
+		if (index !== -1) {
+			modal("Error", "Element name already exists")
+			return false;
+		}
 
         
     	sendEvent("dataChanged", {
@@ -158,7 +173,7 @@ class DataManager {
 
 
 		this._json.children.push(formdata)
-	}
+	}*/
 
 	/**
 	 * [addEdge description]

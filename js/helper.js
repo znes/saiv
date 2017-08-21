@@ -39,17 +39,17 @@ function discardChanges() {
 	return true
 }
 
-function createInput(label, key, currentValue, type, required=false) {
+function createInput(label, key, currentValue, type, required=false, additionalTags = "") {
 	let html = ""
 	
 	if (type != "hidden") {
 		html += '<label for="' + key + '">' + label + '</label>'
 	}
 	if(required) {
-		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>'
+		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags +  ' value="' + currentValue + '"/>'
 	}
 	else {
-		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" value="' + currentValue + '"/>'
+		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags + ' value="' + currentValue + '"/>'
 	}
 
 	return html

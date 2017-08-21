@@ -133,6 +133,7 @@ class Sidebar{
 
 	addNode (pos) {
 		this.body.html("")
+		globals.unsavedChanges = true
 		let form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
 		form.append(createSelect("type", "", config.types, ""))
@@ -147,6 +148,7 @@ class Sidebar{
 
 		form.submit(e => {
 			e.preventDefault()
+			globals.unsavedChanges = false
 
 			sendEvent("data", {
 				task: "addNode",

@@ -72,9 +72,9 @@ class LeafleatMap {
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.pos)
                     break
-                case "addPolygon":
+                /*case "addPolygon":
                     this.addPoly(e.detail.data.name, e.detail.data.wkt)
-                    break
+                    break*/
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
                     break
@@ -92,7 +92,7 @@ class LeafleatMap {
     }
 
     initElements(json) {
-        this.removeExistingElements() 
+        this.removeExistingElements()
 
 
     	json.children.forEach(child => {
@@ -109,7 +109,7 @@ class LeafleatMap {
                 let index = json.children.findIndex(x => x.name==succ)
                 if (index !== -1) {
                     this.addEdge(child.name, succ)
-                 }
+                }
             })
         })
 
@@ -194,7 +194,7 @@ class LeafleatMap {
     sidebarTextPolyCreation(wktText, name = "") {
         let form = $('<form class="createPolyForm"></form>')
         form.append(createInput("name", "name", name, "text", true))
-        form.append(createInput("type", "type", "polygon", "text", true))
+        form.append(createInput("type", "type", "polygon", "text", true, "disabled"))
 
         form.append(createInput("wkt", "wkt", wktText, "hidden"))
 
@@ -243,7 +243,7 @@ class LeafleatMap {
                 e.preventDefault()
                 if (currentPoints.length > 2) {
                     sendEvent("data", {
-                        task: "addPolygon",
+                        task: "addNode",
                         data: readForm(".createPolyForm")
                     })
 
@@ -486,12 +486,16 @@ class LeafleatMap {
 
             added = true
             this.classList.remove('over')
-            return false;
+            return false
         }
 
         function handleDragEnd(e) {
             //console.log("handleDragEnd")
             // this/e.target is the source node.
+            
+            console.log(handleDragEnd)
+            console.log("added")
+            console.log(added)
             if(added) {
                 srcEle.parent().remove()
             }
