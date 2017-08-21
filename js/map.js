@@ -2,8 +2,7 @@ class LeafleatMap {
 	constructor(id) {
 		this.mapEle = {
 
-		};
-        this.noPosEles = [];
+		}
 		this.init(id)
         this.registerEvents()
 		
@@ -16,7 +15,7 @@ class LeafleatMap {
     init(id) {
     	this.map = L.map(id, {
             center: [51.505, -0.09],
-            zoom: 13,
+            zoom: 11,
             contextmenu: true,
             contextmenuWidth: 140,
             contextmenuItems: [{
@@ -93,6 +92,9 @@ class LeafleatMap {
     }
 
     initElements(json) {
+        this.removeExistingElements() 
+
+
     	json.children.forEach(child => {
     		if(typeof child.pos != "undefined") {
                 this.addNode(child.name, child.pos)
@@ -141,6 +143,21 @@ class LeafleatMap {
             this.addEdge(newName, succ)
         }
         delete this.mapEle[oldName]
+    }
+
+    removeExistingElements() {
+        for (let [k, v] of Object.entries(this.mapEle)) {
+            if(v.marker != null) {
+                this.map.removeLayer(v.marker)
+
+                for (let [succ, obj] of Object.entries(v.successors)) {
+                    this.map.removeLayer(obj.arrow)
+                    this.map.removeLayer(obj.head)
+                }
+            }
+        }
+
+        this.mapEle = {}
     }
 
     createNode(name, pos) {
@@ -345,8 +362,6 @@ class LeafleatMap {
             }   
         }
         else {
-            /*this.noPosEles.push(name)
-            if(this.noPosEles.length == 1)*/
             this.showButtonAddNodes()
         }
     }
@@ -368,26 +383,13 @@ class LeafleatMap {
                     data: name
                 })
             })
-
-        //if (typeof pos.long != "undefined" && typeof pos.lat != "undefined" ) {
-        //    this.mapEle[name].marker = this.createNode(name,pos)
-        //}
-        //else {
-            /*this.noPosEles.push(name)
-
-            if(this.noPosEles.length == 1)*/
-            //this.showButtonAddNodes()
-        //}
     }
 
 
-    /**
-     * ERROR WHEN NO ICONS !!!!!!
-     * @return {[type]} [description]
-     */
+
     getNoPosDragElements() {
         let body = $("<div class=\"dragContainer\"></div>")
-        let imgSrc = $(".leaflet-marker-icon").first()
+        //let imgSrc = $(".leaflet-marker-icon").first()
 
 
         for (let [property, data] of Object.entries(this.mapEle)) {
@@ -395,13 +397,12 @@ class LeafleatMap {
                 let letEle = $("<div class=\"dragArticle\"></div>")
 
                 let imgClone = $("<img>")
-                    .prop("src", imgSrc.prop('src'))
+                    .prop("src", config.markerSettings.src)
                     .prop("data-name", property)
                     .prop("class", "dragImg")
-                    .prop("width", imgSrc.prop('width'))
-                    .prop("height", imgSrc.prop('height'))
-                //this.noPosEles[i]
-                //
+                    .prop("width", config.markerSettings.width)
+                    .prop("height", config.markerSettings.height)
+
                 letEle.append('<p class="dragMarkerName">' + property + '</p>')
                 letEle.append(imgClone)
                 body.append(letEle)
@@ -453,7 +454,6 @@ class LeafleatMap {
             document.body.append(canvasImage)
 
             e.dataTransfer.setDragImage(canvasImage, 0, 0)
-            console.log(srcEle.width(), srcEle.prop('height'))
             //e.dataTransfer.setDragImage(img, -50, -50);
         }
 
@@ -666,9 +666,6 @@ class LeafleatMap {
         if(markers.length > 0) {
             let group = new L.featureGroup(markers)
             this.map.fitBounds(group.getBounds().pad(0.3))
-        }
-        else {
-
         }
     }
 

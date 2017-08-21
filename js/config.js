@@ -42,5 +42,10 @@ let config = {
 			heading: ".modal .modal-header h2",
 			body: ".modal .modal-body"
 		}
+	},
+	markerSettings: {
+		src: "css/images/marker-icon-2x.png",
+		width: 25,
+		height: 41
 	}
 }

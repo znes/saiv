@@ -135,7 +135,7 @@ class Sidebar{
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
-		form.append(createInput("type", "type", "", "text", true))
+		form.append(createSelect("type", "", config.types, ""))
 
 		for (let [property, val] of Object.entries(pos)) {
 			form.append(createInput("pos_" + property, "pos_" + property, val, "hidden"))

@@ -105,7 +105,8 @@ class DataManager {
             type: data.type,
             tags: {},
             predecessors: [],
-            successors: []
+            successors: [],
+            pos: {}
         }
         if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
         	formdata.pos = {
