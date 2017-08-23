@@ -42,10 +42,6 @@ class DataManager {
 				break*/
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
-				sendEvent("sidebar", {
-                    task: "showId",
-                    data: detail.data.name
-                })
 				break
 			case "deleteNode":
 				this.deleteNode(detail.data)
@@ -63,7 +59,7 @@ class DataManager {
 				this.updateNode(detail.data)
 				break
 			case "updatePosition":
-				this.updatePosition(detail.data.name, detail.data.lat, detail.data.long)
+				this.updatePosition(detail.data.name, detail.data.pos)
 				break
 			default: 
 				console.log("default case updateData")
@@ -82,21 +78,20 @@ class DataManager {
 		})
 	}
 
-	updatePosition (name, lat, long) {
+	updatePosition (name, pos) {
 		let index = this._json.children.findIndex(x => x.name==name)
 		if (index !== -1) {
 			if(typeof this._json.children[index].pos == "undefined") {
 				this._json.children[index].pos = {}		
 			}
-			this._json.children[index].pos.lat = lat
-			this._json.children[index].pos.long = long
+
+			this._json.children[index].pos = pos
 
 			sendEvent("dataChanged", {
 				task: "positionUpdate",
 				data: {
 					name: name,
-					lat: lat,
-					long: long
+					pos: pos
 				}
 			})
 		}
@@ -122,15 +117,19 @@ class DataManager {
 			if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
 	        	formdata.pos = {
 	        		lat: parseInt(data.pos.lat),
-	        		long: parseInt(data.pos.lng)
+	        		lng: parseInt(data.pos.lng)
 	        	}
 	        }
+	        else if(typeof data.pos.x != "undefined" && typeof data.pos.y != "undefined") {
+	        	formdata.pos = {
+	        		x: parseInt(data.pos.x),
+	        		y: parseInt(data.pos.y)
+	        	}
+	        }
+	        else if(typeof data.pos.wkt != "undefined") {
+	        	formdata.pos = data.pos
+	        }
 		}
-        else if(typeof data.type != "polygon") {
-        	formdata.pos = {
-        		wkt: data.wkt
-        	}
-        }
 
         sendEvent("dataChanged", {
 			task: "addNode",
@@ -231,7 +230,7 @@ class DataManager {
 	deleteNode (name) {
 		this._json.children = this._json.children.filter(child => {
             return child.name != name
-        });
+        })
 
 		this.deleteRelationNames(name)
 
@@ -243,16 +242,18 @@ class DataManager {
 
 	updateNode (updateData) {
 		// check if pos changed
-        if(typeof updateData.pos.lat != undefined && typeof updateData.pos.long != undefined) {
+        if(typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
         	let ele = this._json.children.filter(child => child.name == updateData.currentid)[0]
         	
-        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.long != ele.pos.long) {
+        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
         		sendEvent("dataChanged", {
 					task: "positionUpdate",
 					data: {
 						name: updateData.currentid,
-						lat: updateData.pos.lat,
-						long: updateData.pos.long
+						pos: {
+							lat: updateData.pos.lat,
+							lng: updateData.pos.lng
+						}
 					}
 				})
         	}
@@ -291,10 +292,6 @@ class DataManager {
 							to: this._json.children[index].name
 						}
 					})
-					/*sendEvent("addEdge", {
-						from: updateData.name,
-						to: this._json.children[index].name
-					})*/
 				}
 			}
         })
@@ -385,7 +382,6 @@ class DataManager {
 					child.successors.splice(index,1);
 				}
     		})
-
     	})
     }
 }

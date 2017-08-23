@@ -76,7 +76,7 @@ class CyptoScape {
                     this.renameNode(e.detail.data.oldName, e.detail.data.newName)
                     break
                 case "addNode":
-                    this.addNode(e.detail.data.name, e.detail.data.pos)
+                    this.addNode(e.detail.data.name, e.detail.data.type, e.detail.data.pos)
                     break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
@@ -238,12 +238,13 @@ class CyptoScape {
 
             eles.push(ele)
         })
+        this.cy.add(eles)
 
         // Add edges when nodes loaded
         // Only add Successors 
         jsonData.children.forEach(child => {
             child.successors.forEach(succ => {
-                eles.push({
+                this.cy.add({
                     data: {
                         source: child.name,
                         target: succ
@@ -254,8 +255,8 @@ class CyptoScape {
         })
 
 
-        this.cy.$("*").remove()
-        this.cy.add(eles)
+        //this.cy.$("*").remove()
+        //this.cy.add(eles)
 
         if(!customPos) {
             this.updateLayout()
@@ -266,7 +267,7 @@ class CyptoScape {
         }
     }
 
-    addNode(name, pos = {}) {
+    addNode(name, type, pos = {}) {
         if(typeof pos.x != "undefined" && typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
@@ -343,6 +344,8 @@ class CyptoScape {
     }
 
     addEdge(from, to) {
+        //console.log("to")
+        //console.log(to)
         this.cy.add([{ group: "edges", data: { source: from, target: to}}])
     }
 

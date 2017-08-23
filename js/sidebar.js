@@ -19,11 +19,12 @@ class Sidebar{
 
 
 	showData (data) {
-		this.open()
+		//this.open()
 		this.head.html(JSON.stringify(data))
 	}
 
 	show($head, $body) {
+		//this.open()
 		this.head.html("").append($head)
 		this.body.html("").append($body)
 	}
@@ -74,7 +75,7 @@ class Sidebar{
 					if(prop == "lat") {
 						form.append(createInput("Latitude", "pos_"+prop, val, "text"))
 					}
-					else if(prop == "long") {
+					else if(prop == "lng") {
 						form.append(createInput("Longitude", "pos_"+prop, val, "text"))
 					}
 				}

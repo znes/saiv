@@ -27,7 +27,7 @@
       "predecessors": [],
       "successors": ["hub1"],
       "pos": {
-        "long":51.5,
+        "lng":51.5,
         "lat":-0.09
       }
     },
@@ -41,7 +41,7 @@
       "predecessors": [],
       "successors": ["hub2"],
       "pos": {
-        "long":51.5062793,
+        "lng":51.5062793,
         "lat":-0.13158
       }
     },
@@ -54,7 +54,7 @@
       "predecessors": ["hub2"],
       "successors": [],
       "pos": {
-        "long":51.4062793,
+        "lng":51.4062793,
         "lat":-0.12158
       }
     },
@@ -68,7 +68,7 @@
       "predecessors": ["hub1"],
       "successors": ["hub2"],
       "pos": {
-        "long":51.5262793,
+        "lng":51.5262793,
         "lat":-0.14158
       }
     },
@@ -81,7 +81,7 @@
       "predecessors": ["wind"],
       "successors": ["line"],
       "pos": {
-        "long":51.4862793,
+        "lng":51.4862793,
         "lat":-0.13858
       }
     },
@@ -94,7 +94,7 @@
       "predecessors": ["line", "solar"],
       "successors": ["demand"],
       "pos": {
-        "long":51.4762793,
+        "lng":51.4762793,
         "lat":-0.12058
       }
     }

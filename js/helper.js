@@ -33,7 +33,10 @@ function showMap() {
 
 function discardChanges() {
 	if(globals.unsavedChanges) {
-		return confirm('You have unsaved changes. You want to discard them?')
+		if(confirm('You have unsaved changes. You want to discard them?'))
+			globals.unsavedChanges = false
+		else
+			return false
 	}
 	
 	return true
