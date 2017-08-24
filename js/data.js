@@ -32,14 +32,7 @@ class DataManager {
 		switch(detail.task) {
 			case "addNode":
 				this.addNode(detail.data)
-				break;
-			/*case "addPolygon":
-				this.addPolygon(detail.data)
-				sendEvent("sidebar", {
-                    task: "showId",
-                    data: detail.data.name
-                })
-				break*/
+				break
 			case "addEdge":
 				this.addEdge(detail.data.from, detail.data.to)
 				break
@@ -81,9 +74,9 @@ class DataManager {
 	updatePosition (name, pos) {
 		let index = this._json.children.findIndex(x => x.name==name)
 		if (index !== -1) {
-			if(typeof this._json.children[index].pos == "undefined") {
+			/*if(typeof this._json.children[index].pos == "undefined") {
 				this._json.children[index].pos = {}		
-			}
+			}*/
 
 			this._json.children[index].pos = pos
 
@@ -116,8 +109,8 @@ class DataManager {
 		if(typeof data.pos != "undefined") {
 			if(typeof data.pos.lat != "undefined" && typeof data.pos.lng != "undefined") {
 	        	formdata.pos = {
-	        		lat: parseInt(data.pos.lat),
-	        		lng: parseInt(data.pos.lng)
+	        		lat: data.pos.lat,
+	        		lng: data.pos.lng
 	        	}
 	        }
 	        else if(typeof data.pos.x != "undefined" && typeof data.pos.y != "undefined") {
@@ -141,38 +134,13 @@ class DataManager {
 		})
 
 		this._json.children.push(formdata)
+
+		sendEvent("sidebar", {
+            task: "showId",
+            data: data.name
+        })
 	}
 
-	/*addPolygon (data) {
-		let formdata = {
-            name: data.name,
-            type: data.type,
-            tags: {},
-            predecessors: [],
-            successors: [],
-            pos: {
-            	wkt: data.wkt
-            }
-        }
-
-        let index = this._json.children.findIndex(x => x.name==data.name)
-		if (index !== -1) {
-			modal("Error", "Element name already exists")
-			return false;
-		}
-
-        
-    	sendEvent("dataChanged", {
-			task: "addPolygon",
-			data: {
-				name: data.name,
-				wkt: data.wkt
-			}
-		})
-
-
-		this._json.children.push(formdata)
-	}*/
 
 	/**
 	 * [addEdge description]
@@ -242,22 +210,24 @@ class DataManager {
 
 	updateNode (updateData) {
 		// check if pos changed
-        if(typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
-        	let ele = this._json.children.filter(child => child.name == updateData.currentid)[0]
-        	
-        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
-        		sendEvent("dataChanged", {
-					task: "positionUpdate",
-					data: {
-						name: updateData.currentid,
-						pos: {
-							lat: updateData.pos.lat,
-							lng: updateData.pos.lng
+        if(typeof updateData.pos != "undefined") {
+	        if(typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
+	        	let ele = this._json.children.filter(child => child.name == updateData.currentid)[0]
+	        	
+	        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
+	        		sendEvent("dataChanged", {
+						task: "positionUpdate",
+						data: {
+							name: updateData.currentid,
+							pos: {
+								lat: updateData.pos.lat,
+								lng: updateData.pos.lng
+							}
 						}
-					}
-				})
-        	}
-        }
+					})
+	        	}
+	        }
+	    }
 
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 

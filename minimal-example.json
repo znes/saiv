@@ -1,105 +1,119 @@
 {
-  "api_parameters": {
-    "api_version": "0.1",
-    "api_type": "element",
-    "query": {
-      "geom": "false",
-      "tags": "true",
-      "sequences": "false",
-      "children": "true",
-      "parents": "false",
-      "predecessors": "true",
-      "successors": "true",
-      "expand": "children",
-      "hubs_explicitly": "true"
+    "api_parameters":
+    {
+        "api_version": "0.1",
+        "api_type": "element",
+        "query":
+        {
+            "geom": "false",
+            "tags": "true",
+            "sequences": "false",
+            "children": "true",
+            "parents": "false",
+            "predecessors": "true",
+            "successors": "true",
+            "expand": "children",
+            "hubs_explicitly": "true"
+        }
+    },
+    "type": "scenario",
+    "name": "test_scenario",
+    "children": [
+    {
+        "name": "wind",
+        "type": "volatile_generator",
+        "tags":
+        {
+            "fuel_type": "wind",
+            "installed_power": "251"
+        },
+        "predecessors": [],
+        "successors": ["hub1"],
+        "pos":
+        {
+            "lng": 51.5,
+            "lat": -0.09
+        }
+    },
+    {
+        "name": "solar",
+        "type": "volatile_generator",
+        "tags":
+        {
+            "fuel_type": "solar",
+            "installed_power": "251"
+        },
+        "predecessors": [],
+        "successors": ["hub2"],
+        "pos":
+        {
+            "lng": 51.5062793,
+            "lat": -0.13158
+        }
+    },
+    {
+        "name": "demand",
+        "type": "demand",
+        "tags":
+        {
+            "amount": "100000"
+        },
+        "predecessors": ["hub2"],
+        "successors": [],
+        "pos":
+        {
+            "lng": 51.4062793,
+            "lat": -0.12158
+        }
+    },
+    {
+        "name": "line",
+        "type": "transmission",
+        "tags":
+        {
+            "capacity": "200",
+            "efficiency": "0.9"
+        },
+        "predecessors": ["hub1"],
+        "successors": ["hub2"],
+        "pos":
+        {
+            "lng": 51.5262793,
+            "lat": -0.14158
+        }
+    },
+    {
+        "name": "hub1",
+        "type": "hub",
+        "tags":
+        {
+            "sector": "electricity"
+        },
+        "predecessors": ["wind"],
+        "successors": ["line"],
+        "pos":
+        {
+            "lng": 51.4862793,
+            "lat": -0.13858
+        }
+    },
+    {
+        "name": "hub2",
+        "type": "hub",
+        "tags":
+        {
+            "sector": "electricity"
+        },
+        "predecessors": ["line", "solar"],
+        "successors": ["demand"],
+        "pos":
+        {
+            "lng": 51.4762793,
+            "lat": -0.12058
+        }
+    }],
+    "tags":
+    {
+        "description": "Minimal example scenario for testing purposes"
     }
-  },
-  "type": "scenario",
-  "name": "test_scenario",
-  "children": [
-   {
-      "name": "wind",
-      "type": "volatile_generator",
-      "tags": {
-        "fuel_type": "wind",
-        "installed_power": "251"
-      },
-      "predecessors": [],
-      "successors": ["hub1"],
-      "pos": {
-        "lng":51.5,
-        "lat":-0.09
-      }
-    },
-    {
-      "name": "solar",
-      "type": "volatile_generator",
-      "tags": {
-        "fuel_type": "solar",
-        "installed_power": "251"
-      },
-      "predecessors": [],
-      "successors": ["hub2"],
-      "pos": {
-        "lng":51.5062793,
-        "lat":-0.13158
-      }
-    },
-    {
-      "name": "demand",
-      "type": "demand",
-      "tags": {
-        "amount": "100000"
-      },
-      "predecessors": ["hub2"],
-      "successors": [],
-      "pos": {
-        "lng":51.4062793,
-        "lat":-0.12158
-      }
-    },
-    {
-      "name": "line",
-      "type": "transmission",
-      "tags": {
-        "capacity": "200",
-        "efficiency": "0.9"
-      },
-      "predecessors": ["hub1"],
-      "successors": ["hub2"],
-      "pos": {
-        "lng":51.5262793,
-        "lat":-0.14158
-      }
-    },
-    {
-      "name": "hub1",
-      "type": "hub",
-      "tags": {
-        "sector": "electricity"
-      },
-      "predecessors": ["wind"],
-      "successors": ["line"],
-      "pos": {
-        "lng":51.4862793,
-        "lat":-0.13858
-      }
-    },
-    {
-      "name": "hub2",
-      "type": "hub",
-      "tags": {
-        "sector": "electricity"
-      },
-      "predecessors": ["line", "solar"],
-      "successors": ["demand"],
-      "pos": {
-        "lng":51.4762793,
-        "lat":-0.12058
-      }
-    }
-  ],
-  "tags": {
-    "description": "Minimal example scenario for testing purposes"
-  }
 }

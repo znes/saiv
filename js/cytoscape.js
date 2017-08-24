@@ -268,15 +268,15 @@ class CyptoScape {
     }
 
     addNode(name, type, pos = {}) {
-        if(typeof pos.x != "undefined" && typeof pos.y != "undefined") {
+        if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
                 data: {
                     id: name
                 },
                 position: {
-                    x: parseInt(pos.x),
-                    y: parseInt(pos.y)
+                    x: pos.x,
+                    y: pos.y
                 }
             })
         }
