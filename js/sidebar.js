@@ -48,18 +48,12 @@ class Sidebar{
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 
-
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
 
-		/*if (data.type == 'scenario') {
-			//form.append(createInput("name", "name", data.id, "text"))
-			form.append(createInput("type", "type", data.type, "hidden"))
-		}*/
 
 		for (let [key, value] of Object.entries(data)) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>')
-				if(data.type != "scenario")
 					form.append('<a href="#" class="addTag">Add Tag</label><br/>')
 
 				for (let [tagKey, tagValue] of Object.entries(data[key])) {
@@ -68,7 +62,7 @@ class Sidebar{
 				}
 			} else if (key == "predecessors" || key == "successors") {
 				form.append(createSelect(key, value, nodes))
-				$('.js-example-basic-multiple', form).select2()
+				$('.basic-select', form).select2()
 			}
 			else if (key == "pos")  {
 				for (let [prop, val] of Object.entries(value)) {
@@ -79,6 +73,9 @@ class Sidebar{
 						form.append(createInput("Longitude", "pos_"+prop, val, "text"))
 					}
 				}
+			}
+			else if(key == "type") {
+				form.append(createSelect("type", value, config.types, ""))
 			}
 			else {
 				form.append(createInput(key, key, value, "text"))

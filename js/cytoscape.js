@@ -30,7 +30,6 @@ class CyptoScape {
             }, {
                 selector: "edge",
                 style: {
-                    "width": 4,
                     "target-arrow-shape": "triangle",
                     "line-color": "#9dbaea",
                     "target-arrow-color": "#9dbaea",
@@ -77,6 +76,9 @@ class CyptoScape {
                     break
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.type, e.detail.data.pos)
+                    break
+                case "changeType":
+                    this.changeType(e.detail.data.name, e.detail.data.type)
                     break
                 case "deleteNode":
                     this.deleteNode(e.detail.data)
@@ -218,6 +220,7 @@ class CyptoScape {
     initElements(jsonData) {
         let eles = []
         let customPos = false
+        this.cy.remove("*")
 
         jsonData.children.forEach(child => {
             let ele = {
@@ -267,6 +270,51 @@ class CyptoScape {
         }
     }
 
+    changeType(name, newType) {
+        const ele = this.cy.$("node#" + name)
+
+        let newEle = {
+            group: "nodes",
+            data: {
+                id: newName,
+                type: newType
+            },
+            position: ele.position()
+        }
+        this.cy.add(newEle)
+        
+
+        let edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
+        //replace Nodes
+        let edges = []
+        edgesToUpdate.forEach(edge => {
+            let target = edge.target().id(),
+                source = edge.source().id(),
+                ele = {
+                    group: "edges",
+                    data: {
+                        source: "",
+                        target: ""
+                    }
+                }
+
+            
+            if(target == name) {
+                ele.data.source = source
+                ele.data.target = newName
+            }
+            else {
+                ele.data.source = newName
+                ele.data.target = target
+            }
+
+            edges.push(ele)
+        })
+        ele.remove();
+        edgesToUpdate.remove();
+        this.cy.add(edges)
+    }
+
     addNode(name, type, pos = {}) {
         if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
             this.cy.add({
@@ -284,7 +332,7 @@ class CyptoScape {
             this.cy.add({
                 group: "nodes",
                 data: {
-                    id: name,
+                    id: name
                 }
             })
         }

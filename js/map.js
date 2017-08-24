@@ -1,6 +1,6 @@
 class LeafleatMap {
 	constructor(id) {
-		this.mapEle = {
+		this.elements = {
 
 		}
 		this.init(id)
@@ -8,7 +8,7 @@ class LeafleatMap {
 		
 		// debug	
 	    window.map = () => {
-	    	return this.mapEle
+	    	return this.elements
 	    }
     }
 
@@ -69,6 +69,9 @@ class LeafleatMap {
                 case "renameNode":
                     this.renameNode(e.detail.data.oldName, e.detail.data.newName)
                     break
+                case "changeType":
+                    this.changeType(e.detail.data.name, e.detail.data.type)
+                    break
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.type, e.detail.data.pos)
                     break
@@ -109,15 +112,15 @@ class LeafleatMap {
     }
 
     renameNode(oldName, newName) {
-        let pos = this.mapEle[oldName].marker.getLatLng()
-        let succs = this.mapEle[oldName].successors
+        let pos = this.elements[oldName].marker.getLatLng()
+        let succs = this.elements[oldName].successors
 
-        this.addNode(newName, this.mapEle[oldName].type, pos)
+        this.addNode(newName, this.elements[oldName].type, pos)
 
         // rename relative links
-        for (let [property, data] of Object.entries(this.mapEle)) {
+        for (let [property, data] of Object.entries(this.elements)) {
             if(property != oldName) {
-                for (let [succ, obj] of Object.entries(this.mapEle[property].successors)) {
+                for (let [succ, obj] of Object.entries(this.elements[property].successors)) {
                     if(succ == oldName) {
                         this.deleteEdge(property, oldName)
                         this.addEdge(property, newName)
@@ -127,18 +130,18 @@ class LeafleatMap {
         }
 
         // remove Old 
-        this.map.removeLayer(this.mapEle[oldName].marker)
+        this.map.removeLayer(this.elements[oldName].marker)
         for (let [succ, obj] of Object.entries(succs)) {
             this.map.removeLayer(obj.arrow)
             this.map.removeLayer(obj.head)
 
             this.addEdge(newName, succ)
         }
-        delete this.mapEle[oldName]
+        delete this.elements[oldName]
     }
 
     removeExistingElements() {
-        for (let [k, v] of Object.entries(this.mapEle)) {
+        for (let [k, v] of Object.entries(this.elements)) {
             if(v.marker != null) {
                 this.map.removeLayer(v.marker)
 
@@ -149,39 +152,49 @@ class LeafleatMap {
             }
         }
 
-        this.mapEle = {}
+        this.elements = {}
     }
 
-    createNode(name, type, pos) {
+    createNode(name, pos) {
         let obj = null
-        if(type == "polygon") {
-            if(pos.wkt === undefined)
+        if(this.elements[name].type == "polygon") {
+            /*if(pos.wkt === undefined)
             {
                 showButtonAddNodes()
                 return null
-            }
+            }*/
 
             let wkt = new Wkt.Wkt()
             wkt.read(pos.wkt)
 
             obj = L.polygon(wkt.toJson().coordinates, {
                 contextmenu: true,
-                contextmenuItems: [{
-                    text: 'Connect successors',
+                contextmenuItems: [
+                {
+                    text: 'Change position',
                     index: 0,
+                    callback: e => {
+                        this.drawPolygon(name, true)
+                    }
+                }, {
+                    separator: true,
+                    index: 1
+                }, {
+                    text: 'Connect successors',
+                    index: 2,
                     callback: e => {
                         this.connectSuccessor(e, name)
                     }
                 },{
                     text: 'Delete',
-                    index: 1,
+                    index: 3,
                     callback: e => { sendEvent("data", {
                         task: "deleteNode",
                         data: name
                     })}
                 }, {
                     separator: true,
-                    index: 2
+                    index: 4
                 }]
             })
         }
@@ -221,17 +234,33 @@ class LeafleatMap {
         return obj        
     }
 
+    changeType(name, newType) {
+        let oldType = this.elements[name].type
+
+        this.elements[name].type = newType
+        if(marker != null) {
+            if(oldType == "polygon" || oldType != "polygon" && newType == "polygon") {
+                this.deleteNode(name, false)
+                // No Pos Data
+                showButtonAddNodes()
+            }
+            else {
+                var pos = this.elements[name].marker.getLatLngs()
+                this.elements[name].marker.remove()
+                this.elements[name].marker = this.createNode(name, pos)
+            }
+        }
+    }
+
+
     sidebarTextPolyCreation(wktText, name = "") {
         let form = $('<form class="createPolyForm"></form>')
         form.append(createInput("name", "name", name, "text", true))
-        form.append(createInput("type", "type", "polygon", "text", true, "readonly"))
-
-        form.append(createInput("wkt", "pos_wkt", wktText, "hidden"))
-
-
-        form.append('<input type="submit" name="Submit" value="Submit"/>')
-        form.append('<button class="resetPoly">Reset</button>')
-        form.append('<button class="revertPoly">Revert</button>')         
+            .append(createInput("type", "type", "polygon", "text", true, "readonly"))
+            .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
+            .append('<input type="submit" name="Submit" value="Submit"/>')
+            .append('<button class="resetPoly">Reset</button>')
+            .append('<button class="revertPoly">Revert</button>')         
 
 
         sendEvent("sidebar", {
@@ -239,22 +268,18 @@ class LeafleatMap {
             data: {
                 head: "Create Polygon",
                 body: form
-            }
+            }   
         })
     }
 
     sidebarTextPolyPlacement(wktText, name = "") {
         let form = $('<form class="createPolyForm"></form>')
         form.append(createInput("name", "name", name, "hidden"))
+            .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
+            .append('<input type="submit" name="Submit" value="Submit"/>')
+            .append('<button class="resetPoly">Reset</button>')
+            .append('<button class="revertPoly">Revert</button>')
         /*form.append(createInput("type", "type", "polygon", "text", true, "readonly"))*/
-
-        form.append(createInput("wkt", "pos_wkt", wktText, "hidden"))
-
-
-        form.append('<input type="submit" name="Submit" value="Submit"/>')
-        form.append('<button class="resetPoly">Reset</button>')
-        form.append('<button class="revertPoly">Revert</button>')
-
 
         sendEvent("sidebar", {
             task: "show",
@@ -265,7 +290,7 @@ class LeafleatMap {
         })
     } 
 
-    drawPolygon(name = null) {
+    drawPolygon(name = null, redraw = false) {
         let currentPoints = [],
             ghostPoly = null,
             that = this
@@ -273,13 +298,13 @@ class LeafleatMap {
         modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
         globals.unsavedChanges = true
 
-        updateBodyPoly(currentPoints)
+        
 
+        updateBodyPoly(currentPoints)
         this.map.on('click', e => {
             if(ghostPoly != null) {
                 ghostPoly.remove()
             }
-
 
             currentPoints.push([e.latlng.lat, e.latlng.lng])
 
@@ -288,16 +313,8 @@ class LeafleatMap {
             updateBodyPoly(currentPoints)
         })
 
-        function updateBodyPoly() {
-            let wktText = 'POLYGON ('
-            currentPoints.forEach(pair=>{
-                pair.forEach(entry=>{
-                    wktText += entry + " "
-                })
-                wktText += ","
-            })
-            wktText = wktText.slice(0, -1)
-            wktText += ")"
+        function updateBodyPoly(currentPoints) {
+            let wktText = arrayToPolygonWkt(currentPoints)
 
             if(name != null) {
                 that.sidebarTextPolyPlacement(wktText, name)
@@ -365,7 +382,7 @@ class LeafleatMap {
     addDefaultBind() {
         this.map.off("click")
         this.map.off("mousemove")
-        for (let [property, data] of Object.entries(this.mapEle)) {
+        for (let [property, data] of Object.entries(this.elements)) {
             if(data.marker != null) {
                 data.marker.off("click")
                     .on("click", () => {
@@ -436,7 +453,7 @@ class LeafleatMap {
         })
 
         // add onclick Marker
-        for (let [property, data] of Object.entries(this.mapEle)) {
+        for (let [property, data] of Object.entries(this.elements)) {
             if(property != name) {
                 if(data.marker != null) {
                     data.marker.on("click", () => {
@@ -465,14 +482,14 @@ class LeafleatMap {
     }
 
     addNode(name, type, pos = null) {
-        this.mapEle[name] = {
+        this.elements[name] = {
             successors: {},
             marker: null,
             type: type
         }
-        if(typeof pos != null) {
-            if(typeof pos.lng != "undefined" && typeof pos.lat != "undefined" || typeof pos.wkt != "undefined" ) {
-                this.mapEle[name].marker = this.createNode(name, type, pos)
+        if(typeof pos != "undefined") {
+            if(typeof pos.lng != "undefined" && typeof pos.lat != "undefined"  && type != "polygon" || typeof pos.wkt != "undefined" && type == "polygon") {
+                this.elements[name].marker = this.createNode(name, pos)
             }
             else {
                 this.showButtonAddNodes()
@@ -492,7 +509,7 @@ class LeafleatMap {
         polyContainer.append(list)
 
 
-        for (let [property, data] of Object.entries(this.mapEle)) {
+        for (let [property, data] of Object.entries(this.elements)) {
             if(data.marker == null) {
                 if(data.type == "polygon") {
                     let li = $("<li><a href=\"#\">"+property+"</a></li>")
@@ -639,31 +656,33 @@ class LeafleatMap {
         }
     }
 
-    deleteNode(name) {
-        for (let [k, v] of Object.entries(this.mapEle)) {
+    deleteNode(name, deleteRefs = true) {
+        for (let [k, v] of Object.entries(this.elements)) {
             if(k!=name){
-                for (let [succ, obj] of Object.entries(this.mapEle[k].successors)) {
+                for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
                     if(succ == name) {
                         this.map.removeLayer(obj.arrow)
                         this.map.removeLayer(obj.head)
-                        delete this.mapEle[k].successors[succ]
+                        if(deleteRefs)
+                            delete this.elements[k].successors[succ]
                     }
                 }
             }
             else {
-                this.map.removeLayer(this.mapEle[name].marker)
-                for (let [succ, obj] of Object.entries(this.mapEle[k].successors)) {
+                this.map.removeLayer(this.elements[name].marker)
+                this.elements[name].marker = null
+                for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
                     this.map.removeLayer(obj.arrow)
                     this.map.removeLayer(obj.head)
                 }
-                delete this.mapEle[name]
+                if(deleteRefs)
+                    delete this.elements[name]
             }
         }
-        delete this.mapEle[name]
     }
 
     addEdge(from, to) {
-        if(this.mapEle[from].marker != null && this.mapEle[to].marker != null ) {
+        if(this.elements[from].marker != null && this.elements[to].marker != null ) {
             let arrow = L.polyline([this.getCoordinates(from), this.getCoordinates(to)], {
                 weight: 10,
                 contextmenu: true,
@@ -689,18 +708,18 @@ class LeafleatMap {
             arrowHead.setPatterns([
                 {   offset: '100%', 
                     repeat: 0, 
-                    symbol: L.Symbol.arrowHead({pixelSize: 15, polygon: false, pathOptions: {stroke: true}})
+                    symbol: L.Symbol.arrowHead({weight: 15, polygon: false, pathOptions: {stroke: true}})
                 }
             ])
 
 
-            this.mapEle[from].successors[to] = {
+            this.elements[from].successors[to] = {
                 arrow: arrow,
                 head: arrowHead
             }
         }
         else {
-            this.mapEle[from].successors[to] = {
+            this.elements[from].successors[to] = {
                 arrow: null,
                 head: null
             }
@@ -708,34 +727,34 @@ class LeafleatMap {
     }
 
     getCoordinates(name) {
-        if(this.mapEle[name].type == "polygon") {
+        if(this.elements[name].type == "polygon") {
             // different implementations for polygons can be found here
             // https://stackoverflow.com/questions/22796520/finding-the-center-of-leaflet-polygon
-            return this.mapEle[name].marker.getBounds().getCenter()
+            return this.elements[name].marker.getBounds().getCenter()
         }
         else {
-            return this.mapEle[name].marker.getLatLng()
+            return this.elements[name].marker.getLatLng()
         }
     }
 
     deleteEdge(from, to) {
-        this.map.removeLayer(this.mapEle[from].successors[to].arrow)
-        this.map.removeLayer(this.mapEle[from].successors[to].head)
-        delete this.mapEle[from].successors[to]
+        this.map.removeLayer(this.elements[from].successors[to].arrow)
+        this.map.removeLayer(this.elements[from].successors[to].head)
+        delete this.elements[from].successors[to]
     }
 
     updatePosition(name, pos) {
         // checck if already on Map
-        if(this.mapEle[name].marker != null) {
-            if(this.mapEle[name].type == "polygon") {
-                this.mapEle[name].marker.remove()
-                this.mapEle[name].marker = this.createNode(name, "polygon", pos)
+        if(this.elements[name].marker != null) {
+            if(this.elements[name].type == "polygon") {
+                this.elements[name].marker.remove()
+                this.elements[name].marker = this.createNode(name, pos)
             }
             else {
-                this.mapEle[name].marker.setLatLng(pos)
+                this.elements[name].marker.setLatLng(pos)
 
                 // Update Connections
-                /*for (let [prob, data] of Object.entries(this.mapEle)) {
+                /*for (let [prob, data] of Object.entries(this.elements)) {
                     if(prob == name) {
                         for (let [succ, obj] of Object.entries(data.successors)) {
                             let latlngs = obj.arrow.getLatLngs()
@@ -757,18 +776,18 @@ class LeafleatMap {
                 }*/
             }
             // Update Connections
-            for (let [prob, data] of Object.entries(this.mapEle)) {
+            for (let [prob, data] of Object.entries(this.elements)) {
                 if(prob == name) {
                     for (let [succ, obj] of Object.entries(data.successors)) {
-                        removeEdge(name,succ)
-                        addEdge(name,succ)
+                        this.deleteEdge(name,succ)
+                        this.addEdge(name,succ)
                     }
                 }
                 else {
                     for (let [succ, obj] of Object.entries(data.successors)) {
                         if(succ == name) { 
-                            removeEdge(prob, name)
-                            addEdge(prob, name)
+                            this.deleteEdge(prob, name)
+                            this.addEdge(prob, name)
                         }
                     }
                 }
@@ -777,14 +796,14 @@ class LeafleatMap {
         }
         // create Node and Successors
         else {
-            this.mapEle[name].marker = this.createNode(name, this.mapEle[name].type, pos)
+            this.elements[name].marker = this.createNode(name, pos)
 
             // check succs
-            for (let [prob, data] of Object.entries(this.mapEle)) {
+            for (let [prob, data] of Object.entries(this.elements)) {
                 if(prob == name) {
                     for (let [succ, obj] of Object.entries(data.successors)) {
                         // check if marker already exists
-                        if(this.mapEle[succ].marker != null) {
+                        if(this.elements[succ].marker != null) {
                             this.addEdge(name, succ)
                         }
                     }
@@ -808,7 +827,7 @@ class LeafleatMap {
 
     centerMap (e) {
         let markers = []
-        for (let [k, v] of Object.entries(this.mapEle)) {
+        for (let [k, v] of Object.entries(this.elements)) {
             if(v.marker != null)
                 markers.push(v.marker)
         }

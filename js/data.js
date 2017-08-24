@@ -209,10 +209,11 @@ class DataManager {
 	}
 
 	updateNode (updateData) {
+
 		// check if pos changed
         if(typeof updateData.pos != "undefined") {
 	        if(typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
-	        	let ele = this._json.children.filter(child => child.name == updateData.currentid)[0]
+	        	let ele = this.getElement(updateData.currentid)
 	        	
 	        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
 	        		sendEvent("dataChanged", {
@@ -228,6 +229,17 @@ class DataManager {
 	        	}
 	        }
 	    }
+
+	    // check if type changed
+	    if(updateData.type != this.getElement(updateData.currentid).type) {
+	    	sendEvent("dataChanged", {
+				task: "changeTyp",
+				data: {
+					name: updateData.currentid,
+					type: updateData.type
+				}
+			})
+		}
 
 		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
 
@@ -265,7 +277,6 @@ class DataManager {
 				}
 			}
         })
-
         updateData.predecessors.forEach(child => {
         	let index = this._json.children.findIndex(x => x.name==child)
 			if (index !== -1) {
@@ -284,7 +295,8 @@ class DataManager {
 			}
         })
 
-        // Check if something has been removed
+
+        // Check if Edges have been removed
         this._json.children.forEach((child, id, arr)=> {
         	let index = child.predecessors.indexOf(updateData.name)
         	if( index !== -1)
@@ -318,6 +330,7 @@ class DataManager {
         		}
         	}
         })
+
         this._json.children.push(updateData)
 
         sendEvent("sidebar", {

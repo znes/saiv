@@ -33,13 +33,36 @@ function showMap() {
 
 function discardChanges() {
 	if(globals.unsavedChanges) {
-		if(confirm('You have unsaved changes. You want to discard them?'))
+		if(confirm('You have unsaved changes. You want to discard them?')) {
+			if(typeof globals.discardFunction == "function") {
+				globals.discardFunction()
+				globals.discardFunction = null
+			}
 			globals.unsavedChanges = false
-		else
+		}
+		else {
 			return false
+		}
 	}
 	
 	return true
+}
+
+function arrayToPolygonWkt(arr) {
+	let wktText = 'POLYGON ('
+
+    for (var i = 0; i < arr.length; i++) {
+        arr[i].forEach( entry=> {
+            wktText += entry + " "
+        })
+
+        if(arr.length - 1 != i) {
+            wktText += ","
+        }
+    }
+
+    wktText += ")"
+    return wktText
 }
 
 function createInput(label, key, currentValue, type, required=false, additionalTags = "") {
@@ -60,7 +83,7 @@ function createInput(label, key, currentValue, type, required=false, additionalT
 function createSelect(key, currentValues, options, additionalTags = "multiple=\"multiple\"") {
 	let html = ""
 	html += '<label for="' + key + '">' + key + '</label>'
-	html += '<select class="js-example-basic-multiple ' + key + '" ' + additionalTags + ' name="' + key + '">'
+	html += '<select class="basic-select ' + key + '" ' + additionalTags + ' name="' + key + '">'
 
 	options.forEach(opt => {
 		let name =  opt.name ? opt.name : opt
@@ -75,6 +98,7 @@ function createSelect(key, currentValues, options, additionalTags = "multiple=\"
 	html += '</select>'
 	return html
 }
+
 
 function readForm (form) {
     let formData = {}
