@@ -61,7 +61,7 @@ class Sidebar{
 					form.append(createInput(tagKey, "tags_" + tagKey, tagValue, "text"))
 				}
 			} else if (key == "predecessors" || key == "successors") {
-				form.append(createSelect(key, value, nodes, "multiple=\"multiple\""))
+				form.append(createSelect(key, value, nodes.filter(node=> {return node != data.name}), "multiple=\"multiple\""))
 				$('.basic-select', form).select2()
 			}
 			else if (key == "pos")  {

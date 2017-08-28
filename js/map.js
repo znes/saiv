@@ -245,7 +245,6 @@ class LeafleatMap {
     }
 
     changeType(name, newType) {
-        console.log("Map: changeType")
         let oldType = this.elements[name].type
 
         this.elements[name].type = newType
@@ -302,8 +301,6 @@ class LeafleatMap {
     }
 
     discard() {
-        console.log("discard")
-        console.log(this.redraw)
         if(this.redraw.ghostPoly != null) {
             this.redraw.ghostPoly.remove()
         }
@@ -523,6 +520,8 @@ class LeafleatMap {
     }
 
     addNode(name, type, pos = null) {
+        console.log("addNode")
+        console.log(name, type, pos)
         this.elements[name] = {
             successors: {},
             marker: null,
@@ -672,7 +671,6 @@ class LeafleatMap {
             }
             srcEle = null
             srcName = null
-
         }
     }
 

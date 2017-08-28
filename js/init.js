@@ -96,46 +96,55 @@ $(function() {
     }
 
     function initListenerDataRevieved() {
-        $(config.dom.links.graph).click(() => {
-            if(discardChanges()) {
-                setActiveMenuItem("Explorer")
-                showGraph()
-            }
-        }).click()
-
-        $(config.dom.links.map).click(() => {
-            if(discardChanges()) {
-                setActiveMenuItem("Map")
-                showMap()
-            }
-        }).parent("li").removeClass("disabled")
-
-        $(config.dom.links.download).click(() => {
-            let bool = confirm("Attach Explorer Positions to json?")
-            let data = dataManager.json
-            let urlString = "text/json;charset=utf-8,"
-
-            if(bool) {
-                for (let i = 0; i < data.children.length; i++) {
-                    if(typeof data.children[i].pos == "undefined") 
-                        data.children[i].pos = {}
-                    Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())
+        $(config.dom.links.graph)
+            .off("click")
+            .on("click", () => {
+                if(discardChanges()) {
+                    setActiveMenuItem("Explorer")
+                    showGraph()
                 }
-            }
-            else {
-                for (let i = 0; i < data.children.length; i++) {
-                    if(typeof data.children[i].pos != undefined) {
-                        if(data.children[i].pos.x != undefined)
-                            delete data.children[i].pos.x;
-                        if(data.children[i].pos.y != undefined)
-                            delete data.children[i].pos.y;
-                    }
-                }  
-            }
-            urlString += encodeURIComponent(JSON.stringify(data))
+            })
+            .click()
 
-            $(config.dom.links.download).prop("href", "data:" + urlString)
-            $(config.dom.links.download).prop("download", "data.json")
-        }).parent("li").removeClass("disabled")
+        $(config.dom.links.map)
+            .off("click")
+            .on("click", () => {
+                if(discardChanges()) {
+                    setActiveMenuItem("Map")
+                    showMap()
+                }
+            })
+            .parent("li").removeClass("disabled")
+
+        $(config.dom.links.download)
+            .off("click")
+            .on("click", () => {
+                let bool = confirm("Attach Explorer Positions to json?")
+                let data = dataManager.json
+                let urlString = "text/json;charset=utf-8,"
+
+                if(bool) {
+                    for (let i = 0; i < data.children.length; i++) {
+                        if(typeof data.children[i].pos == "undefined") 
+                            data.children[i].pos = {}
+                        Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())
+                    }
+                }
+                else {
+                    for (let i = 0; i < data.children.length; i++) {
+                        if(typeof data.children[i].pos != "undefined") {
+                            if(typeof data.children[i].pos.x != "undefined")
+                                delete data.children[i].pos.x;
+                            if(typeof data.children[i].pos.y != "undefined")
+                                delete data.children[i].pos.y;
+                        }
+                    }  
+                }
+                urlString += encodeURIComponent(JSON.stringify(data))
+
+                $(config.dom.links.download).prop("href", "data:" + urlString)
+                $(config.dom.links.download).prop("download", "data.json")
+            })
+            .parent("li").removeClass("disabled")
     }
 })

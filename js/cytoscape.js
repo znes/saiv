@@ -65,7 +65,7 @@ class CyptoScape {
                     this.initElements(e.detail.data)
                     break
                 case "updateStyle": 
-                    if(this.cy.$("nodes").length > 0) {
+                    if(this.cy.$("node").length > 0) {
                         this.updateLayout()
 
                         showGraph()
@@ -268,6 +268,10 @@ class CyptoScape {
             this.cy.reset()
             this.cy.center()
         }
+    }
+
+    discard() {
+        
     }
 
     changeType(name, newType) {

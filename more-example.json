@@ -68,7 +68,7 @@
         {
             "sector": "electricity"
         },
-        "predecessors": ["", "vsdvsd", "cascasca"],
+        "predecessors": ["vsdvsd", "cascasca"],
         "successors": ["hub6"]
     },
     {
@@ -93,37 +93,37 @@
     },
     {
         "name": "vsdvsd",
-        "type": "qwfqwfq",
+        "type": "demand",
         "successors": ["hub5", "hub6", "fdsfew"],
         "predecessors": ["wind"]
     },
     {
         "name": "cascads",
-        "type": "sdadqwd",
+        "type": "polygon",
         "predecessors": ["solar", "vavasfafwq"],
         "successors": ["demand"]
     },
     {
         "name": "csacasdq",
-        "type": "qdqdsa",
+        "type": "polygon",
         "predecessors": ["solar"],
         "successors": ["demand"]
     },
     {
         "name": "vdsagreqwf",
-        "type": "dafdaf",
+        "type": "polygon",
         "predecessors": [null],
         "successors": ["hub1"]
     },
     {
         "name": "vdasvadwew",
-        "type": "afefafeaw",
+        "type": "demand",
         "predecessors": ["solar"],
         "successors": ["line"]
     },
     {
         "name": "vavasfafwq",
-        "type": "fqwfqwf",
+        "type": "demand",
         "successors": ["cascads"],
         "predecessors": ["hub1"]
     },
@@ -160,19 +160,19 @@
     },
     {
         "name": "dadwqdq",
-        "type": "dasdasd",
+        "type": "polygon",
         "predecessors": ["line"],
         "successors": ["hub6"]
     },
     {
         "name": "cascasca",
-        "type": "dasdwqqwd",
+        "type": "polygon",
         "predecessors": ["wind"],
         "successors": ["hub5"]
     },
     {
         "name": "fdsfew",
-        "type": "fafafa",
+        "type": "polygon",
         "predecessors": ["vsdvsd"],
         "successors": ["hub6"]
     }],
