@@ -276,13 +276,12 @@ class CyptoScape {
         let newEle = {
             group: "nodes",
             data: {
-                id: newName,
+                id: name,
                 type: newType
             },
             position: ele.position()
         }
-        this.cy.add(newEle)
-        
+
 
         let edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
         //replace Nodes
@@ -301,17 +300,19 @@ class CyptoScape {
             
             if(target == name) {
                 ele.data.source = source
-                ele.data.target = newName
+                ele.data.target = name
             }
             else {
-                ele.data.source = newName
+                ele.data.source = name
                 ele.data.target = target
             }
 
             edges.push(ele)
         })
-        ele.remove();
-        edgesToUpdate.remove();
+        
+        edgesToUpdate.remove()
+        ele.remove()
+        this.cy.add(newEle)
         this.cy.add(edges)
     }
 
@@ -320,7 +321,8 @@ class CyptoScape {
             this.cy.add({
                 group: "nodes",
                 data: {
-                    id: name
+                    id: name,
+                    type: type
                 },
                 position: {
                     x: pos.x,
@@ -332,7 +334,8 @@ class CyptoScape {
             this.cy.add({
                 group: "nodes",
                 data: {
-                    id: name
+                    id: name,
+                    type: type
                 }
             })
         }

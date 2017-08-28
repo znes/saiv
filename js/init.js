@@ -16,28 +16,46 @@ $(function() {
      * init menu listener
      */
     $(config.dom.links.json).click(() => {
-        if(discardChanges())
+        if(discardChanges()) {
             openJsonSelection()
+        }
     })
 
     $(config.dom.links.home).click(() => {
-        if(discardChanges())
+        if(discardChanges()) {
             home()
+        }
     })
 
     $(config.dom.links.style).click(() => {
-        if(discardChanges())
+        if(discardChanges()) {
             selectStyle()
+        }
     })
 
     $(config.dom.links.jsonSettings).click(() => {
-        if(discardChanges())
+        if(discardChanges()) {
             jsonSettings()
+        }
     })
 
     
 
 
+    document.addEventListener("discardChanges", (e) => {
+        if($(".navbar li.active").length == 1) {
+            let activeLink = $(".navbar li.active").text()
+            switch (activeLink) {
+                case "Map":
+                    map.discard()
+                    break
+                case "Graph Explorer":
+                    cy.discard()
+                    break
+            }
+        }
+        //map.discard
+    })
     document.addEventListener("sidebar", (e) => {
         switch(e.detail.task) {
             case "showId":
@@ -119,19 +137,5 @@ $(function() {
             $(config.dom.links.download).prop("href", "data:" + urlString)
             $(config.dom.links.download).prop("download", "data.json")
         }).parent("li").removeClass("disabled")
-
-
-        /*$(config.dom.links.downloadJsonPos).click(() => {
-            let data = dataManager.json
-            for (let i = 0; i < data.children.length; i++) {
-                if(typeof data.children[i].pos == "undefined") data.children[i].pos = {}
-
-                Object.assign(data.children[i].pos, cy.$("#" + data.children[i].name).position())
-            }
-            //let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataManager.json))
-            let urlString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data))
-            $(config.dom.links.downloadJsonPos).prop("href", "data:" + urlString)
-            $(config.dom.links.downloadJsonPos).prop("download", "data.json")
-        }).parent("li").removeClass("disabled")*/
     }
 })

@@ -3,6 +3,12 @@ class LeafleatMap {
 		this.elements = {
 
 		}
+        this.redraw = {
+            ghostPoly: null,
+            name: null
+        }
+
+
 		this.init(id)
         this.registerEvents()
 		
@@ -158,23 +164,25 @@ class LeafleatMap {
     createNode(name, pos) {
         let obj = null
         if(this.elements[name].type == "polygon") {
-            /*if(pos.wkt === undefined)
-            {
-                showButtonAddNodes()
-                return null
-            }*/
+            let posArr = null
+            
+            if(typeof pos.wkt != "undefined") {
+                let wkt = new Wkt.Wkt()
+                wkt.read(pos.wkt)
+                posArr = wkt.toJson().coordinates
+            }
+            else {
+                posArr = pos
+            }
 
-            let wkt = new Wkt.Wkt()
-            wkt.read(pos.wkt)
-
-            obj = L.polygon(wkt.toJson().coordinates, {
+            obj = L.polygon(posArr, {
                 contextmenu: true,
                 contextmenuItems: [
                 {
                     text: 'Change position',
                     index: 0,
                     callback: e => {
-                        this.drawPolygon(name, true)
+                        this.drawPolygon(name)
                     }
                 }, {
                     separator: true,
@@ -188,10 +196,12 @@ class LeafleatMap {
                 },{
                     text: 'Delete',
                     index: 3,
-                    callback: e => { sendEvent("data", {
-                        task: "deleteNode",
-                        data: name
-                    })}
+                    callback: e => { 
+                        sendEvent("data", {
+                            task: "deleteNode",
+                            data: name
+                        }
+                    )}
                 }, {
                     separator: true,
                     index: 4
@@ -235,17 +245,18 @@ class LeafleatMap {
     }
 
     changeType(name, newType) {
+        console.log("Map: changeType")
         let oldType = this.elements[name].type
 
         this.elements[name].type = newType
-        if(marker != null) {
+        if(this.elements[name].marker != null) {
             if(oldType == "polygon" || oldType != "polygon" && newType == "polygon") {
                 this.deleteNode(name, false)
                 // No Pos Data
-                showButtonAddNodes()
+                this.showButtonAddNodes()
             }
             else {
-                var pos = this.elements[name].marker.getLatLngs()
+                var pos = this.elements[name].marker.getLatLng()
                 this.elements[name].marker.remove()
                 this.elements[name].marker = this.createNode(name, pos)
             }
@@ -288,28 +299,58 @@ class LeafleatMap {
                 body: form
             }
         })
-    } 
+    }
 
-    drawPolygon(name = null, redraw = false) {
+    discard() {
+        console.log("discard")
+        console.log(this.redraw)
+        if(this.redraw.ghostPoly != null) {
+            this.redraw.ghostPoly.remove()
+        }
+
+        if(this.redraw.name != null && this.elements[this.redraw.name].marker != null) {
+            // redraw OLD !!!
+            this.elements[this.redraw.name].marker = this.createNode(this.redraw.name, this.redraw.pos)
+        }
+        this.map.off('click')
+
+
+        sendEvent("sidebar", {
+            task: "showId",
+            data: this.redraw.name
+        })
+    }
+
+    drawPolygon(name = null) {
         let currentPoints = [],
-            ghostPoly = null,
             that = this
+
+        //registerDiscardEvent(this.redrawOld)
+
+        if(name != null) {
+            if(this.elements[name].marker != null) {
+                this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
+                this.redraw.name = name
+
+                this.elements[name].marker.remove()
+            }
+        }
 
         modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
         globals.unsavedChanges = true
 
-        
 
         updateBodyPoly(currentPoints)
+
         this.map.on('click', e => {
-            if(ghostPoly != null) {
-                ghostPoly.remove()
+            if(this.redraw.ghostPoly != null) {
+                this.redraw.ghostPoly.remove()
             }
 
             currentPoints.push([e.latlng.lat, e.latlng.lng])
 
 
-            ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
+            this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
             updateBodyPoly(currentPoints)
         })
 
@@ -345,8 +386,8 @@ class LeafleatMap {
                     }
                     
                     that.map.off('click')
-                    ghostPoly.remove()
-                    ghostPoly = null
+                    that.redraw.ghostPoly.remove()
+                    that.redraw.ghostPoly = null
                     currentPoints = []
 
                     globals.unsavedChanges = false
@@ -357,21 +398,21 @@ class LeafleatMap {
             })
 
             $(".resetPoly").on("click", (e) => {
-                if (ghostPoly != null)
-                    ghostPoly.remove()
+                if (this.redraw.ghostPoly != null)
+                    this.redraw.ghostPoly.remove()
                 
-                ghostPoly = null
+                this.redraw.ghostPoly = null
                 currentPoints = []
                 return false
             })
 
             $(".revertPoly").on("click", (e) => {
-                if(ghostPoly != null)
-                    ghostPoly.remove()
+                if(this.redraw.ghostPoly != null)
+                    this.redraw.ghostPoly.remove()
                 if(currentPoints.length >= 1)
                     currentPoints.pop()
 
-                ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
+                this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
                 updateBodyPoly(currentPoints)
                 return false
             })
@@ -487,7 +528,7 @@ class LeafleatMap {
             marker: null,
             type: type
         }
-        if(typeof pos != "undefined") {
+        if(pos != null) {
             if(typeof pos.lng != "undefined" && typeof pos.lat != "undefined"  && type != "polygon" || typeof pos.wkt != "undefined" && type == "polygon") {
                 this.elements[name].marker = this.createNode(name, pos)
             }
@@ -571,6 +612,7 @@ class LeafleatMap {
             srcEle = $(this)
             srcName = srcEle.parent().find("p").text()
             srcEle.parent().addClass('moving')
+            added = false
 
             let img = new Image()
             img.crossOrigin="anonymous"
@@ -626,10 +668,11 @@ class LeafleatMap {
                 srcEle.parent().remove()
             }
             else {
-                srcEle.parent().addClass('moving');
+                srcEle.parent().removeClass('moving');
             }
             srcEle = null
             srcName = null
+
         }
     }
 

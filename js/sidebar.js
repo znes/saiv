@@ -54,28 +54,28 @@ class Sidebar{
 		for (let [key, value] of Object.entries(data)) {
 			if (key == "tags") {
 				form.append('<label>Tags</label><br/>')
-					form.append('<a href="#" class="addTag">Add Tag</label><br/>')
+				form.append('<a href="#" class="addTag">Add Tag</label><br/>')
 
 				for (let [tagKey, tagValue] of Object.entries(data[key])) {
 					form.append('<a href="#" class="removeTag">Remove ' + tagKey + '</a><br/>')
 					form.append(createInput(tagKey, "tags_" + tagKey, tagValue, "text"))
 				}
 			} else if (key == "predecessors" || key == "successors") {
-				form.append(createSelect(key, value, nodes))
+				form.append(createSelect(key, value, nodes, "multiple=\"multiple\""))
 				$('.basic-select', form).select2()
 			}
 			else if (key == "pos")  {
 				for (let [prop, val] of Object.entries(value)) {
 					if(prop == "lat") {
-						form.append(createInput("Latitude", "pos_"+prop, val, "text"))
+						form.append(createInput("Latitude", "pos_"+prop, val, "number"))
 					}
 					else if(prop == "lng") {
-						form.append(createInput("Longitude", "pos_"+prop, val, "text"))
+						form.append(createInput("Longitude", "pos_"+prop, val, "number"))
 					}
 				}
 			}
 			else if(key == "type") {
-				form.append(createSelect("type", value, config.types, ""))
+				form.append(createSelect("type", value, config.types))
 			}
 			else {
 				form.append(createInput(key, key, value, "text"))
@@ -85,8 +85,6 @@ class Sidebar{
 
 		form.find(".addTag").on("click", () => {
             this.addTag((newTag) => {
-                //datam.addTag(data.name, newTag)
-
                 sendEvent("data", {
                 	task: "addTag",
                 	data: {
@@ -94,11 +92,17 @@ class Sidebar{
                 		tag: newTag
                 	}
                 })
+
+
+                sendEvent("sidebar", {
+                    task: "showId",
+                    data: data.name
+                })
             })
         })
 
 
-        form.find('.removeTag').on("click", function(){
+        form.find('.removeTag').on("click", function() {
             let tag = $(this).text().substring(7, $(this).text().length)
 
             sendEvent("data", {
@@ -108,7 +112,12 @@ class Sidebar{
             		tag: tag
             	}
             })
-            datam.removeTag(data.name, tag)
+
+            sendEvent("sidebar", {
+                task: "showId",
+                data: data.name
+            })
+            //datam.removeTag(data.name, tag)
         })
 
 

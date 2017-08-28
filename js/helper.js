@@ -31,13 +31,10 @@ function showMap() {
 	$("#"+config.dom.mapContainerId).css("visibility", "visible")
 }
 
-function discardChanges() {
+function discardChanges(abort) {
 	if(globals.unsavedChanges) {
 		if(confirm('You have unsaved changes. You want to discard them?')) {
-			if(typeof globals.discardFunction == "function") {
-				globals.discardFunction()
-				globals.discardFunction = null
-			}
+			sendEvent("discardChanges")
 			globals.unsavedChanges = false
 		}
 		else {
@@ -47,6 +44,7 @@ function discardChanges() {
 	
 	return true
 }
+
 
 function arrayToPolygonWkt(arr) {
 	let wktText = 'POLYGON ('
@@ -80,7 +78,7 @@ function createInput(label, key, currentValue, type, required=false, additionalT
 
 	return html
 }
-function createSelect(key, currentValues, options, additionalTags = "multiple=\"multiple\"") {
+function createSelect(key, currentValues, options, additionalTags = "") {
 	let html = ""
 	html += '<label for="' + key + '">' + key + '</label>'
 	html += '<select class="basic-select ' + key + '" ' + additionalTags + ' name="' + key + '">'

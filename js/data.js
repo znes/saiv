@@ -233,7 +233,7 @@ class DataManager {
 	    // check if type changed
 	    if(updateData.type != this.getElement(updateData.currentid).type) {
 	    	sendEvent("dataChanged", {
-				task: "changeTyp",
+				task: "changeType",
 				data: {
 					name: updateData.currentid,
 					type: updateData.type
@@ -258,6 +258,11 @@ class DataManager {
 
 
         delete updateData['currentid']
+
+
+        if(typeof updateData.tags == "undefined") {
+        	updateData.tags = {}
+        }
         
 
         // Add Successor and Predecessors to other
@@ -295,6 +300,8 @@ class DataManager {
 			}
         })
 
+
+ 
 
         // Check if Edges have been removed
         this._json.children.forEach((child, id, arr)=> {

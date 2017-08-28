@@ -3,7 +3,7 @@ function selectStyle() {
 	let form = $('<form class="editStyle"></form>')
 
 
-	form.append(createSelect("style", [currentStyle], config.cytoscape.styles, ""))
+	form.append(createSelect("style", [currentStyle], config.cytoscape.styles))
 
 
 	form.append('<input type="submit" value="Save">')
