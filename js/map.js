@@ -11,6 +11,7 @@ class LeafleatMap {
 
 		this.init(id)
         this.registerEvents()
+        this.addDefaultBind()
 		
 		// debug	
 	    window.map = () => {
@@ -138,8 +139,7 @@ class LeafleatMap {
         // remove Old 
         this.map.removeLayer(this.elements[oldName].marker)
         for (let [succ, obj] of Object.entries(succs)) {
-            this.map.removeLayer(obj.arrow)
-            this.map.removeLayer(obj.head)
+            this.deleteEdge(oldName, succ)
 
             this.addEdge(newName, succ)
         }
@@ -278,8 +278,8 @@ class LeafleatMap {
             task: "show",
             data: {
                 head: "Create Polygon",
-                body: form
-            }   
+                body: body
+            } 
         })
     }
 
@@ -423,7 +423,10 @@ class LeafleatMap {
 
     addDefaultBind() {
         this.map.off("click")
-        this.map.off("mousemove")
+                .off("mousemove")
+                .on("click",(e) => {
+                    closeSitebar()
+                })
         for (let [property, data] of Object.entries(this.elements)) {
             if(data.marker != null) {
                 data.marker.off("click")
@@ -723,6 +726,10 @@ class LeafleatMap {
                         body: body
                     }
                 })
+
+                // hack because map gets clicked afterwards 
+                // because click element is position absolute
+                window.setTimeout(openSitebar, 100)
             })
         }
         
@@ -733,8 +740,13 @@ class LeafleatMap {
             if(k!=name){
                 for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
                     if(succ == name) {
-                        this.map.removeLayer(obj.arrow)
-                        this.map.removeLayer(obj.head)
+                        
+                        if (obj.arrow != null) {
+                            this.map.removeLayer(obj.arrow)
+                            this.map.removeLayer(obj.head)
+                            obj.arrow = null
+                            obj.head = null
+                        }
                         if(deleteRefs)
                             delete this.elements[k].successors[succ]
                     }
@@ -744,8 +756,12 @@ class LeafleatMap {
                 this.map.removeLayer(this.elements[name].marker)
                 this.elements[name].marker = null
                 for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
-                    this.map.removeLayer(obj.arrow)
-                    this.map.removeLayer(obj.head)
+                    if (obj.arrow != null) {
+                        this.map.removeLayer(obj.arrow)
+                        this.map.removeLayer(obj.head)
+                        obj.arrow = null
+                        obj.head = null
+                    }
                 }
                 if(deleteRefs)
                     delete this.elements[name]

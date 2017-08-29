@@ -37,14 +37,14 @@ class Sidebar{
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
 			.append('<button class="btn btn-success">Add</button>')
-			.append('<a class="btn btn-warning cancelAddTag">Cancel</button>')
+			.append('<a class="btn btn-warning cancelForm">Cancel</button>')
 
 			.submit((e) => {
 			e.preventDefault()
 			ready(readForm(".editForm").tag)
 		})
 
-		form.find("a.cancelAddTag").on("click", (e) => {
+		form.find("a.cancelForm").on("click", (e) => {
 			ready(false)
 			return false
 		})
@@ -101,6 +101,7 @@ class Sidebar{
 
 		$('.basic-select', form).select2()
 
+
 		form.find(".addTag").on("click", () => {
             this.addTag((newTag) => {
             	if(typeof newTag == "string") {
@@ -140,6 +141,7 @@ class Sidebar{
         })
 
         form.append('<button class="btn btn-success">Save</button>')
+        form.append('<a class="btn btn-warning cancelForm">Cancel</a>')
 		form.submit(e => {
 			e.preventDefault()
 			let test = readForm('.editForm')
@@ -149,7 +151,14 @@ class Sidebar{
 				task: "updateNode",
 				data: test
 			})
+
+			this.close()
 		})
+		form.find("a.cancelForm").on("click", (e) => {
+			this.close()
+			return false
+		})
+
 		this.body.append(form)
 	}
 
@@ -189,10 +198,12 @@ class Sidebar{
 	}
 
 	open () {
+		console.log("open")
 		$("body").removeClass("sidebar-closed")
 	}
 
 	close () {
+		console.log("close")
 		$("body").addClass("sidebar-closed")
 	}
 }

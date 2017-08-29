@@ -36,6 +36,16 @@ function hideModal() {
     $(config.dom.modal.container).removeClass("in")
 }
 
+function openSitebar () {
+	console.log("open")
+	$("body").removeClass("sidebar-closed")
+}
+
+function closeSitebar () {
+	console.log("close")
+	$("body").addClass("sidebar-closed")
+}
+
 function discardChanges(abort) {
 	if(globals.unsavedChanges) {
 		if(confirm('You have unsaved changes. You want to discard them?')) {

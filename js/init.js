@@ -9,7 +9,7 @@ $(function() {
 
 
     // Opens Page "Select Json"
-    //openJsonSelection(true)
+    openJsonSelection(true)
     //
     home()
 

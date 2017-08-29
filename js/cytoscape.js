@@ -5,6 +5,7 @@ class CyptoScape {
 
         this.init(selector)
         this.registerEvents()
+        this.keepExplorerPosition = localStorage.getItem("keepExplorerPosition") ? localStorage.getItem("keepExplorerPosition") : globals.keepExplorerPosition
 
         // debug
         window.cy = () => {
@@ -66,8 +67,9 @@ class CyptoScape {
                     this.initElements(e.detail.data)
                     break
                 case "updateStyle": 
+                    this.updateLayout()
                     if(this.cy.$("node").length > 0) {
-                        this.updateLayout()
+                        
 
                         showGraph()
                     }
@@ -210,6 +212,10 @@ class CyptoScape {
         this.cy.off('click')
 
         // Add default listener
+        this.cy.on("click", evt => {
+            closeSitebar()
+        })
+
         this.cy.on("click", "node", {}, evt => {
             sendEvent("sidebar", {
                 task: "showId",
@@ -227,16 +233,13 @@ class CyptoScape {
             if(typeof child.pos != "undefined") {
                 if(typeof child.pos.x != "undefined" && typeof child.pos.y != "undefined") {
                     customPos = true
-                    console.log(child)
                     this.addNode(child.name, child.type, child.pos)
                 }
                 else {
-                    console.log(child)
                     this.addNode(child.name, child.type)
                 }
             }
             else { 
-                    console.log(child)
                 this.addNode(child.name, child.type)
             }
         })
@@ -311,9 +314,7 @@ class CyptoScape {
         elementData.id = name
         elementData.type = type
 
-        //elementData.type = type
 
-        console.log(elementData)
         if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
@@ -329,6 +330,10 @@ class CyptoScape {
                 group: "nodes",
                 data: elementData
             })
+        }
+
+        if(this.keepExplorerPosition == "false") {
+            this.updateLayout()
         }
     }
 
@@ -392,6 +397,8 @@ class CyptoScape {
     }
 
     updateLayout() {
+        this.keepExplorerPosition = localStorage.getItem("keepExplorerPosition") ? localStorage.getItem("keepExplorerPosition") : globals.keepExplorerPosition
+
         this.cy.makeLayout({
             name: localStorage.getItem("style") || config.cytoscape.defaultStyle
         }).run()

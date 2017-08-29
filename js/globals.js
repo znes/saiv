@@ -1,3 +1,4 @@
 let globals = {
-	unsavedChanges: false
+	unsavedChanges: false,
+	keepExplorerPosition: true
 }
