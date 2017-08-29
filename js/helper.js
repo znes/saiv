@@ -64,22 +64,23 @@ function arrayToPolygonWkt(arr) {
 }
 
 function createInput(label, key, currentValue, type, required=false, additionalTags = "") {
-	let html = ""
+	let html = "<div class=\"form-group-sm\">"
 	
 	if (type != "hidden") {
 		html += '<label for="' + key + '">' + label + '</label>'
 	}
 	if(required) {
-		html += '<input required type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags +  ' value="' + currentValue + '"/>'
+		html += '<input class="form-control" required type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags +  ' value="' + currentValue + '"/>'
 	}
 	else {
-		html += '<input type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags + ' value="' + currentValue + '"/>'
+		html += '<input class="form-control" type="' + type + '" id="' + key + '" name="' + key + '" ' + additionalTags + ' value="' + currentValue + '"/>'
 	}
+	html += "</div>"
 
 	return html
 }
 function createSelect(key, currentValues, options, additionalTags = "") {
-	let html = ""
+	let html = "<div class=\"form-group-sm\">"
 	html += '<label for="' + key + '">' + key + '</label>'
 	html += '<select class="basic-select ' + key + '" ' + additionalTags + ' name="' + key + '">'
 
@@ -93,7 +94,7 @@ function createSelect(key, currentValues, options, additionalTags = "") {
 		}	
 	})
 	
-	html += '</select>'
+	html += '</select></div>'
 	return html
 }
 

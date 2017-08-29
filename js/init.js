@@ -92,7 +92,7 @@ $(function() {
         let data = dataManager.getElement(id)
 
         sb.showData(data)
-        sb.createForm(data, dataManager.json.children)
+        sb.createNodeForm(data, dataManager.json.children)
     }
 
     function initListenerDataRevieved() {

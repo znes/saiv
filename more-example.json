@@ -58,7 +58,7 @@
         {
             "sector": "electricity"
         },
-        "predecessors": [""],
+        "predecessors": ["solar"],
         "successors": ["demand"]
     },
     {
@@ -148,7 +148,7 @@
         "successors": ["demand"]
     },
     {
-        "name": "wind",
+        "name": "wind2",
         "type": "volatile_generator",
         "tags":
         {

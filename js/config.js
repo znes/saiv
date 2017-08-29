@@ -10,7 +10,29 @@ let config = {
 			"concentric",
 			"breadthfirst",
 			"cose"
-		]
+		],
+		nodeStyle: {
+			polygon : {
+				//weigth: 150,
+				color: "#90a7d0"
+			},
+			volatile_generator : {
+				//weigth: 30,
+				color: "#f2dcde"
+			},
+			demand : {
+				//weigth: 45,
+				color: "#3f4f5e"
+			},
+			transmission : {
+				//weigth: 25,
+				color: "#d6d5da"
+			},	
+			hub : {
+				//weigth: 45,
+				color: "#86af49"
+			}
+		}
 	},
 	types : [
 		"polygon",

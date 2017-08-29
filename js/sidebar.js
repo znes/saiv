@@ -30,11 +30,12 @@ class Sidebar{
 	}
 
 	addTag (ready) {
+		this.head.html("").append("<h4>Add Tag</h4>")
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
-		form.append('<input type="submit" value="Save">')
+		form.append('<button class="btn btn-success">Add</button>')
 
 		form.submit((e) => {
 			e.preventDefault()
@@ -44,44 +45,49 @@ class Sidebar{
 		this.body.append(form)
 	}
 
-	createForm (data, nodes) {
+	createNodeForm (data, nodes) {
+		this.head.html("<h4>Update " + data.name + "</h4>")
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
+			.append(createInput("Name", "name", data.name, "text"))
+			.append(createSelect("type", data.type, config.types))
+			.append('<h5>Tags</h5>')
+			.append('<a href="#" class="addTag">Add Tag</label><br/>')
 
-
-		for (let [key, value] of Object.entries(data)) {
-			if (key == "tags") {
-				form.append('<label>Tags</label><br/>')
-				form.append('<a href="#" class="addTag">Add Tag</label><br/>')
-
-				for (let [tagKey, tagValue] of Object.entries(data[key])) {
-					form.append('<a href="#" class="removeTag">Remove ' + tagKey + '</a><br/>')
-					form.append(createInput(tagKey, "tags_" + tagKey, tagValue, "text"))
-				}
-			} else if (key == "predecessors" || key == "successors") {
-				form.append(createSelect(key, value, nodes.filter(node=> {return node != data.name}), "multiple=\"multiple\""))
-				$('.basic-select', form).select2()
-			}
-			else if (key == "pos")  {
-				for (let [prop, val] of Object.entries(value)) {
-					if(prop == "lat") {
-						form.append(createInput("Latitude", "pos_"+prop, val, "number"))
-					}
-					else if(prop == "lng") {
-						form.append(createInput("Longitude", "pos_"+prop, val, "number"))
-					}
-				}
-			}
-			else if(key == "type") {
-				form.append(createSelect("type", value, config.types))
-			}
-			else {
-				form.append(createInput(key, key, value, "text"))
+		if(typeof data.tags != "undefined") {
+			for (let [key, value] of Object.entries(data.tags)) {
+				form.append('<a href="#" class="removeTag">Remove ' + key + '</a><br/>')
+					.append(createInput(key, "tags_" + key, value, "text"))
 			}
 		}
 
+		form.append(createSelect("predecessors", data.predecessors, nodes.filter(node=> {return node != data.name}), "multiple=\"multiple\""))
+			.append(createSelect("successors", data.successors, nodes.filter(node=> {return node != data.name}), "multiple=\"multiple\""))
+
+
+
+		for (let [key, value] of Object.entries(data)) {
+			if (key != "tags" && key != "name" && key != "type" && key != "predecessors" && key != "successors") {
+				if (key == "pos")  {
+					for (let [prop, val] of Object.entries(value)) {
+						if(prop == "lat") {
+							form.append(createInput("Latitude", "pos_"+prop, val, "number"))
+						}
+						else if(prop == "lng") {
+							form.append(createInput("Longitude", "pos_"+prop, val, "number"))
+						}
+					}
+				}
+				else {
+					form.append(createInput(key, key, value, "text"))
+				}
+			}
+		}
+
+
+		$('.basic-select', form).select2()
 
 		form.find(".addTag").on("click", () => {
             this.addTag((newTag) => {
@@ -120,8 +126,8 @@ class Sidebar{
             //datam.removeTag(data.name, tag)
         })
 
-
-		form.append('<input type="submit" value="Save">')
+        form.append('<button class="btn btn-success">Save</button>')
+		//form.append('<input type="submit" value="Save">')
 		form.submit(e => {
 			e.preventDefault()
 

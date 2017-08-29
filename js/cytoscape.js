@@ -25,7 +25,7 @@ class CyptoScape {
                     "text-opacity": 0.5,
                     "text-valign": "center",
                     "text-halign": "right",
-                    "background-color": "#11479e"
+                    "background-color": "data(color)"
                 }
             }, {
                 selector: "edge",
@@ -44,7 +44,8 @@ class CyptoScape {
             }, {
                 selector: ":selected",
                 style: {
-                    "background-color": "#000"
+                    'border-width': 3,
+                    'border-color': '#333'
                 }
             }]
         })
@@ -118,10 +119,10 @@ class CyptoScape {
                     let evtFromTarget = event.target || event.cyTarget
                     let pos = event.position || event.cyPosition
 
-                    if(evtFromTarget.data().type == "scenario") {
+                    /*if(evtFromTarget.data().type == "scenario") {
                         modal("Error", "Cant be connected to type scenario")
                         return false
-                    }
+                    }*/
 
                     this.cy.add([{ group: "edges", data: {
                         id: "shadowEdge", source: evtFromTarget.data().id, 
@@ -223,37 +224,28 @@ class CyptoScape {
         this.cy.remove("*")
 
         jsonData.children.forEach(child => {
-            let ele = {
-                group: "nodes",
-                data: {
-                    id: child.name
-                }
-            }
             if(typeof child.pos != "undefined") {
                 if(typeof child.pos.x != "undefined" && typeof child.pos.y != "undefined") {
                     customPos = true
-                    ele.position = {
-                        x: child.pos.x,
-                        y: child.pos.y,
-                    }
+                    console.log(child)
+                    this.addNode(child.name, child.type, child.pos)
+                }
+                else {
+                    console.log(child)
+                    this.addNode(child.name, child.type)
                 }
             }
-
-            eles.push(ele)
+            else { 
+                    console.log(child)
+                this.addNode(child.name, child.type)
+            }
         })
-        this.cy.add(eles)
 
         // Add edges when nodes loaded
         // Only add Successors 
         jsonData.children.forEach(child => {
             child.successors.forEach(succ => {
-                this.cy.add({
-                    data: {
-                        source: child.name,
-                        target: succ
-                    },
-                    group: "edges"
-                })
+                this.addEdge(child.name, succ)
             })
         })
 
@@ -277,14 +269,7 @@ class CyptoScape {
     changeType(name, newType) {
         const ele = this.cy.$("node#" + name)
 
-        let newEle = {
-            group: "nodes",
-            data: {
-                id: name,
-                type: newType
-            },
-            position: ele.position()
-        }
+        const position = ele.position()
 
 
         let edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
@@ -316,18 +301,23 @@ class CyptoScape {
         
         edgesToUpdate.remove()
         ele.remove()
-        this.cy.add(newEle)
+        this.addNode(name, newType, position)
         this.cy.add(edges)
     }
 
     addNode(name, type, pos = {}) {
+        let elementData = {}
+        elementData.color = config.cytoscape.nodeStyle[type].color
+        elementData.id = name
+        elementData.type = type
+
+        //elementData.type = type
+
+        console.log(elementData)
         if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
-                data: {
-                    id: name,
-                    type: type
-                },
+                data: elementData,
                 position: {
                     x: pos.x,
                     y: pos.y
@@ -337,10 +327,7 @@ class CyptoScape {
         else {
             this.cy.add({
                 group: "nodes",
-                data: {
-                    id: name,
-                    type: type
-                }
+                data: elementData
             })
         }
     }
