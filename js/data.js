@@ -349,8 +349,12 @@ class DataManager {
     addTag (name, tagName) {
     	let index = this._json.children.findIndex(x => x.name==name)
 
-    	if( index !== -1)
+    	if( index !== -1) {
+    		if(typeof this._json.children[index].tags == "undefined")
+    			this._json.children[index].tags = {}
+    		
     		this._json.children[index].tags[tagName] = ""
+    	}
     }
 
     removeTag (name, tagName) {

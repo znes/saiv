@@ -19,33 +19,41 @@ class Sidebar{
 
 
 	showData (data) {
-		//this.open()
+		this.open()
 		this.head.html(JSON.stringify(data))
 	}
 
 	show($head, $body) {
-		//this.open()
+		this.open()
 		this.head.html("").append($head)
 		this.body.html("").append($body)
 	}
 
 	addTag (ready) {
+		this.open()
 		this.head.html("").append("<h4>Add Tag</h4>")
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
-		form.append('<button class="btn btn-success">Add</button>')
+			.append('<button class="btn btn-success">Add</button>')
+			.append('<a class="btn btn-warning cancelAddTag">Cancel</button>')
 
-		form.submit((e) => {
+			.submit((e) => {
 			e.preventDefault()
 			ready(readForm(".editForm").tag)
+		})
+
+		form.find("a.cancelAddTag").on("click", (e) => {
+			ready(false)
+			return false
 		})
 
 		this.body.append(form)
 	}
 
 	createNodeForm (data, nodes) {
+		this.open()
 		this.head.html("<h4>Update " + data.name + "</h4>")
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
@@ -53,13 +61,17 @@ class Sidebar{
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
 			.append(createInput("Name", "name", data.name, "text"))
 			.append(createSelect("type", data.type, config.types))
-			.append('<h5>Tags</h5>')
-			.append('<a href="#" class="addTag">Add Tag</label><br/>')
+
+			.append('<h5>Tags <small><a href="#" class="addTag">Add Tag</a></small></h5>')
 
 		if(typeof data.tags != "undefined") {
 			for (let [key, value] of Object.entries(data.tags)) {
-				form.append('<a href="#" class="removeTag">Remove ' + key + '</a><br/>')
-					.append(createInput(key, "tags_" + key, value, "text"))
+				//form.append('<button class="removeTag btn">&times;</button>')
+				let input = $("<div class=\"input-group\"></div>")
+				input.append('<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>')
+					.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
+				form.append('<label for="tags_'+key+'">' + key + '</label>')
+					.append(input)
 			}
 		}
 
@@ -91,14 +103,15 @@ class Sidebar{
 
 		form.find(".addTag").on("click", () => {
             this.addTag((newTag) => {
-                sendEvent("data", {
-                	task: "addTag",
-                	data: {
-                		id: data.name,
-                		tag: newTag
-                	}
-                })
-
+            	if(typeof newTag == "string") {
+            		sendEvent("data", {
+	                	task: "addTag",
+	                	data: {
+	                		id: data.name,
+	                		tag: newTag
+	                	}
+	                })
+            	}
 
                 sendEvent("sidebar", {
                     task: "showId",
@@ -109,9 +122,10 @@ class Sidebar{
 
 
         form.find('.removeTag').on("click", function() {
-            let tag = $(this).text().substring(7, $(this).text().length)
+        	const inputName = $(this).parent().parent().find("input").prop("name")
+            let tag = inputName.substring(5, inputName.length)
 
-            sendEvent("data", {
+            sendEvent("data", {	
             	task: "removeTag",
             	data: {
             		id: data.name,
@@ -123,17 +137,13 @@ class Sidebar{
                 task: "showId",
                 data: data.name
             })
-            //datam.removeTag(data.name, tag)
         })
 
         form.append('<button class="btn btn-success">Save</button>')
-		//form.append('<input type="submit" value="Save">')
 		form.submit(e => {
 			e.preventDefault()
-
 			let test = readForm('.editForm')
 			
-			//console.log(test)
 			
 			sendEvent("data", {
 				task: "updateNode",
@@ -145,19 +155,22 @@ class Sidebar{
 
 
 	addNode (pos) {
+		this.open()
 		this.body.html("")
 		globals.unsavedChanges = true
 		let form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
-		form.append(createSelect("type", "", config.types, ""))
+		form.append(createSelect("type", "", config.types, "required"))
 
 		for (let [property, val] of Object.entries(pos)) {
 			form.append(createInput("pos_" + property, "pos_" + property, val, "hidden"))
 		}
 		//form.append(createInput("posy", "posy", pos.y, "hidden"))
 
-		form.append('<input type="submit" value="Add Node">')
+		form.append('<button class="btn btn-success">Add</button>')
+		form.append('<a class="btn btn-warning">Cancel</button>')
 
+		$('.basic-select', form).select2()
 
 		form.submit(e => {
 			e.preventDefault()
@@ -168,10 +181,18 @@ class Sidebar{
 				data: readForm(".editForm")
 			})
 		})
+		form.find(".btn-warning").on("click", e => {
+			this.close()
+		})
+
 		this.body.append(form)
 	}
 
 	open () {
 		$("body").removeClass("sidebar-closed")
+	}
+
+	close () {
+		$("body").addClass("sidebar-closed")
 	}
 }

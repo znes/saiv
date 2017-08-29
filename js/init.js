@@ -9,7 +9,9 @@ $(function() {
 
 
     // Opens Page "Select Json"
-    openJsonSelection(true)
+    //openJsonSelection(true)
+    //
+    home()
 
 
     /**
@@ -83,16 +85,15 @@ $(function() {
             data: dataManager.json
         })
 
-        showId(dataManager.json.children[0].name)
+        //showId(dataManager.json.children[0].name)
         showGraph()
     })
 
 
-    function showId(id) {        
+    function showId(id) {
         let data = dataManager.getElement(id)
 
-        sb.showData(data)
-        sb.createNodeForm(data, dataManager.json.children)
+            sb.createNodeForm(data, dataManager.json.children)
     }
 
     function initListenerDataRevieved() {

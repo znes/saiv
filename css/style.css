@@ -72,12 +72,7 @@ body {
 }
 .sidebar .body input,
 .sidebar .body select {
-  display: block;
-  color:#000;
-  width: 100%;
-  height: 28px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
+
 }
 
 
@@ -148,19 +143,6 @@ a:hover {
     cursor: pointer;
 }
 
-.moal-header {
-    padding: 2px 16px;
-    background-color: rgba(0, 0, 0, 0.75);
-    color: white;
-}
-
-.moal-body {padding: 2px 16px;}
-
-.moal-footer {
-    padding: 2px 16px;
-    background-color: #5cb85c;
-    color: white;
-}
 .modal.fade, .modal-backdrop {
   display:block;
   visibility: hidden;

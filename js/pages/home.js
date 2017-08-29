@@ -1,6 +1,6 @@
 function home() {
-  let content = "Home";
+  let content = "Home"
   
-  createContentPage("Saiv", content );
-  setActiveMenuItem("home");
+  createContentPage("Saiv", content )
+  setActiveMenuItem("home")
 }

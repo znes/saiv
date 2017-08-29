@@ -31,6 +31,11 @@ function showMap() {
 	$("#"+config.dom.mapContainerId).css("visibility", "visible")
 }
 
+function hideModal() {
+    $(config.dom.modal.backdrop).removeClass("in")
+    $(config.dom.modal.container).removeClass("in")
+}
+
 function discardChanges(abort) {
 	if(globals.unsavedChanges) {
 		if(confirm('You have unsaved changes. You want to discard them?')) {
@@ -64,7 +69,7 @@ function arrayToPolygonWkt(arr) {
 }
 
 function createInput(label, key, currentValue, type, required=false, additionalTags = "") {
-	let html = "<div class=\"form-group-sm\">"
+	let html = "<div class=\"form-group\">"
 	
 	if (type != "hidden") {
 		html += '<label for="' + key + '">' + label + '</label>'
@@ -80,7 +85,7 @@ function createInput(label, key, currentValue, type, required=false, additionalT
 	return html
 }
 function createSelect(key, currentValues, options, additionalTags = "") {
-	let html = "<div class=\"form-group-sm\">"
+	let html = "<div class=\"form-group\">"
 	html += '<label for="' + key + '">' + key + '</label>'
 	html += '<select class="basic-select ' + key + '" ' + additionalTags + ' name="' + key + '">'
 

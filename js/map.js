@@ -263,14 +263,16 @@ class LeafleatMap {
 
 
     sidebarTextPolyCreation(wktText, name = "") {
+        const body = $('<div></div>')
         let form = $('<form class="createPolyForm"></form>')
         form.append(createInput("name", "name", name, "text", true))
             .append(createInput("type", "type", "polygon", "text", true, "readonly"))
             .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
-            .append('<input type="submit" name="Submit" value="Submit"/>')
-            .after('<button class="resetPoly">Reset</button>')
-            .after('<button class="revertPoly">Revert</button>')         
+            .append('<button class="btn btn-success">Save</button>')       
 
+        body.append(form)
+            .append('<button class="resetPoly btn btn-default">Reset</button>')
+            .append('<button class="revertPoly btn btn-primary">Revert</button>')  
 
         sendEvent("sidebar", {
             task: "show",
@@ -339,7 +341,7 @@ class LeafleatMap {
         globals.unsavedChanges = true
 
 
-        updateBodyPoly(currentPoints)
+        updateBodyPoly()
 
         this.map.on('click', e => {
             if(this.redraw.ghostPoly != null) {
@@ -350,7 +352,7 @@ class LeafleatMap {
 
 
             this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
-            updateBodyPoly(currentPoints)
+            updateBodyPoly()
         })
 
         function updateBodyPoly() {
@@ -754,7 +756,7 @@ class LeafleatMap {
     addEdge(from, to) {
         if(this.elements[from].marker != null && this.elements[to].marker != null ) {
             let arrow = L.polyline([this.getCoordinates(from), this.getCoordinates(to)], {
-                weight: 10,
+                weight: 5,
                 color: "#9dbaea",
                 contextmenu: true,
                 contextmenuItems: [{

@@ -18,14 +18,10 @@ function modal(head = "", content = "", abortFunction = function(){} ) {
 			    }
 			})
 
-		modal.find(".close, .btn-default").click((event) => {
-			abortFunction()
-		    hideModal()
-		})
+		modal.find(".close, .btn-default").off("click")
+			.on("click", (event) => {
+				abortFunction()
+			    hideModal()
+			})
 	},100)
-
-	function hideModal() {
-	    modal.removeClass("in")
-	    backdrop.removeClass("in")
-	}
 }

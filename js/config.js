@@ -5,7 +5,6 @@ let config = {
 			"dagre",
 			"circle",
 			"cose-bilkent",
-			"preset",
 			"grid",
 			"concentric",
 			"breadthfirst",

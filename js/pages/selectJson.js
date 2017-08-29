@@ -3,8 +3,7 @@ function openJsonSelection(firstCall = false) {
   content += "<input id='selectFile' type='file'><br>";
   content += "<button id='useDefault'>Use default</button>"
   
-  createContentPage("Select File", content )
-  setActiveMenuItem("UploadJson")
+  modal("Select File", content )
 
   if(firstCall)
     initDropEvents();
@@ -29,6 +28,7 @@ function openJsonSelection(firstCall = false) {
       try {
         let json = JSON.parse(dataURL)
         submitJson(json)
+        hideModal()
       } catch(e) { 
         modal("Error", "File not supported")
       }

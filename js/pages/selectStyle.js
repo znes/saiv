@@ -6,7 +6,7 @@ function selectStyle() {
 	form.append(createSelect("style", [currentStyle], config.cytoscape.styles))
 
 
-	form.append('<input type="submit" value="Save">')
+	form.append('<button class="btn btn-success">Save</button>')
 	form.submit(e => {
 		e.preventDefault()
 		let data = readForm(".editStyle")
@@ -18,6 +18,6 @@ function selectStyle() {
 		})
 	})
 
-	createContentPage("Set Explorer Styles", form )
+	modal("Set Explorer Styles", form )
 	setActiveMenuItem("setStyle")
 }
