@@ -1,27 +1,31 @@
 function modal(head = "", content = "", abortFunction = function(){} ) {
 	// Get the modal
 	const modal = $(config.dom.modal.container)
+	const backdrop = $(config.dom.modal.backdrop)
 	$(config.dom.modal.heading).text(head)
 	$(config.dom.modal.body).html(content)
 
 	// Get the <span> element that closes the modal
-	modal.show()
+	modal.addClass("in")
+	backdrop.addClass("in")
 
 	window.setTimeout(() => {
-		$('html').on("click", (event) => {
-		    if (!$.contains(modal[0], event.target) && event.target != modal[0]) {
-		    	abortFunction()
-		    	hideModal()
-		    }
-		})
+		modal.off("click")
+			.on("click", (event) => {
+			    if ($(event.target).hasClass("modal")) {
+			    	abortFunction()
+			    	hideModal()
+			    }
+			})
 
-		modal.find(".close").click((event) => {
+		modal.find(".close, .btn-default").click((event) => {
 			abortFunction()
 		    hideModal()
 		})
 	},100)
-}
-function hideModal() {
-    $(config.dom.modal.container).hide()
-    $('html').off('click')
+
+	function hideModal() {
+	    modal.removeClass("in")
+	    backdrop.removeClass("in")
+	}
 }

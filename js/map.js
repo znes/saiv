@@ -755,6 +755,7 @@ class LeafleatMap {
         if(this.elements[from].marker != null && this.elements[to].marker != null ) {
             let arrow = L.polyline([this.getCoordinates(from), this.getCoordinates(to)], {
                 weight: 10,
+                color: "#9dbaea",
                 contextmenu: true,
                 contextmenuItems: [{
                     text: 'Delete Edge',
@@ -776,9 +777,10 @@ class LeafleatMap {
 
             let arrowHead = L.polylineDecorator(arrow).addTo(this.map)
             arrowHead.setPatterns([
-                {   offset: '100%', 
+                {   
+                    offset: '100%', 
                     repeat: 0, 
-                    symbol: L.Symbol.arrowHead({weight: 15, polygon: false, pathOptions: {stroke: true}})
+                    symbol: L.Symbol.arrowHead({polygon: false, pathOptions: {stroke: true, color: "#9dbaea"}})
                 }
             ])
 
@@ -826,28 +828,6 @@ class LeafleatMap {
             }
             else {
                 this.elements[name].marker.setLatLng(pos)
-
-                // Update Connections
-                /*for (let [prob, data] of Object.entries(this.elements)) {
-                    if(prob == name) {
-                        for (let [succ, obj] of Object.entries(data.successors)) {
-                            let latlngs = obj.arrow.getLatLngs()
-                            latlngs.splice(0, 1, [pos.lat,pos.lng])
-
-                            obj.arrow.setLatLngs(latlngs)
-                        }
-                    }
-                    else {
-                        for (let [succ, obj] of Object.entries(data.successors)) {
-                            if(succ == name) { 
-                                let latlngs = obj.arrow.getLatLngs()
-                                latlngs.splice(1, 1, [pos.lat,pos.lng])
-
-                                obj.arrow.setLatLngs(latlngs)
-                            }
-                        }
-                    }
-                }*/
             }
             // Update Connections
             for (let [prob, data] of Object.entries(this.elements)) {

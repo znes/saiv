@@ -1,6 +1,6 @@
 let config = {
 	cytoscape: {
-		defaultStyle: "dagre",
+		defaultStyle: "cose-bilkent",
 		styles: [
 			"dagre",
 			"circle",
@@ -61,6 +61,7 @@ let config = {
 		},
 		modal: {
 			container: ".modal",
+			backdrop: ".modal-backdrop",
 			heading: ".modal .modal-header h2",
 			body: ".modal .modal-body"
 		}

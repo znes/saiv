@@ -93,7 +93,7 @@ a:hover {
 
 
 /* The Modal (background) */
-.modal {
+.moal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 200; /* Sit on top */
@@ -108,7 +108,7 @@ a:hover {
 }
 
 /* Modal Content */
-.modal-content {
+.moal-content {
     position: relative;
     background-color: #fefefe;
     margin: auto;
@@ -148,20 +148,26 @@ a:hover {
     cursor: pointer;
 }
 
-.modal-header {
+.moal-header {
     padding: 2px 16px;
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
 }
 
-.modal-body {padding: 2px 16px;}
+.moal-body {padding: 2px 16px;}
 
-.modal-footer {
+.moal-footer {
     padding: 2px 16px;
     background-color: #5cb85c;
     color: white;
 }
-
+.modal.fade, .modal-backdrop {
+  display:block;
+  visibility: hidden;
+}
+.modal.in, .modal-backdrop.in {
+  visibility: visible;
+}
 
 /**
  * Sidebar Drag
