@@ -3,7 +3,7 @@ class DataManager {
 		this._json = null
 		// debug	
 	    window.json = () => {
-	    	return this._json.children
+	    	return this._json
 	    }
 
 	    document.addEventListener("data", (e) => {
@@ -27,6 +27,16 @@ class DataManager {
 		this._json.tags.description = data.tags.description
 	}
 
+	getScenario () {
+		if(this._json != null) {
+			return {
+				name: this._json.name,
+				description: this._json.tags.description
+			}
+		}
+		else 
+			return null
+	}
 
 	updateData (detail) {
 		switch(detail.task) {
@@ -54,7 +64,10 @@ class DataManager {
 			case "updatePosition":
 				this.updatePosition(detail.data.name, detail.data.pos)
 				break
-			default: 
+			case "updateScenario":
+				this.updateScenario(detail.data)
+				break
+			default:
 				console.log("default case updateData")
 				break
 		}

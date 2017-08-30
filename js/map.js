@@ -7,6 +7,7 @@ class LeafleatMap {
             ghostPoly: null,
             name: null
         }
+        this.shadowEdge = null
 
 
 		this.init(id)
@@ -15,7 +16,7 @@ class LeafleatMap {
 		
 		// debug	
 	    window.map = () => {
-	    	return this.elements
+	    	return this.map
 	    }
     }
 
@@ -52,7 +53,6 @@ class LeafleatMap {
                 callback: e => { this.zoomOut(e) }
             }]
         })
-        //.setView([51.505, -0.09], 13)
 
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 			maxZoom: 18,
@@ -237,6 +237,7 @@ class LeafleatMap {
                     task: "showId",
                     data: name
                 })
+                return false
             })
 
 
@@ -269,10 +270,11 @@ class LeafleatMap {
             .append(createInput("type", "type", "polygon", "text", true, "readonly"))
             .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
             .append('<button class="btn btn-success">Save</button>')       
+            .append('<a class="cancel btn btn-warning pull-right">Cancel</a>')
 
         body.append(form)
-            .append('<button class="resetPoly btn btn-default">Reset</button>')
-            .append('<button class="revertPoly btn btn-primary">Revert</button>')  
+            .append('<a class="resetPoly btn m-t-sm btn-default">Reset</a>')
+            .append('<a class="revertPoly btn m-t-sm btn-primary pull-right">Revert</a>')
 
         sendEvent("sidebar", {
             task: "show",
@@ -289,11 +291,12 @@ class LeafleatMap {
         form.append(createInput("name", "name", name, "hidden"))
             .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
             .append('<button class="btn btn-success">Save</button>')
+            .append('<a class="cancel btn btn-warning pull-right">Cancel</a>')
             
 
         body.append(form)
-            .append('<button class="resetPoly btn btn-default">Reset</button>')
-            .append('<button class="revertPoly btn btn-primary">Revert</button>')
+            .append('<button class="resetPoly btn btn-default m-t-sm">Reset</button>')
+            .append('<button class="revertPoly btn btn-primary m-t-sm pull-right">Revert</button>')
 
         sendEvent("sidebar", {
             task: "show",
@@ -305,118 +308,132 @@ class LeafleatMap {
     }
 
     discard() {
+        globals.unsavedChanges = false
+        closeSitebar()
+
         if(this.redraw.ghostPoly != null) {
             this.redraw.ghostPoly.remove()
+            this.redraw.ghostPoly = null
         }
 
         if(this.redraw.name != null && this.elements[this.redraw.name].marker != null) {
             // redraw OLD !!!
             this.elements[this.redraw.name].marker = this.createNode(this.redraw.name, this.redraw.pos)
+
+            this.redraw.name = null
         }
-        this.map.off('click')
+
+        if(this.shadowEdge != null) {
+            this.shadowEdge.remove()
+            this.shadowEdge = null
+        }
 
 
-        sendEvent("sidebar", {
-            task: "showId",
-            data: this.redraw.name
-        })
+        this.addDefaultBind()
     }
 
     drawPolygon(name = null) {
         let currentPoints = [],
             that = this
 
-        //registerDiscardEvent(this.redrawOld)
-
-        if(name != null) {
-            if(this.elements[name].marker != null) {
-                this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
-                this.redraw.name = name
-
-                this.elements[name].marker.remove()
-            }
-        }
-
-        modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
-        globals.unsavedChanges = true
-
-
-        updateBodyPoly()
-
-        this.map.on('click', e => {
-            if(this.redraw.ghostPoly != null) {
-                this.redraw.ghostPoly.remove()
-            }
-
-            currentPoints.push([e.latlng.lat, e.latlng.lng])
-
-
-            this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
-            updateBodyPoly()
-        })
-
-        function updateBodyPoly() {
-            let wktText = arrayToPolygonWkt(currentPoints)
+        if(discardChanges())
+        {
 
             if(name != null) {
-                that.sidebarTextPolyPlacement(wktText, name)
-            }
-            else {
-                that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
+                if(this.elements[name].marker != null) {
+                    this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
+                    this.redraw.name = name
+
+                    this.elements[name].marker.remove()
+                }
             }
 
-            $(".createPolyForm").submit((e) => {
-                e.preventDefault()
-                if (currentPoints.length > 2) {
-                    if(name != null) {
-                        sendEvent("data", {
-                            task: "updatePosition",
-                            data: readForm(".createPolyForm")
-                        })
-                        sendEvent("sidebar", {
-                            task: "showId",
-                            data: name
-                        })
-                    }
-                    else {
-                        var fromData = readForm(".createPolyForm")
-                        sendEvent("data", {
-                            task: "addNode",
-                            data:  fromData
-                        })
-                    }
-                    
-                    that.map.off('click')
-                    that.redraw.ghostPoly.remove()
-                    that.redraw.ghostPoly = null
-                    currentPoints = []
+            modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
+            globals.unsavedChanges = true
 
-                    globals.unsavedChanges = false
+
+            updateBodyPoly()
+
+            this.map.on('click', e => {
+                if(this.redraw.ghostPoly != null) {
+                    this.redraw.ghostPoly.remove()
+                }
+
+                currentPoints.push([e.latlng.lat, e.latlng.lng])
+
+
+                this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
+                updateBodyPoly()
+            })
+
+            function updateBodyPoly() {
+                let wktText = arrayToPolygonWkt(currentPoints)
+
+                if(name != null) {
+                    that.sidebarTextPolyPlacement(wktText, name)
                 }
                 else {
-                    modal("Alarm", "At least 3 points required")
+                    that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
                 }
-            })
 
-            $(".resetPoly").on("click", (e) => {
-                if (that.redraw.ghostPoly != null)
-                    that.redraw.ghostPoly.remove()
-                
-                that.redraw.ghostPoly = null
-                currentPoints = []
-                return false
-            })
+                $(".createPolyForm").submit((e) => {
+                    e.preventDefault()
+                    if (currentPoints.length > 2) {
+                        if(name != null) {
+                            sendEvent("data", {
+                                task: "updatePosition",
+                                data: readForm(".createPolyForm")
+                            })
+                            sendEvent("sidebar", {
+                                task: "showId",
+                                data: name
+                            })
+                        }
+                        else {
+                            var fromData = readForm(".createPolyForm")
+                            sendEvent("data", {
+                                task: "addNode",
+                                data:  fromData
+                            })
+                        }
+                        
+                        that.addDefaultBind()
+                        that.redraw.ghostPoly.remove()
+                        that.redraw.ghostPoly = null
+                        currentPoints = []
 
-            $(".revertPoly").on("click", (e) => {
-                if(that.redraw.ghostPoly != null)
-                    that.redraw.ghostPoly.remove()
-                if(currentPoints.length >= 1)
-                    currentPoints.pop()
+                        globals.unsavedChanges = false
+                    }
+                    else {
+                        modal("Alarm", "At least 3 points required")
+                    }
+                })
 
-                that.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
-                that.updateBodyPoly(currentPoints)
-                return false
-            })
+                $(".resetPoly").on("click", (e) => {
+                    if (that.redraw.ghostPoly != null)
+                        that.redraw.ghostPoly.remove()
+                    
+                    that.redraw.ghostPoly = null
+                    currentPoints = []
+                    return false
+                })
+
+                $(".cancel").on("click", (e) => {
+                    that.discard()
+                    return false
+                })
+
+                $(".revertPoly").on("click", (e) => {
+                    if(that.redraw.ghostPoly != null)
+                        that.redraw.ghostPoly.remove()
+                    if(currentPoints.length >= 1)
+                        currentPoints.pop()
+
+                    that.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
+                    updateBodyPoly()
+                    return false
+                })
+            }
         }
     }
 
@@ -446,64 +463,32 @@ class LeafleatMap {
 
 
     connectSuccessor(evt, name) {
-        function setClickable(target, value) {
-            if(value && !target.options.clickable) {
-                target.options.clickable = true;
-                L.Path.prototype._initEvents.call(target);
-                target._path.removeAttribute('pointer-events');
-            } 
-            else if(!value && target.options.clickable) {
-                target.options.clickable = false;
+        let evtFromTarget = event.target || event.cyTarget,
+            fromPos = this.getCoordinates(name),
+            hoverNode = false,
+            mousePos = evt.latlng
 
-                // undoing actions done in L.Path.prototype._initEvents
-                L.DomUtil.removeClass(target._path, 'leaflet-clickable');
-                L.DomEvent.off(target._container, 'click', target._onMouseClick);
-                ['dblclick', 'mousedown', 'mouseover', 'mouseout', 'mousemove', 'contextmenu'].forEach(function(evt) {
-                    L.DomEvent.off(target._container, evt, target._fireMouseEvent);
-                });
-
-                target._path.setAttribute('pointer-events', target.options.pointerEvents || 'none');
-            }
-        }
-
-
-
-        let evtFromTarget = event.target || event.cyTarget
-        let fromPos = this.getCoordinates(name)
-        let hoverNode = false
-        let mousePos = evt.latlng
-
-
-        let arrow = L.polyline([fromPos, mousePos], {
-            weight: 10,
+        globals.unsavedChanges = true
+        
+        this.shadowEdge = L.polyline([fromPos, mousePos], {
+            weight: 5,
             clickable: false,
             color: "black"
         })
-        arrow.addTo(this.map)
+
+        this.shadowEdge.addTo(this.map)
             .bringToBack()
 
 
-        /*let arrowHead = L.polylineDecorator(arrow).addTo(this.map)
-        arrowHead.setPatterns([
-            {   offset: '100%', 
-                repeat: 0, 
-                symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})
-            }
-        ])
-        function updateArrowHead() {
-            arrowHead.setPaths(arrow)
-        }*/
-
         this.map.on("mousemove", e => {
             if(!hoverNode) {
-                arrow.setLatLngs([fromPos, e.latlng])
-                //updateArrowHead()
+                this.shadowEdge.setLatLngs([fromPos, e.latlng])
             }
         })
 
         this.map.on("click", e => {
-            arrow.remove()
-            //arrowHead.remove()
+            globals.unsavedChanges = false
+            this.shadowEdge.remove()
             this.addDefaultBind()
         })
 
@@ -514,22 +499,20 @@ class LeafleatMap {
                     data.marker.on("mouseover", () => {
                         console.log("enter")
                         hoverNode = true
-                        arrow.setLatLngs([fromPos, this.getCoordinates(property)])
-                        //updateArrowHead()
+                        this.shadowEdge.setLatLngs([fromPos, this.getCoordinates(property)])
                     })
 
                     data.marker.on("mouseout", () => {
                         console.log("leave")
                         hoverNode = false
-                        arrow.setLatLngs([fromPos, this.getCoordinates(property)])
-                        //updateArrowHead()
+                        this.shadowEdge.setLatLngs([fromPos, this.getCoordinates(property)])
                     })
 
 
                     data.marker.on("click", () => {
-                        arrow.remove()
-                        //arrowHead.remove()
-
+                        globals.unsavedChanges = false
+                        this.shadowEdge.remove()
+                        this.shadowEdge = null
                         this.addDefaultBind()
 
                         sendEvent("data", {
@@ -544,7 +527,6 @@ class LeafleatMap {
                             task: "showId",
                             data: property
                         })
-
                     })
                 }
             }
@@ -552,8 +534,6 @@ class LeafleatMap {
     }
 
     addNode(name, type, pos = null) {
-        console.log("addNode")
-        console.log(name, type, pos)
         this.elements[name] = {
             successors: {},
             marker: null,
@@ -620,15 +600,15 @@ class LeafleatMap {
     }
 
     registerDragEvents(eles) {
-        let srcEle = null
-        let srcName = null
-        let that = this
-        let added = false
+        let srcEle = null,
+            srcName = null,
+            that = this,
+            added = false
 
 
         eles.each((index,item) => {
-            item.addEventListener('dragstart', handleDragStart, false);
-            item.addEventListener('dragend', handleDragEnd, false);
+            item.addEventListener('dragstart', handleDragStart, false)
+            item.addEventListener('dragend', handleDragEnd, false)
         })
 
 
@@ -641,7 +621,6 @@ class LeafleatMap {
             .on('dragleave', handleDragLeave)
 
         function handleDragStart(e) {
-            //console.log("handleDragStart")
             srcEle = $(this)
             srcName = srcEle.parent().find("p").text()
             srcEle.parent().addClass('moving')
@@ -651,34 +630,34 @@ class LeafleatMap {
             img.crossOrigin="anonymous"
             img.src = srcEle.prop("src")
 
-            var canvas = document.createElement('canvas');
+            let canvas = document.createElement('canvas');
             canvas.width = "25";
             canvas.height = "41";
-            var context = canvas.getContext('2d');
+            let context = canvas.getContext('2d')
             context.drawImage(img, 0, 0);
-            var canvasImage = new Image();
+
+            let canvasImage = new Image();
             canvasImage.crossOrigin="anonymous"
-            canvasImage.src = canvas.toDataURL();
+            canvasImage.src = canvas.toDataURL()
+
             document.body.append(canvasImage)
 
             e.dataTransfer.setDragImage(canvasImage, 0, 0)
-            //e.dataTransfer.setDragImage(img, -50, -50);
         }
 
         function handleDragEnter(e) {
-            //console.log("handleDragEnter")
             // this / e.target is the current hover target.
-            this.classList.add('over')
+            //this.classList.add('over')
         }
 
         function handleDragLeave(e) {
-            //console.log("handleDragLeave")
-            this.classList.remove('over');  // this / e.target is previous target element.
+            // this / e.target is previous target element.
+            //this.classList.remove('over') 
         }
 
         function handleDrop(e) {
             if (e.stopPropagation) {
-                e.stopPropagation() // stops the browser from redirecting.
+                e.stopPropagation()
             }
             e.preventDefault()
             let mousePos = that.map.mouseEventToLatLng(e)
@@ -726,10 +705,6 @@ class LeafleatMap {
                         body: body
                     }
                 })
-
-                // hack because map gets clicked afterwards 
-                // because click element is position absolute
-                window.setTimeout(openSitebar, 100)
             })
         }
         

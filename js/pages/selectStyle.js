@@ -1,18 +1,17 @@
 function selectStyle() {
 	let currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.defaultStyle
-	let currentKeepExplorerPosition = localStorage.getItem("keepExplorerPosition") ? localStorage.getItem("keepExplorerPosition") : globals.keepExplorerPosition
+	let currentAutoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
 	let form = $('<form class="editStyle"></form>')
 
 
 	form.append(createSelect("style", [currentStyle], config.cytoscape.styles))
 
-	console.log(currentKeepExplorerPosition)
-	if(currentKeepExplorerPosition == "true")
+	if(currentAutoLayout == "true")
 	{
-		form.append('<div class="form-group"><label for="keepExplorerPosition">Keep Explorer Postions after adding Elements</label><input checked class="form-control" type="checkbox" name="keepExplorerPosition"></div>')
+		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input checked class="form-control" type="checkbox" name="autoLayout"></div>')
 	}
 	else {
-		form.append('<div class="form-group"><label for="keepExplorerPosition">Keep Explorer Postions after adding Elements</label><input class="form-control" type="checkbox" name="keepExplorerPosition"></div>')
+		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input class="form-control" type="checkbox" name="autoLayout"></div>')
 
 	}
 
@@ -21,15 +20,16 @@ function selectStyle() {
 	form.submit(e => {
 		e.preventDefault()
 		let data = readForm(".editStyle")
-		if(typeof data.keepExplorerPosition != "undefined") {
-			globals.keepExplorerPosition = "true"
+		
+		if(typeof data.autoLayout != "undefined") {
+			globals.autoLayout = "true"
 		} 
 		else {
-			globals.keepExplorerPosition = "false"
+			globals.autoLayout = "false"
 		}
-		console.log(globals)
+
 		localStorage.setItem("style", data.style)
-		localStorage.setItem("keepExplorerPosition", globals.keepExplorerPosition)
+		localStorage.setItem("autoLayout", globals.autoLayout)
 
 		sendEvent("dataChanged", {
 			task: "updateStyle"
@@ -39,5 +39,5 @@ function selectStyle() {
 	})
 
 	modal("Set Explorer Styles", form )
-	setActiveMenuItem("setStyle")
+	$('.basic-select', form).select2()
 }

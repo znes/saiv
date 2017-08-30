@@ -37,13 +37,16 @@ function hideModal() {
 }
 
 function openSitebar () {
-	console.log("open")
+	globals.callSitebarTimestamp = Date.now()
 	$("body").removeClass("sidebar-closed")
 }
 
 function closeSitebar () {
-	console.log("close")
-	$("body").addClass("sidebar-closed")
+	// hack
+	// map calls closeSitebar when polygone is clicked
+	// if open call is called 100ms before it will not be called
+	if(globals.callSitebarTimestamp + 100 < Date.now() )
+		$("body").addClass("sidebar-closed")
 }
 
 function discardChanges(abort) {

@@ -1,4 +1,5 @@
 let globals = {
 	unsavedChanges: false,
-	keepExplorerPosition: true
+	autoLayout: "false",
+	callSitebarTimestamp: 0
 }

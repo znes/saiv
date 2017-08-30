@@ -9,6 +9,9 @@
 	margin: 0;
 	padding: 0;
 }
+[hidden] {
+  display: none !important;
+}
 
 body {
 	width: 100%;
@@ -46,8 +49,14 @@ body {
   overflow: auto;
   z-index: 1;
 }
-.sidebar a {
-  color:#fff;
+.sidebar a. {
+  color: #333;
+}
+.sidebar a.btn-default {
+  color: #333;
+}
+.sidebar small a {
+  text-decoration: underline;
 }
 .sidebar-toggle {
   position: absolute;
@@ -67,7 +76,7 @@ body {
 .sidebar .body {
   margin-top: 20px;
 }
-.sidebar .body .select2-container {
+.sidebar .body .select2-container { 
   display: block;
 }
 .sidebar .body input,
@@ -75,7 +84,9 @@ body {
 
 }
 
-
+.m-t-sm {
+  margin-top: 15px;
+}
 a:hover {
   color: #62daea;
 }

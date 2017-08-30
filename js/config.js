@@ -4,9 +4,7 @@ let config = {
 		styles: [
 			"dagre",
 			"circle",
-			"cose-bilkent",
 			"grid",
-			"concentric",
 			"breadthfirst",
 			"cose"
 		],
@@ -54,14 +52,14 @@ let config = {
 			home: ".home",
 			style: ".styleSettings",
 			graph: ".navbar .shoWExplorer",
-			jsonSetting: ".jsonSettings",
+			scenario: ".scenarioSetting",
 			map: ".showMap",
 			download: ".navbar .downloadJson"
 		},
 		modal: {
 			container: ".modal",
 			backdrop: ".modal-backdrop",
-			heading: ".modal .modal-header h2",
+			heading: ".modal .modal-header h3",
 			body: ".modal .modal-body"
 		}
 	},

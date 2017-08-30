@@ -8,9 +8,9 @@ $(function() {
     let map = new LeafleatMap(config.dom.mapContainerId)
 
 
-    // Opens Page "Select Json"
-    openJsonSelection(true)
-    //
+    // Init File Drop Events
+    initDropEvents()
+    // Open Page home
     home()
 
 
@@ -30,15 +30,15 @@ $(function() {
     })
 
     $(config.dom.links.style).click(() => {
-        if(discardChanges()) {
+        //if(discardChanges()) {
             selectStyle()
-        }
+        //}
     })
 
-    $(config.dom.links.jsonSettings).click(() => {
-        if(discardChanges()) {
-            jsonSettings()
-        }
+    $(config.dom.links.scenario).click(() => {
+        //if(discardChanges()) {
+            scenario(dataManager.getScenario())
+        //}
     })
 
     
@@ -77,6 +77,7 @@ $(function() {
 
     // Init Event Reciver 
     document.addEventListener("dataReceived", (e) => {
+        console.log("dataReceived")
         initListenerDataRevieved()
         dataManager.json = e.detail
 
@@ -93,7 +94,7 @@ $(function() {
     function showId(id) {
         let data = dataManager.getElement(id)
 
-            sb.createNodeForm(data, dataManager.json.children)
+        sb.createNodeForm(data, dataManager.json.children)
     }
 
     function initListenerDataRevieved() {

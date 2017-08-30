@@ -5,7 +5,7 @@ class CyptoScape {
 
         this.init(selector)
         this.registerEvents()
-        this.keepExplorerPosition = localStorage.getItem("keepExplorerPosition") ? localStorage.getItem("keepExplorerPosition") : globals.keepExplorerPosition
+        this.autoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
 
         // debug
         window.cy = () => {
@@ -120,7 +120,7 @@ class CyptoScape {
                 onClickFunction: (event) => {
                     let evtFromTarget = event.target || event.cyTarget
                     let pos = event.position || event.cyPosition
-
+                    globals.unsavedChanges = true
                     /*if(evtFromTarget.data().type == "scenario") {
                         modal("Error", "Cant be connected to type scenario")
                         return false
@@ -138,6 +138,8 @@ class CyptoScape {
 
                     this.cy.on("click", "node", {}, (_event) => {
                         let evtToTarget = _event.target || _event.cyTarget 
+                        globals.unsavedChanges = false
+
                         if(evtFromTarget == evtToTarget ) {
                             modal("Error", "Cant connect to same node")
                         }
@@ -150,8 +152,14 @@ class CyptoScape {
                                 }
                             })
                         }
+
                         this.cy.$('#shadowEdge').remove()
                         this.updateBind()
+
+                        sendEvent("sidebar", {
+                            task: "showId",
+                            data: evtToTarget.data().id
+                        })
                     })
                 }            
             },
@@ -256,7 +264,7 @@ class CyptoScape {
         //this.cy.$("*").remove()
         //this.cy.add(eles)
 
-        if(!customPos) {
+        if(!customPos || this.autoLayout == "true") {
             this.updateLayout()
         }
         else {
@@ -266,7 +274,10 @@ class CyptoScape {
     }
 
     discard() {
+        if(this.cy.$('#shadowEdge').length > 0)
+            this.cy.$('#shadowEdge').remove()
         
+        this.updateBind()
     }
 
     changeType(name, newType) {
@@ -332,7 +343,8 @@ class CyptoScape {
             })
         }
 
-        if(this.keepExplorerPosition == "false") {
+        console.log(this.autoLayout)
+        if(this.autoLayout == "true") {
             this.updateLayout()
         }
     }
@@ -364,7 +376,6 @@ class CyptoScape {
                     }
                 }
 
-            
             if(target == oldName) {
                 ele.data.source = source
                 ele.data.target = newName
@@ -376,8 +387,9 @@ class CyptoScape {
 
             edges.push(ele)
         })
-        ele.remove();
-        edgesToUpdate.remove();
+
+        ele.remove()
+        edgesToUpdate.remove()
         this.cy.add(edges)
     }
 
@@ -391,13 +403,15 @@ class CyptoScape {
     }
 
     addEdge(from, to) {
-        //console.log("to")
-        //console.log(to)
+        console.log("to")
+        console.log(to)
+        console.log("from")
+        console.log(from)
         this.cy.add([{ group: "edges", data: { source: from, target: to}}])
     }
 
     updateLayout() {
-        this.keepExplorerPosition = localStorage.getItem("keepExplorerPosition") ? localStorage.getItem("keepExplorerPosition") : globals.keepExplorerPosition
+        this.autoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
 
         this.cy.makeLayout({
             name: localStorage.getItem("style") || config.cytoscape.defaultStyle

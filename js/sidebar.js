@@ -37,7 +37,7 @@ class Sidebar{
 
 		form.append(createInput("Tag name", "tag", "", "text", true))
 			.append('<button class="btn btn-success">Add</button>')
-			.append('<a class="btn btn-warning cancelForm">Cancel</button>')
+			.append('<a class="btn btn-warning cancelForm pull-right">Cancel</button>')
 
 			.submit((e) => {
 			e.preventDefault()
@@ -141,7 +141,7 @@ class Sidebar{
         })
 
         form.append('<button class="btn btn-success">Save</button>')
-        form.append('<a class="btn btn-warning cancelForm">Cancel</a>')
+        form.append('<a class="btn btn-warning cancelForm pull-right">Cancel</a>')
 		form.submit(e => {
 			e.preventDefault()
 			let test = readForm('.editForm')
@@ -177,7 +177,7 @@ class Sidebar{
 		//form.append(createInput("posy", "posy", pos.y, "hidden"))
 
 		form.append('<button class="btn btn-success">Add</button>')
-		form.append('<a class="btn btn-warning">Cancel</button>')
+		form.append('<a class="btn btn-warning pull-right">Cancel</button>')
 
 		$('.basic-select', form).select2()
 
@@ -199,11 +199,16 @@ class Sidebar{
 
 	open () {
 		console.log("open")
+		globals.callSitebarTimestamp = Date.now()
 		$("body").removeClass("sidebar-closed")
 	}
 
 	close () {
 		console.log("close")
-		$("body").addClass("sidebar-closed")
+		// hack
+		// map calls closeSitebar when polygone is clicked
+		// if open call is called 100ms before it will not be called
+		if(globals.callSitebarTimestamp + 100 < Date.now() )
+			$("body").addClass("sidebar-closed")
 	}
 }
