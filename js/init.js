@@ -30,15 +30,11 @@ $(function() {
     })
 
     $(config.dom.links.style).click(() => {
-        //if(discardChanges()) {
-            selectStyle()
-        //}
+        selectStyle()
     })
 
     $(config.dom.links.scenario).click(() => {
-        //if(discardChanges()) {
-            scenario(dataManager.getScenario())
-        //}
+        scenario(dataManager.getScenario())
     })
 
     
@@ -56,7 +52,6 @@ $(function() {
                     break
             }
         }
-        //map.discard
     })
     document.addEventListener("sidebar", (e) => {
         switch(e.detail.task) {
@@ -69,15 +64,11 @@ $(function() {
             case "show":
                 sb.show(e.detail.data.head, e.detail.data.body)
                 break;
-            /*case "addNodeMap":
-                sb.addNode(e.detail.data.pos)
-                break*/
         }
     })
 
     // Init Event Reciver 
     document.addEventListener("dataReceived", (e) => {
-        console.log("dataReceived")
         initListenerDataRevieved()
         dataManager.json = e.detail
 
@@ -86,7 +77,6 @@ $(function() {
             data: dataManager.json
         })
 
-        //showId(dataManager.json.children[0].name)
         showGraph()
     })
 

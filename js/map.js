@@ -28,20 +28,26 @@ class LeafleatMap {
             contextmenuWidth: 140,
             contextmenuItems: [{
                 text: 'Add Node',
-                callback: e => { 
-                    sendEvent("sidebar", {
-                        task: "addNode",
-                        data: {
-                            pos: e.latlng
-                        }
-                    })
+                callback: e => {
+                    if(discardChanges())
+                        sendEvent("sidebar", {
+                            task: "addNode",
+                            data: {
+                                pos: e.latlng
+                            }
+                        })
                 }
             },{
                 text: 'Add Polygon',
-                callback: e => { this.drawPolygon() }
+                callback: e => { 
+                    if(discardChanges())
+                        this.drawPolygon() 
+                }
             },{
                 text: 'Show coordinates',
-                callback: e => { this.showCoordinates(e) }
+                callback: e => {
+                    this.showCoordinates(e) 
+                }
             }, {
                 text: 'Center map',
                 callback: e => { this.centerMap(e) }
@@ -181,7 +187,8 @@ class LeafleatMap {
                     text: 'Change position',
                     index: 0,
                     callback: e => {
-                        this.drawPolygon(name)
+                        if(discardChanges())
+                            this.drawPolygon(name)
                     }
                 }, {
                     separator: true,
@@ -190,16 +197,18 @@ class LeafleatMap {
                     text: 'Connect successors',
                     index: 2,
                     callback: e => {
-                        this.connectSuccessor(e, name)
+                        if(discardChanges())
+                            this.connectSuccessor(e, name)
                     }
                 },{
                     text: 'Delete',
                     index: 3,
-                    callback: e => { 
-                        sendEvent("data", {
-                            task: "deleteNode",
-                            data: name
-                        }
+                    callback: e => {
+                        if(discardChanges())
+                            sendEvent("data", {
+                                task: "deleteNode",
+                                data: name
+                            }
                     )}
                 }, {
                     separator: true,
@@ -214,15 +223,19 @@ class LeafleatMap {
                     text: 'Connect successors',
                     index: 0,
                     callback: e => {
-                        this.connectSuccessor(e, name)
+                        if(discardChanges())
+                            this.connectSuccessor(e, name)
                     }
                 },{
                     text: 'Delete',
                     index: 1,
-                    callback: e => { sendEvent("data", {
-                        task: "deleteNode",
-                        data: name
-                    })}
+                    callback: e => { 
+                        if(discardChanges())
+                            sendEvent("data", {
+                                task: "deleteNode",
+                                data: name
+                            })
+                    }
                 }, {
                     separator: true,
                     index: 2
@@ -336,104 +349,100 @@ class LeafleatMap {
         let currentPoints = [],
             that = this
 
-        if(discardChanges())
-        {
+        if(name != null) {
+            if(this.elements[name].marker != null) {
+                this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
+                this.redraw.name = name
+
+                this.elements[name].marker.remove()
+            }
+        }
+
+        modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
+        globals.unsavedChanges = true
+
+        this.removeClickListener()
+        updateBodyPoly()
+
+        this.map.on('click', e => {
+            if(this.redraw.ghostPoly != null) {
+                this.redraw.ghostPoly.remove()
+            }
+
+            currentPoints.push([e.latlng.lat, e.latlng.lng])
+
+
+            this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
+            updateBodyPoly()
+        })
+
+        function updateBodyPoly() {
+            let wktText = arrayToPolygonWkt(currentPoints)
 
             if(name != null) {
-                if(this.elements[name].marker != null) {
-                    this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
-                    this.redraw.name = name
-
-                    this.elements[name].marker.remove()
-                }
+                that.sidebarTextPolyPlacement(wktText, name)
+            }
+            else {
+                that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
             }
 
-            modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
-            globals.unsavedChanges = true
-
-
-            updateBodyPoly()
-
-            this.map.on('click', e => {
-                if(this.redraw.ghostPoly != null) {
-                    this.redraw.ghostPoly.remove()
-                }
-
-                currentPoints.push([e.latlng.lat, e.latlng.lng])
-
-
-                this.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(this.map)
-                updateBodyPoly()
-            })
-
-            function updateBodyPoly() {
-                let wktText = arrayToPolygonWkt(currentPoints)
-
-                if(name != null) {
-                    that.sidebarTextPolyPlacement(wktText, name)
-                }
-                else {
-                    that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
-                }
-
-                $(".createPolyForm").submit((e) => {
-                    e.preventDefault()
-                    if (currentPoints.length > 2) {
-                        if(name != null) {
-                            sendEvent("data", {
-                                task: "updatePosition",
-                                data: readForm(".createPolyForm")
-                            })
-                            sendEvent("sidebar", {
-                                task: "showId",
-                                data: name
-                            })
-                        }
-                        else {
-                            var fromData = readForm(".createPolyForm")
-                            sendEvent("data", {
-                                task: "addNode",
-                                data:  fromData
-                            })
-                        }
-                        
-                        that.addDefaultBind()
-                        that.redraw.ghostPoly.remove()
-                        that.redraw.ghostPoly = null
-                        currentPoints = []
-
-                        globals.unsavedChanges = false
+            $(".createPolyForm").submit((e) => {
+                e.preventDefault()
+                if (currentPoints.length > 2) {
+                    if(name != null) {
+                        sendEvent("data", {
+                            task: "updatePosition",
+                            data: readForm(".createPolyForm")
+                        })
+                        sendEvent("sidebar", {
+                            task: "showId",
+                            data: name
+                        })
                     }
                     else {
-                        modal("Alarm", "At least 3 points required")
+                        var fromData = readForm(".createPolyForm")
+                        sendEvent("data", {
+                            task: "addNode",
+                            data:  fromData
+                        })
                     }
-                })
-
-                $(".resetPoly").on("click", (e) => {
-                    if (that.redraw.ghostPoly != null)
-                        that.redraw.ghostPoly.remove()
                     
+                    that.addDefaultBind()
+                    that.redraw.ghostPoly.remove()
                     that.redraw.ghostPoly = null
                     currentPoints = []
-                    return false
-                })
 
-                $(".cancel").on("click", (e) => {
-                    that.discard()
-                    return false
-                })
+                    globals.unsavedChanges = false
+                }
+                else {
+                    modal("Alarm", "At least 3 points required")
+                }
+            })
 
-                $(".revertPoly").on("click", (e) => {
-                    if(that.redraw.ghostPoly != null)
-                        that.redraw.ghostPoly.remove()
-                    if(currentPoints.length >= 1)
-                        currentPoints.pop()
+            $(".resetPoly").on("click", (e) => {
+                if (that.redraw.ghostPoly != null)
+                    that.redraw.ghostPoly.remove()
+                
+                that.redraw.ghostPoly = null
+                currentPoints = []
+                return false
+            })
 
-                    that.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
-                    updateBodyPoly()
-                    return false
-                })
-            }
+            $(".cancel").on("click", (e) => {
+                that.discard()
+                return false
+            })
+
+            $(".revertPoly").on("click", (e) => {
+                if(that.redraw.ghostPoly != null)
+                    that.redraw.ghostPoly.remove()
+                if(currentPoints.length >= 1)
+                    currentPoints.pop()
+
+                that.redraw.ghostPoly = L.polygon(currentPoints, {}).addTo(that.map)
+                updateBodyPoly()
+                return false
+            })
         }
     }
 
@@ -460,6 +469,14 @@ class LeafleatMap {
         }
     }
 
+    removeClickListener() {
+        for (let [property, data] of Object.entries(this.elements)) {
+            if(data.marker != null) {
+                data.marker.off("click")
+            }
+        }
+    }
+
 
 
     connectSuccessor(evt, name) {
@@ -476,7 +493,8 @@ class LeafleatMap {
             color: "black"
         })
 
-        this.shadowEdge.addTo(this.map)
+        this.shadowEdge
+            .addTo(this.map)
             .bringToBack()
 
 
@@ -509,25 +527,27 @@ class LeafleatMap {
                     })
 
 
-                    data.marker.on("click", () => {
-                        globals.unsavedChanges = false
-                        this.shadowEdge.remove()
-                        this.shadowEdge = null
-                        this.addDefaultBind()
+                    data.marker
+                        .off("click")
+                        .on("click", () => {
+                            globals.unsavedChanges = false
+                            this.shadowEdge.remove()
+                            this.shadowEdge = null
+                            this.addDefaultBind()
 
-                        sendEvent("data", {
-                            task: "addEdge",
-                            data: {
-                                from: name,
-                                to: property
-                            }
-                        })
+                            sendEvent("data", {
+                                task: "addEdge",
+                                data: {
+                                    from: name,
+                                    to: property
+                                }
+                            })
 
-                        sendEvent("sidebar", {
-                            task: "showId",
-                            data: property
+                            sendEvent("sidebar", {
+                                task: "showId",
+                                data: property
+                            })
                         })
-                    })
                 }
             }
         }
@@ -688,24 +708,29 @@ class LeafleatMap {
     }
 
     showButtonAddNodes() {
-        if($(".alertMissingPositionBar").length == 0) {
+        if($(".alertMissingPositionBar").length == 0) 
+        {
             const alertButton = $('<div class="alertMissingPositionBar leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Show Nodes" role="button" aria-label="Show Nodes">!</a></div>')
-             $('.leaflet-top.leaflet-right').append(alertButton).on('click', e => {
+             $('.leaflet-top.leaflet-right')
+                .append(alertButton)
+                .on('click', e => {
+                    if(!discardChanges())
+                        return
+
+                    let head = "<h4>Elements without Positions</h4>"
+                    let body = this.getNoPosDragElements()
             
-                let head = "<h4>Elements without Positions</h4>"
-                let body = this.getNoPosDragElements()
-        
-                this.registerDragEvents(body.find("img"))
+                    this.registerDragEvents(body.find("img"))
 
 
-                sendEvent("sidebar", {
-                    task: "show",
-                    data: {
-                        head: head,
-                        body: body
-                    }
+                    sendEvent("sidebar", {
+                        task: "show",
+                        data: {
+                            head: head,
+                            body: body
+                        }
+                    })
                 })
-            })
         }
         
     }
@@ -728,14 +753,16 @@ class LeafleatMap {
                 }
             }
             else {
-                this.map.removeLayer(this.elements[name].marker)
-                this.elements[name].marker = null
-                for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
-                    if (obj.arrow != null) {
-                        this.map.removeLayer(obj.arrow)
-                        this.map.removeLayer(obj.head)
-                        obj.arrow = null
-                        obj.head = null
+                if(this.elements[name].marker != null){
+                    this.map.removeLayer(this.elements[name].marker)
+                    this.elements[name].marker = null
+                    for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
+                        if (obj.arrow != null) {
+                            this.map.removeLayer(obj.arrow)
+                            this.map.removeLayer(obj.head)
+                            obj.arrow = null
+                            obj.head = null
+                        }
                     }
                 }
                 if(deleteRefs)

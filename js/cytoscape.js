@@ -106,11 +106,13 @@ class CyptoScape {
                 title: 'Remove',
                 selector: 'node',
                 onClickFunction: (event) => {
+                    if(!discardChanges())
+                        return
+
                     sendEvent("data", {
                         task: "deleteNode",
                         data: event.cyTarget.id()
                     })
-                    //datam.deleteNode(event.cyTarget.id())
                 }
             },
             {
@@ -120,11 +122,12 @@ class CyptoScape {
                 onClickFunction: (event) => {
                     let evtFromTarget = event.target || event.cyTarget
                     let pos = event.position || event.cyPosition
+
+                    if(!discardChanges())
+                        return
+
+
                     globals.unsavedChanges = true
-                    /*if(evtFromTarget.data().type == "scenario") {
-                        modal("Error", "Cant be connected to type scenario")
-                        return false
-                    }*/
 
                     this.cy.add([{ group: "edges", data: {
                         id: "shadowEdge", source: evtFromTarget.data().id, 
@@ -168,6 +171,8 @@ class CyptoScape {
                 title: 'Remove',
                 selector: 'edge',
                 onClickFunction: (event) => {
+                    if(!discardChanges())
+                        return
 
                     sendEvent("data", {
                         task: "deleteEdge",
@@ -185,6 +190,9 @@ class CyptoScape {
                 title: 'Add node',
                 coreAsWell: true,
                 onClickFunction: (event) => {
+                    if(!discardChanges())
+                        return
+                    
                     let pos = event.position || event.cyPosition
                     sendEvent("sidebar", {
                         task: "addNode",
