@@ -16,6 +16,7 @@ function openJsonSelection() {
   $("#useDefault").on('click', () => {
       $.getJSON("minimal-example.json", jsonData => {
         sendEvent("dataReceived", jsonData)
+        hideModal()
       })
         .fail(function() {
           modal("Error", "Cross orgin error. Choose json file above or drop it.")
