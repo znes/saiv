@@ -13,6 +13,8 @@ class LeafleatMap {
 		this.init(id)
         this.registerEvents()
         this.addDefaultBind()
+
+
 		
 		// debug	
 	    window.map = () => {
@@ -67,6 +69,31 @@ class LeafleatMap {
 				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 			id: 'mapbox.streets'
 		}).addTo(this.map);
+
+
+        this.alertButton = $('<div class="alertMissingPositionBar leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Show Nodes" role="button" aria-label="Show Nodes">!</a></div>')
+        $('.leaflet-top.leaflet-right')
+            .append(this.alertButton)
+
+        this.alertButton.hide()
+            .on('click', e => {
+                if(!discardChanges())
+                    return
+
+                let head = "<h4>Elements without Positions</h4>"
+                let body = this.getNoPosDragElements()
+        
+                this.registerDragEvents(body.find("img"))
+
+
+                sendEvent("sidebar", {
+                    task: "show",
+                    data: {
+                        head: head,
+                        body: body
+                    }
+                })
+            })
     }
     
     registerEvents() {
@@ -398,6 +425,8 @@ class LeafleatMap {
                             task: "showId",
                             data: name
                         })
+
+                        that.checkCountNoPosElements()
                     }
                     else {
                         var fromData = readForm(".createPolyForm")
@@ -619,6 +648,19 @@ class LeafleatMap {
         return body
     }
 
+    checkCountNoPosElements() {
+        let count = 0
+        for (let [property, data] of Object.entries(this.elements)) {
+            if(data.marker == null) 
+                count += 1
+        }
+
+        if(count == 0)
+            this.alertButton.hide()
+
+        return count
+    }
+
     registerDragEvents(eles) {
         let srcEle = null,
             srcName = null,
@@ -681,6 +723,7 @@ class LeafleatMap {
             }
             e.preventDefault()
             let mousePos = that.map.mouseEventToLatLng(e)
+            added = true
 
             sendEvent("data", {
                 task: "updatePosition",
@@ -689,9 +732,13 @@ class LeafleatMap {
                     pos: mousePos
                 }
             })
-
-            added = true
+            
             this.classList.remove('over')
+
+            if(that.checkCountNoPosElements() == 0) {
+                closeSitebar()
+            }
+
             return false
         }
 
@@ -708,31 +755,7 @@ class LeafleatMap {
     }
 
     showButtonAddNodes() {
-        if($(".alertMissingPositionBar").length == 0) 
-        {
-            const alertButton = $('<div class="alertMissingPositionBar leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Show Nodes" role="button" aria-label="Show Nodes">!</a></div>')
-             $('.leaflet-top.leaflet-right')
-                .append(alertButton)
-                .on('click', e => {
-                    if(!discardChanges())
-                        return
-
-                    let head = "<h4>Elements without Positions</h4>"
-                    let body = this.getNoPosDragElements()
-            
-                    this.registerDragEvents(body.find("img"))
-
-
-                    sendEvent("sidebar", {
-                        task: "show",
-                        data: {
-                            head: head,
-                            body: body
-                        }
-                    })
-                })
-        }
-        
+        this.alertButton.show()
     }
 
     deleteNode(name, deleteRefs = true) {
