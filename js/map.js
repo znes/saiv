@@ -278,7 +278,7 @@ class LeafleatMap {
 
     sidebarTextPolyCreation(wktText, name = "") {
         const body = $('<div></div>')
-        let form = $('<form class="createPolyForm"></form>')
+        let form = $('<form class="createPolyForm clearfix"></form>')
         form.append(createInput("name", "name", name, "text", true))
             .append(createInput("type", "type", "polygon", "text", true, "readonly"))
             .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
@@ -300,7 +300,7 @@ class LeafleatMap {
 
     sidebarTextPolyPlacement(wktText, name = "") {
         const body = $('<div></div>')
-        let form = $('<form class="createPolyForm"></form>')
+        let form = $('<form class="createPolyForm clearfix"></form>')
         form.append(createInput("name", "name", name, "hidden"))
             .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
             .append('<button class="btn btn-success">Save</button>')

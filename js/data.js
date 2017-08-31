@@ -353,10 +353,10 @@ class DataManager {
 
         this._json.children.push(updateData)
 
-        sendEvent("sidebar", {
+        /*sendEvent("sidebar", {
             task: "showId",
             data: updateData.name
-        })
+        })*/
     }
 
     addTag (name, tagName) {

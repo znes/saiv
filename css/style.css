@@ -11,7 +11,7 @@
 }
 [hidden] {
   display: none !important;
-}
+} 
 
 body {
 	width: 100%;
@@ -210,3 +210,9 @@ a:hover {
 .form-group-sm {
   margin-bottom: 10px;
 } 
+
+
+
+.selectStyle label{
+  display: block;
+}

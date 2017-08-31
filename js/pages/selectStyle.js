@@ -1,17 +1,17 @@
 function selectStyle() {
 	let currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.defaultStyle
 	let currentAutoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
-	let form = $('<form class="editStyle"></form>')
+	let form = $('<form class="editStyle selectStyle"></form>')
 
 
 	form.append(createSelect("style", [currentStyle], config.cytoscape.styles))
 
 	if(currentAutoLayout == "true")
 	{
-		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input checked class="form-control" type="checkbox" name="autoLayout"></div>')
+		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input checked class="" type="checkbox" name="autoLayout"></div>')
 	}
 	else {
-		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input class="form-control" type="checkbox" name="autoLayout"></div>')
+		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input class="" type="checkbox" name="autoLayout"></div>')
 
 	}
 
