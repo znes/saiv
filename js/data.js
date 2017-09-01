@@ -173,7 +173,8 @@ class DataManager {
 		// Add Predecessor
 		index = this._json.children.findIndex(x => x.name==successors)
 		if (index !== -1) {
-			this._json.children[index].predecessors.indexOf(predecessors) === -1 ? this._json.children[index].predecessors.push(predecessors) : console.log("This item already exists");
+			if(this._json.children[index].predecessors.indexOf(predecessors) === -1)
+				this._json.children[index].predecessors.push(predecessors)
 		}
 
 		

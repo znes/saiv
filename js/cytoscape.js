@@ -351,7 +351,6 @@ class CyptoScape {
             })
         }
 
-        console.log(this.autoLayout)
         if(this.autoLayout == "true") {
             this.updateLayout()
         }

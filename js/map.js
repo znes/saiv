@@ -24,7 +24,10 @@ class LeafleatMap {
 
     init(id) {
     	this.map = L.map(id, {
-            center: [51.505, -0.09],
+            // Flensburg
+            //center: [54.79118460009706, 9.434165954589844],
+            // Sylt !!
+            center: [54.911356424188476, 8.327636718750002],
             zoom: 11,
             contextmenu: true,
             contextmenuWidth: 140,
@@ -319,7 +322,7 @@ class LeafleatMap {
         sendEvent("sidebar", {
             task: "show",
             data: {
-                head: "Create Polygon",
+                head: "<h4>Create Polygon</h4>",
                 body: body
             } 
         })
@@ -544,13 +547,11 @@ class LeafleatMap {
             if(property != name) {
                 if(data.marker != null) {
                     data.marker.on("mouseover", () => {
-                        console.log("enter")
                         hoverNode = true
                         this.shadowEdge.setLatLngs([fromPos, this.getCoordinates(property)])
                     })
 
                     data.marker.on("mouseout", () => {
-                        console.log("leave")
                         hoverNode = false
                         this.shadowEdge.setLatLngs([fromPos, this.getCoordinates(property)])
                     })

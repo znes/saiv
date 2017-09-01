@@ -17,7 +17,6 @@ class Sidebar{
 
 	}
 
-
 	showData (data) {
 		this.open()
 		this.head.html(JSON.stringify(data))
@@ -199,13 +198,11 @@ class Sidebar{
 	}
 
 	open () {
-		console.log("open")
 		globals.callSitebarTimestamp = Date.now()
 		$("body").removeClass("sidebar-closed")
 	}
 
 	close () {
-		console.log("close")
 		// hack
 		// map calls closeSitebar when polygone is clicked
 		// if open call is called 100ms before it will not be called
