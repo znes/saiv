@@ -329,7 +329,8 @@ class CyptoScape {
 
     addNode(name, type, pos = {}) {
         let elementData = {}
-        elementData.color = config.cytoscape.nodeStyle[type].color
+        elementData.color = configNode[type].color
+        elementData.icon = configNode[type].icon
         elementData.id = name
         elementData.type = type
 

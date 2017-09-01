@@ -59,7 +59,7 @@ class Sidebar{
 
 		form.append(createInput("currentid", "currentid", data.name, "hidden"))
 			.append(createInput("Name", "name", data.name, "text"))
-			.append(createSelect("type", data.type, config.types))
+			.append(createSelect("type", data.type, configNode.nodesAvailable))
 
 			.append('<h5>Tags <small><a href="#" class="addTag">Add Tag</a></small></h5>')
 

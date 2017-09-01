@@ -99,19 +99,19 @@
     },
     {
         "name": "cascads",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": ["solar", "vavasfafwq"],
         "successors": ["demand"]
     },
     {
         "name": "csacasdq",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": ["solar"],
         "successors": ["demand"]
     },
     {
         "name": "vdsagreqwf",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": [null],
         "successors": ["hub1"]
     },
@@ -160,19 +160,19 @@
     },
     {
         "name": "dadwqdq",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": ["line"],
         "successors": ["hub6"]
     },
     {
         "name": "cascasca",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": ["wind"],
         "successors": ["hub5"]
     },
     {
         "name": "fdsfew",
-        "type": "polygon",
+        "type": "hub",
         "predecessors": ["vsdvsd"],
         "successors": ["hub6"]
     }],
