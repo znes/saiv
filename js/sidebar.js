@@ -39,14 +39,14 @@ class Sidebar{
 			.append('<a class="btn btn-warning cancelForm pull-right">Cancel</button>')
 
 			.submit((e) => {
-			e.preventDefault()
-			ready(readForm(".editForm").tag)
-		})
-
-		form.find("a.cancelForm").on("click", (e) => {
-			ready(false)
-			return false
-		})
+				e.preventDefault()
+				ready(readForm(".editForm").tag)
+			})
+			.find("a.cancelForm")
+				.on("click", (e) => {
+					ready(false)
+					return false
+				})
 
 		this.body.append(form)
 	}
@@ -57,19 +57,33 @@ class Sidebar{
 		this.body.html("")
 		let form = $('<form class="editForm"></form>')
 
-		form.append(createInput("currentid", "currentid", data.name, "hidden"))
+		form.append(createInput("currentId", "currentId", data.name, "hidden"))
+			.append(createInput("currentType", "currentType", data.type, "hidden"))
 			.append(createInput("Name", "name", data.name, "text"))
-			.append(createSelect("type", data.type, configNode.nodesAvailable))
+			.append(createSelect("type", [data.type], Object.keys(configNode.nodesAvailable).map((k) => k) ))
 
-			.append('<h5>Tags <small><a href="#" class="addTag">Add Tag</a></small></h5>')
+
+
+		if(typeof data.geometryType != "undefined")
+			form.append(createSelect("geometryType", [data.geometryType], configNode.nodesAvailable[data.type].geometryTypes))
+		else 
+			form.append(createSelect("geometryType", [], configNode.nodesAvailable[data.type].geometryTypes))
+
+		if(configNode.allowCustomTags)
+			form.append('<div class="formTags"><h5>Tags <small><a href="#" class="addTag">Add Tag</a></small></h5></div>')
+		else 
+			form.append('<div class="formTags"><h5>Tags</h5></div>')
+
 
 		if(typeof data.tags != "undefined") {
 			for (let [key, value] of Object.entries(data.tags)) {
-				//form.append('<button class="removeTag btn">&times;</button>')
 				let input = $("<div class=\"input-group\"></div>")
 				input.append('<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>')
-					.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
-				form.append('<label for="tags_'+key+'">' + key + '</label>')
+
+				if(configNode.allowCustomTags)
+					input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
+
+				form.find('.formTags').append('<label for="tags_'+key+'">' + key + '</label>')
 					.append(input)
 			}
 		}
@@ -118,6 +132,23 @@ class Sidebar{
                     data: data.name
                 })
             })
+        })
+
+
+		// listen to changes of type 
+		// update tags and geometry type according to it
+        form.find("select[name='type']").on('change', e=>{
+        	let selectedGeo = form.find('select[name="geometryType"]').val()
+        	let currentGeo = form.find('select[name="currentType"]').val()
+
+        	// update geometric types to select
+        	form.find('label[for="geometryType"]').parent().replaceWith(createSelect("geometryType", [currentGeo], configNode.nodesAvailable[e.target.value].geometryTypes))
+        	$('select[name="geometryType"]', form).select2({width: '100%'})
+
+        	// update tags 
+        	if(!configNode.allowCustomTags) {
+        		
+        	}
         })
 
 
@@ -170,7 +201,7 @@ class Sidebar{
 
 		let form = $('<form class="editForm"></form>')
 		form.append(createInput("name", "name", "", "text", true))
-		form.append(createSelect("type", "", config.types, "required"))
+		form.append(createSelect("type", [], config.types, "required"))
 
 		for (let [property, val] of Object.entries(pos)) {
 			form.append(createInput("pos_" + property, "pos_" + property, val, "hidden"))

@@ -5,7 +5,7 @@ function scenario(data = null) {
 	// EditForm
 	if(data != null) {
 		heading = "Edit Scenario"
-		form.append(createInput("currentid","currentid", data.name, "hidden", true))
+		form.append(createInput("currentId","currentId", data.name, "hidden", true))
 			.append(createInput("Name","name", data.name, "text", true))
 			.append(createInput("Description","tags_description", data.description, "text"))
 			.append("<button class='btn-success btn'>Save</button>")
@@ -20,16 +20,16 @@ function scenario(data = null) {
 
 	form.submit((e) => {
 		e.preventDefault()
-		let data = readForm(".scenarioForm")
+		let formData = readForm(".scenarioForm")
 
 		// CreateForm
-		if(typeof data.currentid == "undefined") {
+		if(typeof formData.currentId == "undefined") {
 			sendEvent(
 				"dataReceived", 
 				{
-					name: data.name,
+					name: formData.name,
 					tags: {
-						description: data.tags.description
+						description: formData.tags.description
 					},
 					children: []
 				}
@@ -39,7 +39,7 @@ function scenario(data = null) {
 		else {
 			sendEvent("data", {
 				task: "updateScenario",
-                data: data
+                data: formData
 			})
 		}
 

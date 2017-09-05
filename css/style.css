@@ -49,7 +49,10 @@ body {
   overflow: auto;
   z-index: 1;
 }
-.sidebar a. {
+.sidebar .form-group {
+  width: 100%;
+}
+.sidebar a {
   color: #333;
 }
 .sidebar a.btn-default {

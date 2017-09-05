@@ -1,6 +1,8 @@
 class DataManager {
 	constructor() {
 		this._json = null
+		this._filterElements = null
+
 		// debug	
 	    window.json = () => {
 	    	return this._json
@@ -11,7 +13,10 @@ class DataManager {
 	    })
     }
 
-    set json  (paraJson)  { this._json = paraJson }
+    set json  (paraJson)  { 
+    	this._json = paraJson 
+    	this.initData()
+    }
     get json  ()       { return this._json }
 
 
@@ -37,6 +42,41 @@ class DataManager {
 		else 
 			return null
 	}
+
+	initData () {
+		this.filterElements = []
+
+
+		this._json.children.forEach((child, index, object) => {
+			if(configNode.nodesEnabled.indexOf(child.type) == -1) {
+				this.filterElements.push(child)
+				object.splice(index, 1)
+			}
+			else {
+				// create tags object
+				if(typeof child.tags == "undefined")
+					child.tags = {}
+				// remove wrong tags
+				else if(!configNode.allowCustomTags) {
+					for (let [tag, value] of Object.entries(child.tags)) {
+		                if (configNode.nodesAvailable[child.type].tags.findIndex(x => x.name==tag) == -1) {
+							delete child.tags[tag]
+						}
+					}
+				}
+
+				// create tags not created
+				configNode.nodesAvailable[child.type].tags.forEach((tag) => {
+					if(typeof child.tags[tag] == "undefined") {
+						child.tags[tag.name] = ""
+					}
+					else {
+						// parse value
+					}
+				})
+			}
+		})
+	} 
 
 	updateData (detail) {
 		switch(detail.task) {
@@ -116,7 +156,7 @@ class DataManager {
         let index = this._json.children.findIndex(x => x.name==data.name)
 		if (index !== -1) {
 			modal("Error", "Element name already exists")
-			return false;
+			return false
 		}
 
 		if(typeof data.pos != "undefined") {
@@ -135,6 +175,11 @@ class DataManager {
 	        else if(typeof data.pos.wkt != "undefined") {
 	        	formdata.pos = data.pos
 	        }
+		}
+
+
+		for (var i = 0; i < configNode.nodesAvailable[type].tags.length; i++) {
+			formdata.tags[configNode.nodesAvailable[type].tags[i]] = ""
 		}
 
         sendEvent("dataChanged", {
@@ -227,13 +272,13 @@ class DataManager {
 		// check if pos changed
         if(typeof updateData.pos != "undefined") {
 	        if(typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
-	        	let ele = this.getElement(updateData.currentid)
+	        	let ele = this.getElement(updateData.currentId)
 	        	
 	        	if(updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
 	        		sendEvent("dataChanged", {
 						task: "positionUpdate",
 						data: {
-							name: updateData.currentid,
+							name: updateData.currentId,
 							pos: {
 								lat: updateData.pos.lat,
 								lng: updateData.pos.lng
@@ -245,33 +290,33 @@ class DataManager {
 	    }
 
 	    // check if type changed
-	    if(updateData.type != this.getElement(updateData.currentid).type) {
+	    if(updateData.type != this.getElement(updateData.currentId).type) {
 	    	sendEvent("dataChanged", {
 				task: "changeType",
 				data: {
-					name: updateData.currentid,
+					name: updateData.currentId,
 					type: updateData.type
 				}
 			})
 		}
 
-		this._json.children = this._json.children.filter(child => child.name != updateData.currentid)
+		this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
 
         // if name(id) changes
-        if(updateData.currentid != updateData.name) {
-        	this.updateRelationNames(updateData.name, updateData.currentid)
+        if(updateData.currentId != updateData.name) {
+        	this.updateRelationNames(updateData.name, updateData.currentId)
 
         	sendEvent("dataChanged", {
         		task: "renameNode",
         		data: {
-					oldName: updateData.currentid,
+					oldName: updateData.currentId,
 					newName: updateData.name
 				}
 			})
         }
 
 
-        delete updateData['currentid']
+        delete updateData['currentId']
 
 
         if(typeof updateData.tags == "undefined") {

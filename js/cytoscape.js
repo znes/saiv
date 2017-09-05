@@ -16,19 +16,25 @@ class CyptoScape {
     init (selector) {
         this.cy = cytoscape({
             container: $(selector),
+
             layout: {
-                fit: true
+
             },
             style: [{
                 selector: "node",
                 style: {
                     "content": "data(id)",
-                    "text-opacity": 0.5,
-                    "text-valign": "center",
-                    "text-halign": "right",
-                    "background-color": "data(color)"
+                    "text-opacity": 0.7
                 }
-            }, {
+            },/* {
+                selector: "node:active",
+                style: {
+                    "background-color": "red",
+                    "width": "150px",
+                    'background-width': '20px',
+                    'background-height': '20px'
+                }
+            },*/ {
                 selector: "edge",
                 style: {
                     "target-arrow-shape": "triangle",
@@ -40,15 +46,45 @@ class CyptoScape {
                 selector: "#shadowEdge",
                 style: {
                     "line-color": "rgba(0, 0, 0, 0.50)",
-                    "target-arrow-color": "rgba(0, 0, 0, 0.50)",
+                    "target-arrow-color": "rgba(0, 0, 0, 0.50)"
                 }
             }, {
+                selector: "core",
+                style: {
+                    'active-bg-size': 0,
+                    'selection-box-border-width': 0,
+                    'active-bg-opacity': 0,
+                    'active-bg-color': 'red',
+                    'selection-box-opacity': 0,
+                    'selection-box-color': 'red'
+                }
+            }/*, {
                 selector: ":selected",
                 style: {
-                    'border-width': 3,
-                    'border-color': '#333'
+                    'border-width': 2,
+                    'border-color': "#fff"
                 }
-            }]
+            }*/]
+        })
+
+
+
+        configNode.nodesEnabled.forEach(node => {
+            console.log("node")
+            console.log(node)
+
+            this.cy.style()
+                  .selector('node[type="' + node + '"]')
+                        .style({
+                            'background-color': configNode.nodesAvailable[node].color,
+                            'background-image': 'https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/' + configNode.nodesAvailable[node].icon,
+                            'background-fit': 'cover'
+                            //'background-width-relative-to': 'inner',
+                            //'background-height-relative-to': 'inner',
+                            //'background-width': '20px',
+                            //'background-height': '20px'
+                        })
+
         })
 
         this.initEvents()
@@ -329,8 +365,9 @@ class CyptoScape {
 
     addNode(name, type, pos = {}) {
         let elementData = {}
-        elementData.color = configNode[type].color
-        elementData.icon = configNode[type].icon
+        console.log(configNode)
+        elementData.color = configNode.nodesAvailable[type].color
+        elementData.icon = configNode.nodesAvailable[type].icon
         elementData.id = name
         elementData.type = type
 
@@ -338,6 +375,7 @@ class CyptoScape {
         if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
+                type: type,
                 data: elementData,
                 position: {
                     x: pos.x,
@@ -411,6 +449,7 @@ class CyptoScape {
     }
 
     addEdge(from, to) {
+
         console.log("to")
         console.log(to)
         console.log("from")
