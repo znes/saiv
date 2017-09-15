@@ -11,7 +11,7 @@
 }
 [hidden] {
   display: none !important;
-} 
+}
 
 body {
 	width: 100%;
@@ -23,12 +23,14 @@ body {
 .navbar-static-top {
   margin-bottom: 50px;
 }
+#map {
+  right: 20em;
+}
 .containerCanvas, #map{
 	position: absolute;
 	left: 0;
 	top: 50px;
 	bottom: 0;
-	right: 20em;
 }
 .sidebar-closed .containerCanvas, .sidebar-closed #map {
   right: 0;
@@ -79,7 +81,7 @@ body {
 .sidebar .body {
   margin-top: 20px;
 }
-.sidebar .body .select2-container { 
+.sidebar .body .select2-container {
   display: block;
 }
 .sidebar .body input,
@@ -133,7 +135,7 @@ a:hover {
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from {top:-300px; opacity:0} 
+    from {top:-300px; opacity:0}
     to {top:0; opacity:1}
 }
 
@@ -212,7 +214,7 @@ a:hover {
 
 .form-group-sm {
   margin-bottom: 10px;
-} 
+}
 
 
 

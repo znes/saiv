@@ -26,15 +26,7 @@ class CyptoScape {
                     "content": "data(id)",
                     "text-opacity": 0.7
                 }
-            },/* {
-                selector: "node:active",
-                style: {
-                    "background-color": "red",
-                    "width": "150px",
-                    'background-width': '20px',
-                    'background-height': '20px'
-                }
-            },*/ {
+            }, {
                 selector: "edge",
                 style: {
                     "target-arrow-shape": "triangle",
@@ -58,36 +50,31 @@ class CyptoScape {
                     'selection-box-opacity': 0,
                     'selection-box-color': 'red'
                 }
-            }/*, {
+            }, {
                 selector: ":selected",
                 style: {
-                    'border-width': 2,
-                    'border-color': "#fff"
+                    'border-width': 1,
+                    'border-color': "#000"
                 }
-            }*/]
+            }]
         })
 
+        this.initMarkers()
+        this.initEvents()
+    }
 
 
-        configNode.nodesEnabled.forEach(node => {
-            console.log("node")
-            console.log(node)
-
+    initMarkers() {
+        configNode.nodesEnabled.forEach(type => {
             this.cy.style()
-                  .selector('node[type="' + node + '"]')
+                  .selector('node[type="' + type + '"]')
                         .style({
-                            'background-color': configNode.nodesAvailable[node].color,
-                            'background-image': 'https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/' + configNode.nodesAvailable[node].icon,
+                            'background-color': configNode.nodesAvailable[type].color,
+                            'background-image': configNode.nodesAvailable[type].icon,
                             'background-fit': 'cover'
-                            //'background-width-relative-to': 'inner',
-                            //'background-height-relative-to': 'inner',
-                            //'background-width': '20px',
-                            //'background-height': '20px'
                         })
 
         })
-
-        this.initEvents()
     }
 
 
@@ -98,15 +85,13 @@ class CyptoScape {
     registerEvents() {
          document.addEventListener("dataChanged", (e)=> {
             switch(e.detail.task) {
-                case "initElements": 
-                    
+                case "initElements":
                     this.initElements(e.detail.data)
                     break
-                case "updateStyle": 
+                case "updateStyle":
                     this.updateLayout()
+                    // only change to cytoscape view if elements available
                     if(this.cy.$("node").length > 0) {
-                        
-
                         showGraph()
                     }
                     break
@@ -166,7 +151,7 @@ class CyptoScape {
                     globals.unsavedChanges = true
 
                     this.cy.add([{ group: "edges", data: {
-                        id: "shadowEdge", source: evtFromTarget.data().id, 
+                        id: "shadowEdge", source: evtFromTarget.data().id,
                         target: evtFromTarget.data().id}}])
 
 
@@ -176,7 +161,7 @@ class CyptoScape {
                     })
 
                     this.cy.on("click", "node", {}, (_event) => {
-                        let evtToTarget = _event.target || _event.cyTarget 
+                        let evtToTarget = _event.target || _event.cyTarget
                         globals.unsavedChanges = false
 
                         if(evtFromTarget == evtToTarget ) {
@@ -200,7 +185,7 @@ class CyptoScape {
                             data: evtToTarget.data().id
                         })
                     })
-                }            
+                }
             },
             {
                 id: 'remove',
@@ -217,7 +202,7 @@ class CyptoScape {
                             to: event.cyTarget.target().id()
                         }
                     })
-                    //datam.deleteEdge(, ) 
+                    //datam.deleteEdge(, )
                     //event.cyTarget.remove()
                 }
             },
@@ -228,7 +213,7 @@ class CyptoScape {
                 onClickFunction: (event) => {
                     if(!discardChanges())
                         return
-                    
+
                     let pos = event.position || event.cyPosition
                     sendEvent("sidebar", {
                         task: "addNode",
@@ -291,22 +276,19 @@ class CyptoScape {
                     this.addNode(child.name, child.type)
                 }
             }
-            else { 
+            else {
                 this.addNode(child.name, child.type)
             }
         })
 
         // Add edges when nodes loaded
-        // Only add Successors 
+        // Only add Successors
         jsonData.children.forEach(child => {
             child.successors.forEach(succ => {
                 this.addEdge(child.name, succ)
             })
         })
 
-
-        //this.cy.$("*").remove()
-        //this.cy.add(eles)
 
         if(!customPos || this.autoLayout == "true") {
             this.updateLayout()
@@ -320,13 +302,12 @@ class CyptoScape {
     discard() {
         if(this.cy.$('#shadowEdge').length > 0)
             this.cy.$('#shadowEdge').remove()
-        
+
         this.updateBind()
     }
 
     changeType(name, newType) {
         const ele = this.cy.$("node#" + name)
-
         const position = ele.position()
 
 
@@ -344,7 +325,7 @@ class CyptoScape {
                     }
                 }
 
-            
+
             if(target == name) {
                 ele.data.source = source
                 ele.data.target = name
@@ -356,7 +337,7 @@ class CyptoScape {
 
             edges.push(ele)
         })
-        
+
         edgesToUpdate.remove()
         ele.remove()
         this.addNode(name, newType, position)
@@ -364,28 +345,27 @@ class CyptoScape {
     }
 
     addNode(name, type, pos = {}) {
+        console.log(name,type,pos)
         let elementData = {}
-        console.log(configNode)
-        elementData.color = configNode.nodesAvailable[type].color
-        elementData.icon = configNode.nodesAvailable[type].icon
         elementData.id = name
         elementData.type = type
 
 
-        if(typeof pos.x != "undefined" || typeof pos.y != "undefined") {
+        if(typeof pos.x != "undefined" && typeof pos.y != "undefined") {
             this.cy.add({
                 group: "nodes",
                 type: type,
                 data: elementData,
                 position: {
-                    x: pos.x,
-                    y: pos.y
+                    x: Number.parseFloat(pos.x),
+                    y: Number.parseFloat(pos.y)
                 }
             })
         }
         else {
             this.cy.add({
                 group: "nodes",
+                type: type,
                 data: elementData
             })
         }
@@ -406,7 +386,7 @@ class CyptoScape {
             position: ele.position()
         }
         this.cy.add(newEle)
-        
+
 
         let edgesToUpdate = this.cy.edges("[source='" + oldName + "'], [target='" + oldName + "']");
         //replace Nodes
@@ -449,11 +429,6 @@ class CyptoScape {
     }
 
     addEdge(from, to) {
-
-        console.log("to")
-        console.log(to)
-        console.log("from")
-        console.log(from)
         this.cy.add([{ group: "edges", data: { source: from, target: to}}])
     }
 

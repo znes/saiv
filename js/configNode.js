@@ -1,5 +1,5 @@
 let configNode = {
-	nodesEnabled: ["volatile_generator", "transmission", "hub"],
+	nodesEnabled: ["transmission", "hub", "demand"],
 	allowCustomTags: false,
 	nodesAvailable: {
 		volatile_generator : {
@@ -9,7 +9,7 @@ let configNode = {
 				name: "installed_capacity",
 				type: "number"
 			}],
-			icon: "volatile_generator.svg"
+			icon: "https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/volatile_generator.png"
 		},
 		demand : {
 			color: "#3f4f5e",
@@ -18,7 +18,7 @@ let configNode = {
 				name: "energy_amount",
 				type: "number"
 			}],
-			icon: "demand.svg"
+			icon: "https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/demand.png"
 		},
 		transmission : {
 			color: "#d6d5da",
@@ -30,7 +30,7 @@ let configNode = {
 				name: "efficiency",
 				type: "number"
 			}],
-			icon: "transmission.svg"
+			icon: "https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/transmission.png"
 		},	
 		hub : {
 			color: "#86af49",
@@ -39,7 +39,7 @@ let configNode = {
 				name: "sector",
 				type: "text"
 			}],
-			icon: "hub.svg"
+			icon: "https://cdn.rawgit.com/energiekollektiv/saiv/dev/images/icons/hub.png"
 		}
 	}
 }

@@ -1,14 +1,16 @@
 class LeafleatMap {
 	constructor(id) {
-		this.elements = {
+		this.elements = {}
 
-		}
         this.redraw = {
             ghostPoly: null,
             name: null
         }
-        this.shadowEdge = null
 
+        this.shadowEdge = null
+        this.icons = {
+
+        }
 
 		this.init(id)
         this.registerEvents()
@@ -97,6 +99,19 @@ class LeafleatMap {
                     }
                 })
             })
+
+        this.initMarkers()
+    }
+
+    initMarkers() {
+        configNode.nodesEnabled.forEach(type => {
+            this.icons[type] = L.icon({
+                iconUrl: configNode.nodesAvailable[type].icon,
+                iconSize: [40, 40],
+                iconAnchor:   [20, 40]
+                //popupAnchor:  [0, -80]
+            })
+        })
     }
     
     registerEvents() {
@@ -248,6 +263,7 @@ class LeafleatMap {
         }
         else {
             obj = L.marker(pos,  {
+                icon: this.icons[this.elements[name].type],
                 contextmenu: true,
                 contextmenuItems: [{
                     text: 'Connect successors',

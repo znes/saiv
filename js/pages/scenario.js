@@ -1,5 +1,5 @@
 function scenario(data = null) {
-  	let form = $("<form class='scenarioForm'></form>")
+  let form = $("<form class='scenarioForm'></form>")
 	let heading = ""
 
 	// EditForm
@@ -25,7 +25,7 @@ function scenario(data = null) {
 		// CreateForm
 		if(typeof formData.currentId == "undefined") {
 			sendEvent(
-				"dataReceived", 
+				"dataReceived",
 				{
 					name: formData.name,
 					tags: {
@@ -45,7 +45,6 @@ function scenario(data = null) {
 
 		hideModal()
 	})
-  	
+
 	modal(heading, form)
 }
-		

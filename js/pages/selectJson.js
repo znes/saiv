@@ -4,7 +4,7 @@ function openJsonSelection() {
     .append("<p><label class='btn btn-default'>Browse <input type='file' id='selectFile' hidden></label></p>")
     .append("<button id='useDefault' class='btn btn-primary'>Use default</button>")
     .append("<button class='createScenario btn btn-success pull-right'>Create new scenario</button>")
-  
+
   modal("Select File", content )
 
 
@@ -18,7 +18,7 @@ function openJsonSelection() {
         sendEvent("dataReceived", jsonData)
         hideModal()
       })
-        .fail(function() {
+        .fail(function(er) {
           modal("Error", "Cross orgin error. Choose json file above or drop it.")
         })
   })
@@ -39,7 +39,7 @@ function sendFile(file) {
       let json = JSON.parse(dataURL)
       sendEvent("dataReceived", json)
       hideModal()
-    } catch(e) { 
+    } catch(e) {
       modal("Error", "File not supported")
     }
   };
@@ -54,7 +54,7 @@ function initDropEvents() {
   });
 
   document.addEventListener("drop", e => {
-    e.preventDefault()  
+    e.preventDefault()
     const json = e.dataTransfer.files[0]
 
     sendFile(e.dataTransfer.files[0])
