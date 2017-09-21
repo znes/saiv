@@ -1,7 +1,7 @@
 class DataManager {
   constructor() {
     this._json = null
-    this._filterElements = null
+    this.filterElements = null
 
     // debug
     window.json = () => {
@@ -138,6 +138,9 @@ class DataManager {
         break
       case "updateScenario":
         this.updateScenario(detail.data)
+        break
+      case "updateNodesEnabled":
+        this.updateNodesEnabled(detail.data)
         break
       default:
         console.log("default case updateData")
@@ -287,53 +290,63 @@ class DataManager {
 
   updateNode(updateData) {
     let ele = this.getElement(updateData.currentId)
+    let nodeEnabled = true
 
-    // check if pos changed
-    if (typeof updateData.pos != "undefined") {
-      if (typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
+    if(configNode.nodesEnabled.indexOf(updateData.type) == -1) {
+      nodeEnabled = false
 
-        if (updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
-          sendEvent("dataChanged", {
-            task: "positionUpdate",
-            data: {
-              name: updateData.currentId,
-              pos: {
-                lat: updateData.pos.lat,
-                lng: updateData.pos.lng
+      sendEvent("dataChanged", {
+          task: "deleteNode",
+          data: updateData.currentId
+        })
+    }
+    else {
+      // check if pos changed
+      if (typeof updateData.pos != "undefined") {
+        if (typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
+
+          if (updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
+            sendEvent("dataChanged", {
+              task: "positionUpdate",
+              data: {
+                name: updateData.currentId,
+                pos: {
+                  lat: updateData.pos.lat,
+                  lng: updateData.pos.lng
+                }
               }
-            }
-          })
+            })
+          }
         }
       }
+
+      // check if type changed
+      if (updateData.type != ele.type || updateData.geometry_type != ele.geometry_type) {
+       sendEvent("dataChanged", {
+          task: "changeType",
+          data: {
+            name: updateData.currentId,
+            type: updateData.type,
+            geometry_type: updateData.geometry_type
+          }
+        })
+      }
+
+      this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
+
+      // if name(id) changes
+      if (updateData.currentId != updateData.name) {
+        this.updateRelationNames(updateData.name, updateData.currentId)
+
+        sendEvent("dataChanged", {
+          task: "renameNode",
+          data: {
+            oldName: updateData.currentId,
+            newName: updateData.name
+          }
+        })
+      }
     }
-
-    // check if type changed
-    if (updateData.type != ele.type || updateData.geometry_type != ele.geometry_type) {
-      sendEvent("dataChanged", {
-        task: "changeType",
-        data: {
-          name: updateData.currentId,
-          type: updateData.type,
-          geometry_type: updateData.geometry_type
-        }
-      })
-    }
-
-    this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
-
-    // if name(id) changes
-    if (updateData.currentId != updateData.name) {
-      this.updateRelationNames(updateData.name, updateData.currentId)
-
-      sendEvent("dataChanged", {
-        task: "renameNode",
-        data: {
-          oldName: updateData.currentId,
-          newName: updateData.name
-        }
-      })
-    }
-
 
     delete updateData['currentId']
 
@@ -350,30 +363,35 @@ class DataManager {
         if (this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
           this._json.children[index].predecessors.push(updateData.name)
 
-          sendEvent("dataChanged", {
-            task: "addEdge",
-            data: {
-              from: updateData.name,
-              to: this._json.children[index].name
-            }
-          })
+          if(nodeEnabled) {
+            sendEvent("dataChanged", {
+              task: "addEdge",
+              data: {
+                from: updateData.name,
+                to: this._json.children[index].name
+              }
+            })
+          }
         }
       }
     })
+
+
     updateData.predecessors.forEach(child => {
       let index = this._json.children.findIndex(x => x.name == child)
       if (index !== -1) {
         if (this._json.children[index].successors.indexOf(updateData.name) === -1) {
           this._json.children[index].successors.push(updateData.name)
 
-
-          sendEvent("dataChanged", {
-            task: "addEdge",
-            data: {
-              from: this._json.children[index].name,
-              to: updateData.name
-            }
-          })
+          if(nodeEnabled) {
+            sendEvent("dataChanged", {
+              task: "addEdge",
+              data: {
+                from: this._json.children[index].name,
+                to: updateData.name
+              }
+            })
+          }
         }
       }
     })
@@ -388,13 +406,15 @@ class DataManager {
         if (updateData.successors.indexOf(child.name) === -1) {
           delete arr[id].predecessors[index]
 
-          sendEvent("dataChanged", {
-            task: "deleteEdge",
-            data: {
-              from: updateData.name,
-              to: child.name
-            }
-          })
+          if(nodeEnabled) {
+            sendEvent("dataChanged", {
+              task: "deleteEdge",
+              data: {
+                from: updateData.name,
+                to: child.name
+                }
+            })
+          }
         }
       }
 
@@ -403,23 +423,20 @@ class DataManager {
         if (updateData.predecessors.indexOf(child.name) === -1) {
           delete arr[id].successors[index]
 
-          sendEvent("dataChanged", {
-            task: "deleteEdge",
-            data: {
-              from: child.name,
-              to: updateData.name
-            }
-          })
+          if(nodeEnabled) {
+            sendEvent("dataChanged", {
+              task: "deleteEdge",
+              data: {
+                from: child.name,
+                to: updateData.name
+              }
+            })
+          }
         }
       }
     })
 
     this._json.children.push(updateData)
-
-    /*sendEvent("sidebar", {
-        task: "showId",
-        data: updateData.name
-    })*/
   }
 
   addTag(name, tagName) {
@@ -438,6 +455,80 @@ class DataManager {
 
     if (index !== -1)
       delete this._json.children[index].tags[tagName]
+  }
+
+  updateNodesEnabled(nodesEnabled) {
+    console.log("nodesEnabled")
+
+
+    if(this._json != null) {
+      let diffRemovedTypes = configNode.nodesEnabled.filter(el => {
+        return ( nodesEnabled.indexOf(el) == -1 )
+      })
+
+      let diffAddedTypes = nodesEnabled.filter(el => {
+        return ( configNode.nodesEnabled.indexOf(el) == -1 )
+      })
+
+
+
+      // remove filtered Elements
+      diffRemovedTypes.forEach(name => {
+
+        console.log(this._json.children
+          .filter(x => x.type == name))
+
+        this._json.children
+          .filter(x => x.type == name)
+          .forEach(child => {
+            console.log("remove")
+            console.log(child.name)
+            this.filterElements.push(child)
+
+            sendEvent("dataChanged", {
+              task: "deleteNode",
+              data: child.name
+            })
+          })
+      })
+
+      
+      this.filterElements.forEach(child => {
+        let index = this._json.children.findIndex(x => x.name == child.name)
+        if (index != -1) {
+          this._json.children.splice(index, 1)
+        }
+      })
+
+
+      let elesToAdd = []
+      diffAddedTypes.forEach(name => {
+        elesToAdd = elesToAdd.concat(this.filterElements.filter(x => x.type == name))
+      })
+
+      elesToAdd.forEach(child => {
+        let index = this.filterElements.findIndex(x => x.name == child.name)
+        this._json.children.push(child)
+
+        if(index != -1) {
+          this.filterElements.splice(index, 1)
+        }
+      })
+
+
+      if(elesToAdd.length >= 1) {
+        sendEvent("dataChanged", {
+            task: "addNodes",
+            data: elesToAdd
+          })
+      }
+    }
+
+    
+    console.log(this._json.children)
+    console.log(this.filterElements)
+
+    configNode.nodesEnabled = nodesEnabled
   }
 
   deleteRelationNames(name) {

@@ -25,7 +25,8 @@ let config = {
 			graph: ".navbar .shoWExplorer",
 			scenario: ".scenarioSetting",
 			map: ".showMap",
-			download: ".navbar .downloadJson"
+			download: ".navbar .downloadJson",
+			nodeSettings: ".nodeSettings"
 		},
 		modal: {
 			container: ".modal",

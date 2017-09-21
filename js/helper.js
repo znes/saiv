@@ -81,6 +81,23 @@
 	    wktText += ")"
 	    return wktText
 	}
+	function arrayToPolylineWkt(arr) {
+		let wktText = 'LINESTRING ('
+
+	    for (var i = 0; i < arr.length; i++) {
+	        arr[i].forEach( entry=> {
+	            wktText += entry + " "
+	        })
+
+	        if(arr.length - 1 != i) {
+	            wktText = wktText.substring(0, wktText.length)
+	            wktText += ", "
+	        }
+	    }
+
+	    wktText += ")"
+	    return wktText
+	}
 
 	function createInput(label, key, currentValue, type, required=false, additionalTags = "") {
 		let html = "<div class=\"form-group\">"

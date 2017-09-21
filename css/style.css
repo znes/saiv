@@ -221,3 +221,10 @@ a:hover {
 .selectStyle label{
   display: block;
 }
+.sidebar .input-group .form-control:first-child, 
+.sidebar .input-group .form-control:last-child {
+  border-radius: 4px;
+} 
+.sidebar .input-group {
+  width: 100%;
+}

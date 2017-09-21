@@ -37,6 +37,10 @@ $(function() {
         scenario(dataManager.getScenario())
     })
 
+    $(config.dom.links.nodeSettings).click(() => {
+        nodeSettings()
+    })
+
     
 
 
@@ -53,6 +57,8 @@ $(function() {
             }
         }
     })
+
+
     document.addEventListener("sidebar", (e) => {
         switch(e.detail.task) {
             case "showId":
