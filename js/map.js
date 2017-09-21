@@ -27,9 +27,7 @@ class LeafleatMap {
     init(id) {
         this.map = L.map(id, {
             // Flensburg
-            //center: [54.79118460009706, 9.434165954589844],
-            // Sylt !!
-            center: [54.911356424188476, 8.327636718750002],
+            center: [54.79118460009706, 9.434165954589844],
             zoom: 11,
             contextmenu: true,
             contextmenuWidth: 140,
@@ -44,13 +42,13 @@ class LeafleatMap {
                             }
                         })
                 }
-            }, {
+            }, /*{
                 text: 'Add Polygon',
                 callback: e => {
                     if (discardChanges())
                         this.drawPolygon()
                 }
-            }, {
+            }, */{
                 text: 'Show coordinates',
                 callback: e => {
                     this.showCoordinates(e)
@@ -134,7 +132,7 @@ class LeafleatMap {
                     this.renameNode(e.detail.data.oldName, e.detail.data.newName)
                     break
                 case "changeType":
-                    this.changeType(e.detail.data.name, e.detail.data.type)
+                    this.changeType(e.detail.data.name, e.detail.data.type, e.detail.data.geometry_type)
                     break
                 case "addNode":
                     this.addNode(e.detail.data.name, e.detail.data.type, e.detail.data.pos, e.detail.data.geometry_type)
@@ -346,15 +344,23 @@ class LeafleatMap {
 
     changeType(name, newType, geometryType) {
         let oldType = this.elements[name].type
+        let oldGeo = this.elements[name].geometry_type
 
         this.elements[name].type = newType
+        this.elements[name].geometry_type = geometryType
+
         if (this.elements[name].marker != null) {
-            if (this.elements[name].geometry_type == "polygon" || oldType != "polygon" && newType == "polygon") {
+            if (oldGeo != geometryType) {
                 this.deleteNode(name, false)
-                    // No Pos Data
+                // No Pos Data
                 this.showButtonAddNodes()
             } else {
-                var pos = this.elements[name].marker.getLatLng()
+                let pos = null
+                if(oldGeo == "line" || oldGeo == "polygon")
+                    pos = this.elements[name].marker.getLatLngs()
+                else 
+                    pos = this.elements[name].marker.getLatLng()
+
                 this.elements[name].marker.remove()
                 this.elements[name].marker = this.createNode(name, pos)
             }
@@ -773,32 +779,9 @@ class LeafleatMap {
                         this.addEdge(pred, child.name)
                     }
                 }
-                /*let index = childs.findIndex(x => x.name == succ)
-                if (index !== -1) {
-                    this.addEdge(child.name, succ)
-                }*/
+
             })
         })
-
-        // look for old elements with successor
-        /*for (let [property, data] of Object.entries(this.elements)) {
-            if(childs.findIndex(x => x.name == property) == -1)
-            {
-                data.successors.forEach(succ)
-            }
-        }*/
-
-        // check succs
-        /*for (let [prob, data] of Object.entries(this.elements)) {
-            if(childs.findIndex(x => x.name == prob) == -1) {
-                for (let [succ, obj] of Object.entries(data.successors)) {
-                    // check if marker already exists
-                    if (this.elements[succ].marker != null) {
-                        this.addEdge(name, succ)
-                    }
-                }
-            }
-        }*/
     }
 
     getNoPosElements() {
@@ -965,7 +948,6 @@ class LeafleatMap {
             if (k != name) {
                 for (let [succ, obj] of Object.entries(this.elements[k].successors)) {
                     if (succ == name) {
-
                         if (obj.arrow != null) {
                             this.map.removeLayer(obj.arrow)
                             this.map.removeLayer(obj.head)
@@ -1034,6 +1016,14 @@ class LeafleatMap {
             }])
 
 
+            if(typeof this.elements[from].successors[to] != "undefined") {
+                if(this.elements[from].successors[to].arrow != null) {
+                    console.log(this.elements[from].successors[to].arrow)
+                    this.map.removeLayer(this.elements[from].successors[to].arrow)
+                    this.map.removeLayer(this.elements[from].successors[to].head)
+                }
+            }
+
             this.elements[from].successors[to] = {
                 arrow: arrow,
                 head: arrowHead
@@ -1091,7 +1081,6 @@ class LeafleatMap {
                     }
                 }
             }
-
         }
         // create Node and Successors
         else {
