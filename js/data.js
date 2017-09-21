@@ -524,10 +524,6 @@ class DataManager {
       }
     }
 
-    
-    console.log(this._json.children)
-    console.log(this.filterElements)
-
     configNode.nodesEnabled = nodesEnabled
   }
 
