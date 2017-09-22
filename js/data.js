@@ -198,7 +198,7 @@ class DataManager {
 
 
     for (var i = 0; i < configNode.nodesAvailable[data.type].tags.length; i++) {
-      formdata.tags[configNode.nodesAvailable[data.type].tags[i]] = ""
+      formdata.tags[configNode.nodesAvailable[data.type].tags[i].name] = ""
     }
 
     this._json.children.push(formdata)

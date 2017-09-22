@@ -60,8 +60,14 @@ body {
 .sidebar a.btn-default {
   color: #333;
 }
+.sidebar h5 small a {
+  color: #fff;
+}
 .sidebar small a {
   text-decoration: underline;
+}
+.sidebar .formTags label{
+  margin-top: 5px;
 }
 .sidebar-toggle {
   position: absolute;

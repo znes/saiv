@@ -177,7 +177,7 @@ class Sidebar {
 
 
   createTags(tags, type) {
-    let div = $("<div class='formTags'></div>")
+    let div = $("<div class='formTags form-group'></div>")
 
     if (configNode.allowCustomTags)
       div.append('<h5>Tags <small><a href="#" class="addTag">Add Tag</a></small></h5>')
