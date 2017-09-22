@@ -2,8 +2,6 @@
  * DOM Ready
  */
 $(function() {
-    /*Promise.all(initImages())
-    .then( ()=> {*/
     let dataManager = new DataManager()
     let sb = new Sidebar(config.dom.sidebar)
     let cy = new CyptoScape(config.dom.canvasContainer)
@@ -145,5 +143,4 @@ $(function() {
             })
             .parent("li").removeClass("disabled")
     }
-    //})  
 })
