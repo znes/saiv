@@ -190,7 +190,7 @@
 	    img.src = url;
 	}
 
-	function initImages() {
+	/**function initImages() {
 		let promises = []
 		Object.keys(configNode.nodesAvailable).forEach(key=> {
 			promises.push(
@@ -223,7 +223,7 @@
 		})
 
 		return promises
-	}
+	}*/
 
 
 
