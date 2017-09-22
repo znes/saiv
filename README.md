@@ -1,4 +1,4 @@
 # saiv
 Stand alone interactive visualization
 Demo:
-https://energiekollektiv.github.io/saiv/
+https://znes.github.io/saiv/
