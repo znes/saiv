@@ -135,6 +135,8 @@
 	}
 
 	function readForm (form) {
+		console.log("read 	form")
+		console.log(form)
 	    let formData = {}
 	    $(form).serializeArray().forEach(field => {
 	    	if (field.name.substring(0, 5) == "tags_") {
@@ -190,31 +192,36 @@
 	    img.src = url;
 	}
 
-	/**function initImages() {
+
+function initImages() {
 		let promises = []
 		Object.keys(configNode.nodesAvailable).forEach(key=> {
 			promises.push(
 				new Promise((resolve, reject) => {
 					let img = new Image()
 
-				    img.setAttribute('crossOrigin', 'anonymous')
+				    //img.setAttribute('crossOrigin', 'anonymous')
 				    img.src = configNode.nodesAvailable[key].icon
 				    document.body.append(img)
 
 				    img.onload = function () {
-				        let canvas = document.createElement("canvas");
-				        canvas.width = this.width;
-				        canvas.height = this.height;
+				        let canvas = document.createElement("canvas")
+				        canvas.width = img.width
+				        canvas.height = img.height
 
-				        let ctx = canvas.getContext("2d");
-				        ctx.drawImage(this, 0, 0);
+				        let ctx = canvas.getContext("2d")
+				        ctx.drawImage(img, 0, 0)
+								document.body.append(canvas)
 
-				        let dataURL = canvas.toDataURL("image/png");
+				        //let dataURL = canvas.toDataURL("image/png")
 
-				        configNode.nodesAvailable[key].icon = dataURL//.replace(/^data:image\/(png|jpg);base64,/, "")
+				        //configNode.nodesAvailable[key].icon = dataURL//.replace(/^data:image\/(png|jpg);base64,/, "")
 				        console.log("key")
 				        console.log(key)
-				        console.log(dataURL)
+				        //console.log(dataURL)
+
+								document.body.removeChild(img)
+								document.body.removeChild(canvas)
 
 				        resolve()
 				    }
@@ -223,7 +230,7 @@
 		})
 
 		return promises
-	}*/
+	}
 
 
 
