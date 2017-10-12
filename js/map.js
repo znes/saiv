@@ -343,6 +343,7 @@ class LeafleatMap {
     }
 
     changeType(name, newType, geometryType) {
+      console.log(name, newType, geometryType)
         let oldType = this.elements[name].type
         let oldGeo = this.elements[name].geometry_type
 
@@ -358,7 +359,7 @@ class LeafleatMap {
                 let pos = null
                 if(oldGeo == "line" || oldGeo == "polygon")
                     pos = this.elements[name].marker.getLatLngs()
-                else 
+                else
                     pos = this.elements[name].marker.getLatLng()
 
                 this.elements[name].marker.remove()
@@ -437,17 +438,15 @@ class LeafleatMap {
         this.addDefaultBind()
     }
 
-    drawPolygon(name = null) {
+    drawPolygon(name) {
         let currentPoints = [],
             that = this
 
-        if (name != null) {
-            if (this.elements[name].marker != null) {
-                this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
-                this.redraw.name = name
+        if (this.elements[name].marker != null) {
+            this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
+            this.redraw.name = name
 
-                this.elements[name].marker.remove()
-            }
+            this.elements[name].marker.remove()
         }
 
         modal("Info", "Start adding Points to the map. You need to add at least 3 Points to the Map. Click submit when you are done.")
@@ -470,11 +469,11 @@ class LeafleatMap {
         function updateBodyPoly() {
             let wktText = arrayToPolygonWkt(currentPoints)
 
-            if (name != null) {
-                that.sidebarTextPolyPlacement(wktText, name)
-            } else {
+            // if (name != null) {
+            that.sidebarTextPolyPlacement(wktText, name)
+            /* } else {
                 that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
-            }
+            }*/
 
             $(".createPolyForm").submit((e) => {
                 e.preventDefault()
@@ -537,19 +536,17 @@ class LeafleatMap {
     }
 
 
-    drawLine(name = null) {
+    drawLine(name) {
         let currentPoints = [],
             that = this
 
 
-        if (name != null) {
-            if (this.elements[name].marker != null) {
-                this.redraw.pos = this.elements[name].marker.getLatLngs()[0]
-                this.redraw.name = name
+          if (this.elements[name].marker != null) {
+              this.redraw.pos = this.elements[name].marker.getLatLngs()
+              this.redraw.name = name
 
-                this.elements[name].marker.remove()
-            }
-        }
+              this.elements[name].marker.remove()
+          }
 
         modal("Info", "Start adding Points to the map. You need to add at least 2 Points to the Map. Click submit when you are done.")
         globals.unsavedChanges = true
@@ -571,11 +568,12 @@ class LeafleatMap {
         function updateBodyPoly() {
             let wktText = arrayToPolylineWkt(currentPoints)
 
-            if (name != null) {
-                that.sidebarTextPolyPlacement(wktText, name)
+            that.sidebarTextPolyPlacement(wktText, name)
+            /*if (name != null) {
+
             } else {
                 that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
-            }
+            }*/
 
             $(".createPolyForm").submit((e) => {
                 e.preventDefault()
@@ -1059,7 +1057,7 @@ class LeafleatMap {
     updatePosition(name, pos) {
         // checck if already on Map
         if (this.elements[name].marker != null) {
-            if (this.elements[name].type == "polygon") {
+            if (this.elements[name].geometry_type == "polygon" || this.elements[name].geometry_type == "line") {
                 this.elements[name].marker.remove()
                 this.elements[name].marker = this.createNode(name, pos)
             } else {

@@ -73,7 +73,6 @@ class CyptoScape {
           'background-image': configNode.nodesAvailable[type].icon,
           'background-fit': 'cover'
         })
-
     })
   }
 
@@ -103,9 +102,6 @@ class CyptoScape {
           break
         case "addNodes":
           this.addNodes(e.detail.data)
-          break
-        case "addHiddenNode":
-          this.addHiddenNode(e.detail.data)
           break
         case "changeType":
           this.changeType(e.detail.data.name, e.detail.data.type)
@@ -352,7 +348,7 @@ class CyptoScape {
     childs.forEach(child => {
       child.predecessors.forEach(pred => {
           if(this.cy.edges("[source='" + pred + "'][target='" + child.name + "']").length == 0) {
-            if(this.cy.$("#" + pred).length > 0) {  
+            if(this.cy.$("#" + pred).length > 0) {
               this.addEdge(pred, child.name)
             }
           }

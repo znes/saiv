@@ -61,11 +61,12 @@ class DataManager {
     this._json.children.forEach((child) => {
 			// Node Type unknown
 			if (typeof configNode.nodesAvailable[child.type] == "undefined") {
+        console.log(child.name + " has been removed because type is unknown.")
 				removeItems.push(child)
 			}
 			else {
 				// Add valid geometry_type if not avaible
-				if(typeof child.geometry_type == "undefined") {
+				if(typeof child.geometry_type == "undefined" ) {
 					child.geometry_type = configNode.nodesAvailable[child.type].geometryTypes[0]
 				}
 				else if (configNode.nodesAvailable[child.type].geometryTypes.indexOf(child.geometry_type) == -1) {
@@ -74,12 +75,14 @@ class DataManager {
 
 				// Node Type is not enabled
 				if (configNode.nodesEnabled.indexOf(child.type) == -1) {
+          console.log("Not enabled", child.name, child.type)
 					this.filterElements.push(child)
 				}
 				// Node Type is enabled
 				else {
-					if (typeof child.tags == "undefined")
-					child.tags = {}
+					if (typeof child.tags == "undefined") {
+				    child.tags = {}
+          }
 					else if (!configNode.allowCustomTags) {
 						for (let [tag, value] of Object.entries(child.tags)) {
 							if (configNode.nodesAvailable[child.type].tags.findIndex(x => x.name == tag) == -1) {
@@ -100,7 +103,6 @@ class DataManager {
 			}
     })
 
-
     // remove filtered Elements
     this.filterElements.concat(removeItems).forEach(child => {
       let index = this._json.children.findIndex(x => x.name == child.name)
@@ -108,6 +110,7 @@ class DataManager {
         this._json.children.splice(index, 1)
       }
     })
+
   }
 
   updateData(detail) {
@@ -292,6 +295,17 @@ class DataManager {
     let ele = this.getElement(updateData.currentId)
     let nodeEnabled = true
 
+
+    // if name(id) changes
+    if (updateData.currentId != updateData.name) {
+      if(this.getAllElements().findIndex( x => x.name = updateData.name ) != -1) {
+        modal("Warning", "Name is already used. Changes have been discarded")
+        return
+      }
+    }
+
+
+
     if(configNode.nodesEnabled.indexOf(updateData.type) == -1) {
       nodeEnabled = false
 
@@ -304,7 +318,6 @@ class DataManager {
       // check if pos changed
       if (typeof updateData.pos != "undefined") {
         if (typeof updateData.pos.lat != "undefined" && typeof updateData.pos.lng != "undefined") {
-
           if (updateData.pos.lat != ele.pos.lat || updateData.pos.lng != ele.pos.lng) {
             sendEvent("dataChanged", {
               task: "positionUpdate",
@@ -331,22 +344,10 @@ class DataManager {
           }
         })
       }
-
-      this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
-
-      // if name(id) changes
-      if (updateData.currentId != updateData.name) {
-        this.updateRelationNames(updateData.name, updateData.currentId)
-
-        sendEvent("dataChanged", {
-          task: "renameNode",
-          data: {
-            oldName: updateData.currentId,
-            newName: updateData.name
-          }
-        })
-      }
     }
+
+    // remove current updated Child.
+    this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
 
     delete updateData['currentId']
 
@@ -436,7 +437,11 @@ class DataManager {
       }
     })
 
-    this._json.children.push(updateData)
+
+    if(nodeEnabled)
+      this._json.children.push(updateData)
+    else
+      this.filterElements.push(updateData)
   }
 
   addTag(name, tagName) {
@@ -458,9 +463,6 @@ class DataManager {
   }
 
   updateNodesEnabled(nodesEnabled) {
-    console.log("nodesEnabled")
-
-
     if(this._json != null) {
       let diffRemovedTypes = configNode.nodesEnabled.filter(el => {
         return ( nodesEnabled.indexOf(el) == -1 )
@@ -481,8 +483,6 @@ class DataManager {
         this._json.children
           .filter(x => x.type == name)
           .forEach(child => {
-            console.log("remove")
-            console.log(child.name)
             this.filterElements.push(child)
 
             sendEvent("dataChanged", {
@@ -492,7 +492,7 @@ class DataManager {
           })
       })
 
-      
+
       this.filterElements.forEach(child => {
         let index = this._json.children.findIndex(x => x.name == child.name)
         if (index != -1) {

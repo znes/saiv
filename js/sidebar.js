@@ -1,20 +1,10 @@
 class Sidebar {
-  /*(function init (){
-
-  	$(".sidebar-toggle").on("click", function() {
-          $("body").toggleClass("sidebar-closed")
-          cy.resize()
-      })
-
-  })()*/
   constructor(selector) {
     this.container = $(selector)
     this.head = $('<div class="head"></div>')
     this.body = $('<div class="body"></div>')
-    this.container.append(this.head);
-    this.container.append(this.body);
-
-
+    this.container.append(this.head)
+    this.container.append(this.body)
   }
 
   showData(data) {
@@ -78,26 +68,6 @@ class Sidebar {
       .append(createSelect("successors", data.successors, nodes.filter(node => {
         return node != data.name
       }), "multiple=\"multiple\""))
-
-
-
-    /*for (let [key, value] of Object.entries(data)) {
-    	if (key != "tags" && key != "name" && key != "type" && key != "predecessors" && key != "successors") {
-    		if (key == "pos")  {
-    			for (let [prop, val] of Object.entries(value)) {
-    				if(prop == "lat") {
-    					form.append(createInput("Latitude", "pos_"+prop, val, "number"))
-    				}
-    				else if(prop == "lng") {
-    					form.append(createInput("Longitude", "pos_"+prop, val, "number"))
-    				}
-    			}
-    		}
-    		else {
-    			form.append(createInput(key, key, value, "text"))
-    		}
-    	}
-    }*/
 
 
     $('.basic-select', form).select2()
@@ -184,29 +154,51 @@ class Sidebar {
     else
       div.append('<h5>Tags</h5>')
 
-
-    if (!configNode.allowCustomTags) {
+    //if (!configNode.allowCustomTags) {
       configNode.nodesAvailable[type].tags.forEach(tag => {
+
         let input = $("<div class=\"input-group\"></div>")
         if (typeof tags[tag.name] != "undefined") {
           input.append('<input class="form-control" type="' + tag.type + '" name="tags_' + tag.name + '" value="' + tags[tag.name] + '"></input>')
         } else {
           input.append('<input class="form-control" type="' + tag.type + '" name="tags_' + tag.name + '" value=""></input>')
         }
+
+        if (configNode.allowCustomTags) {
+          input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
+        }
+
+
         div.append('<label for="tags_' + tag.name + '">' + tag.name + '</label>')
           .append(input)
+
       })
+
+      // if didnt added above and custom tags are allowed
+      for (let [key, value] of Object.entries(tags)) {
+        if(configNode.nodesAvailable[type].tags.findIndex(x=> x.name == key) == -1) {
+          let input = $("<div class=\"input-group\"></div>")
+          if (configNode.allowCustomTags) {
+            input.append('<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>')
+            input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
+            div.append('<label for="tags_' + key + '">' + key + '</label>')
+          }
+          else {
+            input = $('<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>')
+          }
+
+          div.append(input)
+        }
+      }
+
+    //}
+      /*// add current tags hidden
+      }
     } else {
       for (let [key, value] of Object.entries(tags)) {
-        let input = $("<div class=\"input-group\"></div>")
-        input.append('<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>')
 
-        input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
-
-        div.append('<label for="tags_' + key + '">' + key + '</label>')
-          .append(input)
       }
-    }
+    }*/
 
     return div
   }

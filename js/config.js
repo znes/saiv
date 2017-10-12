@@ -2,7 +2,6 @@ let config = {
 	cytoscape: {
 		defaultStyle: "cose-bilkent",
 		styles: [
-			"dagre",
 			"circle",
 			"grid",
 			"breadthfirst",

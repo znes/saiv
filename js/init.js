@@ -10,7 +10,7 @@ $(function() {
 
     // Init File Drop Events
     initDropEvents()
-        // Open Page home
+    // Open Page home
     home()
 
 
@@ -72,7 +72,7 @@ $(function() {
         }
     })
 
-    // Init Event Reciver 
+    // Init Event Reciver
     document.addEventListener("dataReceived", (e) => {
         initListenerDataRevieved()
         dataManager.json = e.detail
@@ -118,6 +118,7 @@ $(function() {
             .on("click", () => {
                 let bool = confirm("Attach Explorer Positions to json?")
                 let data = dataManager.json
+                data.children = dataManager.getAllElements()
                 let urlString = "text/json;charset=utf-8,"
 
                 if (bool) {
