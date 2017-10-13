@@ -42,6 +42,7 @@ class Sidebar {
   }
 
   updateNodeForm(data, nodes) {
+    console.log("updateNodeForm");
     this.open()
     this.head.html("<h4>Update " + data.name + "</h4>")
     this.body.html("")
@@ -50,6 +51,7 @@ class Sidebar {
     form.append(createInput("currentId", "currentId", data.name, "hidden"))
       .append(createInput("Name", "name", data.name, "text"))
       .append(createSelect("type", [data.type], Object.keys(configNode.nodesAvailable).map((k) => k)))
+
 
 
 
