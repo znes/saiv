@@ -140,7 +140,7 @@
 	    	if (field.name.substring(0, 5) == "tags_") {
 	            if (typeof(formData.tags) === "undefined") formData.tags = {}
 
-	            formData.tags[field.name.substring(5, field.name.length)] = field.value
+	            formData.tags[field.name.substring(5, field.name.length)] = field.value.trim()
 	        }
 	        else if (field.name == "predecessors" || field.name == "successors") {
 	        	formData[field.name] = $( form + " [name=\"" + field.name + "\"]").val()
@@ -151,7 +151,7 @@
 	        	formData.pos[field.name.substring(4, field.name.length)] = field.value
 	        }
 	        else {
-	            formData[field.name] = field.value
+	            formData[field.name] = field.value.trim()
 	        }
 	    })
 

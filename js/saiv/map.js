@@ -515,7 +515,7 @@ class LeafleatMap {
       let wktText = arrayToPolygonWkt(currentPoints)
 
       // if (name != null) {
-      that.sidebarTextPolyPlacement(wktText, name)
+      that.sidebarTextPlacement(wktText, name)
       /* } else {
           that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
       }*/
@@ -709,6 +709,8 @@ class LeafleatMap {
         var data = readForm(".dragPointForm")
         data.pos = currentPos
         this.elements[name].marker.dragging.disable()
+
+        that.addDefaultBind()
         sendEvent("data", {
           task: "updatePosition",
           data: data
