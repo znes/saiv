@@ -1,6 +1,6 @@
-	function setActiveMenuItem(href) {
+	function setActiveMenuItem(linkClass) {
 		$(".navbar-nav .active").removeClass("active")
-		$("a[href='#"+href+"']").parent("li").attr("class", "active")
+		$(linkClass).parent("li").attr("class", "active")
 	}
 
 	function createContentPage(heading, content) {
@@ -18,7 +18,7 @@
 	}
 
 	function showGraph() {
-		$(config.dom.sidebar).show()
+		//$(config.dom.sidebar).show()
 		$(config.dom.content.container).hide()
 		$("#"+config.dom.mapContainerId).css("visibility", "hidden")
 		$(config.dom.canvasContainer).css("visibility", "visible")
@@ -27,7 +27,7 @@
 	function showMap() {
 		$(config.dom.content.container).hide()
 		$(config.dom.canvasContainer).css("visibility", "hidden")
-		$(config.dom.sidebar).show()
+		//$(config.dom.sidebar).show()
 		$("#"+config.dom.mapContainerId).css("visibility", "visible")
 	}
 

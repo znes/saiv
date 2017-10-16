@@ -1,5 +1,5 @@
-import 'babel-polyfill';
-import $ from 'jquery';
-import saiv from './saiv/saiv'
+let saivInstance = new saiv()
 
-new saiv()
+let mapPlugin = new LeafleatMap(config.dom.mapContainerId)
+
+saivInstance.addPlugin(mapPlugin, ".showMap", "#map")

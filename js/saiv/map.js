@@ -173,11 +173,8 @@ class LeafleatMap {
   extendSidebar() {
     document.addEventListener("sidebar", (e) => {
       switch (e.detail.task) {
-        case "showId":
-          window.setTimeout(event => {
-            console.log("showId")
-            this.addPositionToSidebar(e.detail.data)
-          }, 500)
+        case "openUpdateForm":
+          this.addPositionToSidebar(e.detail.data)
           break
       }
     })
@@ -189,6 +186,10 @@ class LeafleatMap {
     $(".editForm").append(setPositionEle)
 
     setPositionEle.on("click", e => {
+      $(".contentPage").css("visibility", "hidden")
+      $("#map").css("visibility", "visible")
+      setActiveMenuItem(".showMap")
+
       switch (this.elements[name].geometry_type) {
         case "polygon":
           console.log("Listener Poly");
@@ -200,9 +201,8 @@ class LeafleatMap {
           break
         case "point":
           console.log("Listener Line");
-          //this.drawPoint(name)
+          this.drawPoint(name)
       }
-      showMap()
     })
   }
 
@@ -413,29 +413,8 @@ class LeafleatMap {
   }
 
 
-  sidebarTextPolyCreation(wktText, name = "") {
-    const body = $('<div></div>')
-    let form = $('<form class="createPolyForm clearfix"></form>')
-    form.append(createInput("name", "name", name, "text", true))
-      .append(createInput("type", "type", "polygon", "text", true, "readonly"))
-      .append(createInput("wkt", "pos_wkt", wktText, "hidden"))
-      .append('<button class="btn btn-success">Save</button>')
-      .append('<a class="cancel btn btn-warning pull-right">Cancel</a>')
 
-    body.append(form)
-      .append('<a class="resetPoly btn m-t-sm btn-default">Reset</a>')
-      .append('<a class="revertPoly btn m-t-sm btn-primary pull-right">Revert</a>')
-
-    sendEvent("sidebar", {
-      task: "show",
-      data: {
-        head: "<h4>Create Polygon</h4>",
-        body: body
-      }
-    })
-  }
-
-  sidebarTextPolyPlacement(wktText, name = "") {
+  sidebarTextPlacement(wktText, name = "", heading = "Place Polygon") {
     const body = $('<div></div>')
     let form = $('<form class="createPolyForm clearfix"></form>')
     form.append(createInput("name", "name", name, "hidden"))
@@ -451,7 +430,28 @@ class LeafleatMap {
     sendEvent("sidebar", {
       task: "show",
       data: {
-        head: "<h4>Place Polygon</h4>",
+        head: "<h4>" + heading + "</h4>",
+        body: body
+      }
+    })
+  }
+
+
+  sidebarTextPointPlacement(name = "") {
+    const body = $('<div></div>')
+    let form = $('<form class="dragPointForm clearfix"></form>')
+
+    form.append(createInput("name", "name", name, "hidden"))
+      .append('<button class="btn btn-success">Save</button>')
+      .append('<a class="cancel btn btn-warning pull-right">Cancel</a>')
+
+
+    body.append(form)
+
+    sendEvent("sidebar", {
+      task: "show",
+      data: {
+        head: "<h4>Drag Point</h4>",
         body: body
       }
     })
@@ -468,6 +468,7 @@ class LeafleatMap {
 
     if (this.redraw.name != null && this.elements[this.redraw.name].marker != null) {
       // redraw OLD !!!
+      this.elements[this.redraw.name].marker.remove()
       this.elements[this.redraw.name].marker = this.createNode(this.redraw.name, this.redraw.pos)
 
       this.redraw.name = null
@@ -612,7 +613,7 @@ class LeafleatMap {
     function updateBodyPoly() {
       let wktText = arrayToPolylineWkt(currentPoints)
 
-      that.sidebarTextPolyPlacement(wktText, name)
+      that.sidebarTextPlacement(wktText, name, "Place Line")
       /*if (name != null) {
 
       } else {
@@ -677,6 +678,53 @@ class LeafleatMap {
         return false
       })
     }
+  }
+
+  drawPoint(name) {
+    if (this.elements[name].marker == null) {
+      // opens sidebar to drag into map
+      this.alertButton.click()
+    } else {
+      modal("Info", "Start dragging selected marker")
+      this.elements[name].marker.dragging.enable()
+      this.redraw.pos = this.elements[name].marker.getLatLng()
+      this.redraw.name = name
+
+      this.sidebarTextPointPlacement(name)
+
+      globals.unsavedChanges = true
+
+      this.removeClickListener()
+      this.map.off("click")
+    }
+
+    $(".dragPointForm").submit((e) => {
+      e.preventDefault()
+      let currentPos = this.elements[name].marker.getLatLng()
+
+      if (currentPos.lat == this.redraw.pos.lat && currentPos.lng == this.redraw.pos.lng) {
+        this.discard()
+      } else {
+        globals.unsavedChanges = false
+        var data = readForm(".dragPointForm")
+        data.pos = currentPos
+        this.elements[name].marker.dragging.disable()
+        sendEvent("data", {
+          task: "updatePosition",
+          data: data
+        })
+        sendEvent("sidebar", {
+          task: "showId",
+          data: name
+        })
+      }
+    })
+
+    $(".cancel").on("click", (e) => {
+      this.discard()
+      return false
+    })
+
   }
 
 

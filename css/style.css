@@ -26,6 +26,10 @@ body {
 #map {
   right: 20em;
 }
+#map .leaflet-marker-draggable {
+  border: solid 3px red;
+}
+
 .containerCanvas, #map{
 	position: absolute;
 	left: 0;
@@ -227,10 +231,10 @@ a:hover {
 .selectStyle label{
   display: block;
 }
-.sidebar .input-group .form-control:first-child, 
+.sidebar .input-group .form-control:first-child,
 .sidebar .input-group .form-control:last-child {
   border-radius: 4px;
-} 
+}
 .sidebar .input-group {
   width: 100%;
 }
