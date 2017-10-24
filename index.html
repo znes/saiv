@@ -6,12 +6,9 @@
 	<title>Saiv</title>
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/leaflet.css">
-	<link rel="stylesheet" href="css/fontawesome.css">
 	<link rel="stylesheet" href="css/select2.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/contextmenu.css">
-	<!--<link rel="stylesheet" href="css/leaflet.contextmenu.min.css">
-	<linkS href="css/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />-->
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 </head>
 
@@ -29,16 +26,17 @@
 			</div>
 			<div id="navbar" class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="disabled"><a href="#Explorer" class="shoWExplorer">Graph Explorer</a></li>
+					<li class="disabled"><a href="#Explorer" class="showExplorer">Graph Explorer</a></li>
 					<li class="disabled"><a href="#Map" class="showMap">Map</a></li>
 					<li class=""><a href="#UploadJson" class="changeJson">Select Json</a></li>
 					<li class="disabled"><a href="#DownloadJson" class="downloadJson">Download Json</a></li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings<span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="#SetStyle" class="styleSettings">Style</a></li>
-							<li><a href="#Scenario" class="scenarioSetting">Scenario</a></li>
-							<li><a href="#NodeSettings" class="nodeSettings">Node Settings</a></li>
+							<li><a href="#" class="styleSettings">Style</a></li>
+							<li><a href="#" class="scenarioSetting">Scenario</a></li>
+							<li><a href="#" class="nodeSettings">Node Settings</a></li>
+							<li><a href="#" class="mapSettings">Map Settings</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -51,7 +49,7 @@
 	<div class="sidebar">
 	</div>
 
-	<div class="containerCanvas" class="contentPage">
+	<div class="containerCanvas contentPage">
 	</div>
 
 	<div id="map" class="contentPage">
@@ -114,8 +112,8 @@
 	<script src="js/saiv/pages/selectStyle.js"></script>
 	<script src="js/saiv/pages/nodeSettings.js"></script>
 	<script src="js/saiv/pages/home.js"></script>
-	<script src="js/saiv/map.js"></script>
 	<script src="js/saiv/saiv.js"></script>
+	<script src="js/map.js"></script>
 	<script src="js/init.js"></script>
 
 </html>

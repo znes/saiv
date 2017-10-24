@@ -6,26 +6,18 @@ class LeafleatMap {
       ghostPoly: null,
       name: null
     }
-
     this.shadowEdge = null
+
+    this.focusedElement = null
+
     this.icons = {
 
     }
 
     this.init(id)
-    this.registerEvents()
-    this.addDefaultBind()
-
-
-
-    // debug
-    window.map = () => {
-      return this.map
-    }
   }
 
   init(id) {
-    //
     this.extendSidebar()
 
     this.map = L.map(id, {
@@ -35,46 +27,37 @@ class LeafleatMap {
       contextmenu: true,
       contextmenuWidth: 140,
       contextmenuItems: [{
-          text: 'Add Node',
-          callback: e => {
-            if (discardChanges())
-              sendEvent("sidebar", {
-                task: "addNode",
-                data: {
-                  pos: e.latlng
-                }
-              })
-          }
-        },
-        /*{
-                       text: 'Add Polygon',
-                       callback: e => {
-                           if (discardChanges())
-                               this.drawPolygon()
-                       }
-                   }, */
-        {
-          text: 'Show coordinates',
-          callback: e => {
-            this.showCoordinates(e)
-          }
-        }, {
-          text: 'Center map',
-          callback: e => {
-            this.centerMap(e)
-          }
-        }, {
-          text: 'Zoom in',
-          callback: e => {
-            this.zoomIn(e)
-          }
-        }, {
-          text: 'Zoom out',
-          callback: e => {
-            this.zoomOut(e)
-          }
+        text: 'Add Node',
+        callback: e => {
+          if (discardChanges())
+            sendEvent("sidebar", {
+              task: "addNode",
+              data: {
+                pos: e.latlng
+              }
+            })
         }
-      ]
+      }, {
+        text: 'Show coordinates',
+        callback: e => {
+          this.showCoordinates(e)
+        }
+      }, {
+        text: 'Center map',
+        callback: e => {
+          this.centerMap(e)
+        }
+      }, {
+        text: 'Zoom in',
+        callback: e => {
+          this.zoomIn(e)
+        }
+      }, {
+        text: 'Zoom out',
+        callback: e => {
+          this.zoomOut(e)
+        }
+      }]
     })
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -110,7 +93,14 @@ class LeafleatMap {
         })
       })
 
+    // Init Menu Listener
+    $(".navbar .mapSettings").on("click", e => {
+      this.openSettingsModal()
+    })
+
     this.initMarkers()
+    this.registerEvents()
+    this.addDefaultBind()
   }
 
   initMarkers() {
@@ -157,6 +147,9 @@ class LeafleatMap {
           break
         case "positionUpdate":
           this.updatePosition(e.detail.data.name, e.detail.data.pos, e.detail.data.geometry_type)
+          break
+        case "focusNode":
+          this.focusNode(e.detail.data)
           break
       }
     })
@@ -322,8 +315,7 @@ class LeafleatMap {
           index: 2
         }]
       })
-    } else //if(this.elements[name].geometry_type == "line")
-    {
+    } else if (this.elements[name].geometry_type == "line") {
       let posArr = null
 
       if (typeof pos.wkt != "undefined") {
@@ -385,9 +377,41 @@ class LeafleatMap {
   }
 
 
+  focusNode(name = null) {
+    if (this.elementInMap(this.focusedElement)) {
+      if (this.elements[this.focusedElement].geometry_type == "point") {
+        L.DomUtil.removeClass(this.elements[this.focusedElement].marker._icon, 'selectedMarker')
+      }
+    }
+
+    if (this.elementInMap(name)) {
+      //$(this.elements[name].marker._icon).addClass("selectedMarker")
+      if (this.elements[name].geometry_type == "point") {
+        L.DomUtil.addClass(this.elements[name].marker._icon, 'selectedMarker')
+      }
+      this.focusedElement = name
+    } else {
+      this.focusedElement = null
+    }
+  }
+
+
+  /**
+   * return true or false depending if element is in map
+   */
+  elementInMap(name = null) {
+    if (name != null) {
+      if (typeof this.elements[name] != 'undefined') {
+        if (this.elements[name].marker != null) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
 
   changeType(name, newType, geometryType) {
-    console.log(name, newType, geometryType)
     let oldType = this.elements[name].type
     let oldGeo = this.elements[name].geometry_type
 
@@ -437,11 +461,13 @@ class LeafleatMap {
   }
 
 
-  sidebarTextPointPlacement(name = "") {
+  sidebarTextPointPlacement(name = "", pos = {}) {
     const body = $('<div></div>')
     let form = $('<form class="dragPointForm clearfix"></form>')
 
     form.append(createInput("name", "name", name, "hidden"))
+      .append(createInput("Latitude", "pos_lat", pos.lat, "number"))
+      .append(createInput("Longitude", "pos_lng", pos.lng, "number"))
       .append('<button class="btn btn-success">Save</button>')
       .append('<a class="cancel btn btn-warning pull-right">Cancel</a>')
 
@@ -614,15 +640,10 @@ class LeafleatMap {
       let wktText = arrayToPolylineWkt(currentPoints)
 
       that.sidebarTextPlacement(wktText, name, "Place Line")
-      /*if (name != null) {
-
-      } else {
-          that.sidebarTextPolyCreation(wktText, $(".createPolyForm input#name").val())
-      }*/
 
       $(".createPolyForm").submit((e) => {
         e.preventDefault()
-        if (currentPoints.length > 2) {
+        if (currentPoints.length >= 2) {
           if (name != null) {
             sendEvent("data", {
               task: "updatePosition",
@@ -649,7 +670,7 @@ class LeafleatMap {
 
           globals.unsavedChanges = false
         } else {
-          modal("Alarm", "At least 3 points required")
+          modal("Alarm", "At least 2 points required")
         }
       })
 
@@ -689,44 +710,56 @@ class LeafleatMap {
       this.elements[name].marker.dragging.enable()
       this.redraw.pos = this.elements[name].marker.getLatLng()
       this.redraw.name = name
-
-      this.sidebarTextPointPlacement(name)
-
       globals.unsavedChanges = true
 
+      this.sidebarTextPointPlacement(name, this.redraw.pos)
       this.removeClickListener()
       this.map.off("click")
-    }
 
-    $(".dragPointForm").submit((e) => {
-      e.preventDefault()
-      let currentPos = this.elements[name].marker.getLatLng()
-
-      if (currentPos.lat == this.redraw.pos.lat && currentPos.lng == this.redraw.pos.lng) {
-        this.discard()
-      } else {
-        globals.unsavedChanges = false
-        var data = readForm(".dragPointForm")
-        data.pos = currentPos
-        this.elements[name].marker.dragging.disable()
-
-        that.addDefaultBind()
-        sendEvent("data", {
-          task: "updatePosition",
-          data: data
+      let watchForm = (form) => {
+        form.find("input[name='pos_lng'], input[name='pos_lat']").on("change", e => {
+          const formData = readForm(".dragPointForm")
+          this.elements[name].marker.setLatLng(formData.pos)
         })
-        sendEvent("sidebar", {
-          task: "showId",
-          data: name
+
+        $(".dragPointForm").submit((e) => {
+          e.preventDefault()
+          let currentPos = this.elements[name].marker.getLatLng()
+
+          if (currentPos.lat == this.redraw.pos.lat && currentPos.lng == this.redraw.pos.lng) {
+            this.discard()
+          } else {
+            globals.unsavedChanges = false
+            var data = readForm(".dragPointForm")
+            data.pos = currentPos
+            this.elements[name].marker.dragging.disable()
+
+            this.addDefaultBind()
+            sendEvent("data", {
+              task: "updatePosition",
+              data: data
+            })
+            sendEvent("sidebar", {
+              task: "showId",
+              data: name
+            })
+          }
+        })
+
+        $(".cancel").on("click", (e) => {
+          this.discard()
+          return false
         })
       }
-    })
 
-    $(".cancel").on("click", (e) => {
-      this.discard()
-      return false
-    })
+      this.elements[name].marker.on("dragend", e => {
+        this.sidebarTextPointPlacement(name, this.elements[name].marker.getLatLng())
+        watchForm($(".dragPointForm"))
+      })
 
+
+      watchForm($(".dragPointForm"))
+    }
   }
 
 
@@ -747,7 +780,6 @@ class LeafleatMap {
               data: property
             })
           })
-        //.bindPopup(property)
       }
     }
   }
@@ -871,13 +903,12 @@ class LeafleatMap {
             this.addEdge(pred, child.name)
           }
         }
-
       })
     })
   }
 
   getNoPosElements() {
-    let dragContainer = $("<div class=\"dragContainer\"></div>"),
+    let dragContainer = $("<div class=\"dragContainer row\"></div>"),
       polyContainer = $("<div class=\"listContainer\"></div>"),
       list = $("<div class=\"list-group\"></div>"),
       body = $("<div></div>")
@@ -898,16 +929,14 @@ class LeafleatMap {
           })
           list.append(li)
         } else {
-          let letEle = $("<div class=\"dragArticle\"></div>")
+          let letEle = $("<div class=\"dragArticle col-xs-6 col-md-4\"></div>")
 
           let imgClone = $("<img>")
-            .prop("src", config.markerSettings.src)
+            .prop("src", configNode.nodesAvailable[data.type].icon)
             .prop("data-name", property)
-            .prop("class", "dragImg")
-            .prop("width", config.markerSettings.width)
-            .prop("height", config.markerSettings.height)
+            .prop("class", "dragImg img-responsive")
 
-          letEle.append('<p class="dragMarkerName">' + property + '</p>')
+          letEle.append(`<p class="dragMarkerName">${property}</p>`)
           letEle.append(imgClone)
           dragContainer.append(letEle)
         }
@@ -919,7 +948,7 @@ class LeafleatMap {
       body.append(dragContainer)
     }
     if (list.find("a").length > 0) {
-      body.append("<p>Click element to start adding area</p>")
+      body.append("<p>Click element to set position</p>")
       body.append(polyContainer)
     }
 
@@ -946,9 +975,9 @@ class LeafleatMap {
       added = false
 
 
-    eles.each((index, item) => {
-      item.addEventListener('dragstart', handleDragStart, false)
-      item.addEventListener('dragend', handleDragEnd, false)
+    eles.each((index, value) => {
+      value.addEventListener('dragstart', handleDragStart, false)
+      value.addEventListener('dragend', handleDragEnd, false)
     })
 
 
@@ -967,22 +996,11 @@ class LeafleatMap {
       added = false
 
       let img = new Image()
-      img.crossOrigin = "anonymous"
       img.src = srcEle.prop("src")
+      img.width = srcEle.width()
+      img.height = srcEle.height()
 
-      let canvas = document.createElement('canvas');
-      canvas.width = "25";
-      canvas.height = "41";
-      let context = canvas.getContext('2d')
-      context.drawImage(img, 0, 0);
-
-      let canvasImage = new Image();
-      canvasImage.crossOrigin = "anonymous"
-      canvasImage.src = canvas.toDataURL()
-
-      document.body.append(canvasImage)
-
-      e.dataTransfer.setDragImage(canvasImage, 0, 0)
+      //e.dataTransfer.setDragImage(img, -(srcEle.width()/2), -(srcEle.height()))
     }
 
     function handleDragEnter(e) {
@@ -1075,6 +1093,7 @@ class LeafleatMap {
         weight: 5,
         color: "#9dbaea",
         contextmenu: true,
+        className: 'successorsLine',
         contextmenuItems: [{
           text: 'Delete Edge',
           index: 0,
@@ -1094,12 +1113,14 @@ class LeafleatMap {
       }).addTo(this.map)
 
 
-      let arrowHead = L.polylineDecorator(arrow).addTo(this.map)
+      let arrowHead = L.polylineDecorator(arrow, {className: 'successorsLine'}).addTo(this.map)
       arrowHead.setPatterns([{
         offset: '100%',
         repeat: 0,
+        className: 'successorsLine',
         symbol: L.Symbol.arrowHead({
           polygon: false,
+          className: 'successorsLine',
           pathOptions: {
             stroke: true,
             color: "#9dbaea"
@@ -1110,7 +1131,6 @@ class LeafleatMap {
 
       if (typeof this.elements[from].successors[to] != "undefined") {
         if (this.elements[from].successors[to].arrow != null) {
-          console.log(this.elements[from].successors[to].arrow)
           this.map.removeLayer(this.elements[from].successors[to].arrow)
           this.map.removeLayer(this.elements[from].successors[to].head)
         }
@@ -1222,5 +1242,43 @@ class LeafleatMap {
 
   zoomOut(e) {
     this.map.zoomOut()
+  }
+
+  openSettingsModal(e) {
+    const heading = "Map Settings"
+    const form = $("<form class='mapSettingsForm'></form>")
+
+    if (globals.showPredAndSuccOnMap) {
+      form.append('<div class="form-group"><label for="showPredAndSuccOnMap">Show predecessors and successors on map</label><input checked class="" type="checkbox" name="showPredAndSuccOnMap"></div>')
+    } else {
+      form.append('<div class="form-group"><label for="showPredAndSuccOnMap">Show predecessors and successors on map</label><input class="" type="checkbox" name="showPredAndSuccOnMap"></div>')
+    }
+
+    form.append('<button class="btn btn-success">Save</button>')
+
+
+    form.submit((e) => {
+      e.preventDefault()
+      let formData = readForm(".mapSettingsForm")
+
+
+      if (typeof formData.showPredAndSuccOnMap != "undefined") {
+        globals.showPredAndSuccOnMap = true
+      } else {
+        globals.showPredAndSuccOnMap = false
+      }
+      this.updateGlobals()
+
+      hideModal()
+    })
+
+    modal(heading, form)
+  }
+
+  updateGlobals() {
+    if(globals.showPredAndSuccOnMap)
+      $(".successorsLine").css("display", "block")
+    else
+      $(".successorsLine").css("display", "none")
   }
 }

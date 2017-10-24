@@ -29,6 +29,10 @@ body {
 #map .leaflet-marker-draggable {
   border: solid 3px red;
 }
+.leaflet-marker-icon.selectedMarker{
+  border: solid 1px #a0a0a0;
+  background: blue;
+}
 
 .containerCanvas, #map{
 	position: absolute;
@@ -192,11 +196,8 @@ a:hover {
         flex-basis: 45%;
     }
 }
-
-.dragArticle {
-  margin-top: 5px;
-  margin-right: 5px;
-  flex-basis: 27%;
+.dragArticle .dragImg {
+  padding: 0 5px;
 }
 .dragArticle .dragImg, .dragArticle .dragMarkerName{
   -webkit-transition: -webkit-transform 0.2s ease-out;

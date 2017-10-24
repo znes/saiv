@@ -1,5 +1,9 @@
-let saivInstance = new saiv()
+let saivObj = new saiv()
 
-let mapPlugin = new LeafleatMap(config.dom.mapContainerId)
+let mapPlugin = new LeafleatMap("map")
 
-saivInstance.addPlugin(mapPlugin, ".showMap", "#map")
+saivObj.addPlugin(
+  mapPlugin,
+  ".showMap",
+  "#map"
+)

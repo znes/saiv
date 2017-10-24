@@ -10,7 +10,6 @@ let config = {
 	},
 	dom: {
 		canvasContainer: ".containerCanvas",
-		mapContainerId: "map",
 		content: {
 			container: ".containerContent",
 			heading: ".containerContent .page-header h1",
@@ -21,7 +20,7 @@ let config = {
 			json: ".changeJson",
 			home: ".home",
 			style: ".styleSettings",
-			graph: ".navbar .shoWExplorer",
+			graph: ".navbar .showExplorer",
 			scenario: ".scenarioSetting",
 			map: ".showMap",
 			download: ".navbar .downloadJson",
@@ -33,10 +32,5 @@ let config = {
 			heading: ".modal .modal-header h3",
 			body: ".modal .modal-body"
 		}
-	},
-	markerSettings: {
-		src: "css/images/marker-icon-2x.png",
-		width: 25,
-		height: 41
 	}
 }

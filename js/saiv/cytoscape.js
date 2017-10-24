@@ -89,10 +89,6 @@ class CyptoScape {
           break
         case "updateStyle":
           this.updateLayout()
-          // only change to cytoscape view if elements available
-          if (this.cy.$("node").length > 0) {
-            showGraph()
-          }
           break
         case "renameNode":
           this.renameNode(e.detail.data.oldName, e.detail.data.newName)
@@ -114,6 +110,9 @@ class CyptoScape {
           break
         case "deleteEdge":
           this.deleteEdge(e.detail.data.from, e.detail.data.to)
+          break
+        case "focusNode":
+          this.focusNode(e.detail.data)
           break
       }
     })
@@ -283,6 +282,8 @@ class CyptoScape {
     this.updateBind()
   }
 
+
+
   changeType(name, newType) {
     const ele = this.cy.$("node#" + name)
     const position = ele.position()
@@ -347,11 +348,11 @@ class CyptoScape {
     // check if all pred added
     childs.forEach(child => {
       child.predecessors.forEach(pred => {
-          if(this.cy.edges("[source='" + pred + "'][target='" + child.name + "']").length == 0) {
-            if(this.cy.$("#" + pred).length > 0) {
-              this.addEdge(pred, child.name)
-            }
+        if (this.cy.edges("[source='" + pred + "'][target='" + child.name + "']").length == 0) {
+          if (this.cy.$("#" + pred).length > 0) {
+            this.addEdge(pred, child.name)
           }
+        }
       })
     })
 
@@ -453,6 +454,13 @@ class CyptoScape {
         target: to
       }
     }])
+  }
+
+  focusNode(name = null) {
+    this.cy.$(":selected").unselect()
+    if (name != null) {
+      this.cy.$("#" + name).select()
+    }
   }
 
   updateLayout() {

@@ -12,7 +12,6 @@ function selectStyle() {
 	}
 	else {
 		form.append('<div class="form-group"><label for="autoLayout">Relayout Explorer after adding Elements</label><input class="" type="checkbox" name="autoLayout"></div>')
-
 	}
 
 
@@ -20,10 +19,10 @@ function selectStyle() {
 	form.submit(e => {
 		e.preventDefault()
 		let data = readForm(".editStyle")
-		
+
 		if(typeof data.autoLayout != "undefined") {
 			globals.autoLayout = "true"
-		} 
+		}
 		else {
 			globals.autoLayout = "false"
 		}

@@ -1,6 +1,6 @@
 function nodeSettings() {
-  let form = $("<form class='nodeSettingsForm'></form>")
-  let heading = "Node Settings"
+  const form = $("<form class='nodeSettingsForm'></form>")
+  const heading = "Node Settings"
 
   form.append(createSelect("Nodes enabled", configNode.nodesEnabled, Object.keys(configNode.nodesAvailable), "multiple=\"multiple\""))
 
@@ -8,12 +8,6 @@ function nodeSettings() {
     form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input checked class="" type="checkbox" name="allowCustomTags"></div>')
   } else {
     form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input class="" type="checkbox" name="allowCustomTags"></div>')
-  }
-
-  if (configNode.showPredAndSucc == true) {
-    form.append('<div class="form-group"><label for="showPredAndSucc">Allow custom Tags</label><input checked class="" type="checkbox" name="showPredAndSucc"></div>')
-  } else {
-    form.append('<div class="form-group"><label for="showPredAndSucc">Allow custom Tags</label><input class="" type="checkbox" name="showPredAndSucc"></div>')
   }
 
   form.append('<button class="btn btn-success">Save</button>')
