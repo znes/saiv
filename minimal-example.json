@@ -1,120 +1,160 @@
 {
-    "api_parameters":
-    {
-        "api_version": "0.1",
-        "api_type": "element",
-        "query":
-        {
-            "geom": "false",
-            "tags": "true",
-            "sequences": "false",
-            "children": "true",
-            "parents": "false",
-            "predecessors": "true",
-            "successors": "true",
-            "expand": "children",
-            "hubs_explicitly": "true"
-        }
-    },
-    "type": "scenario",
-    "name": "test_scenario",
-    "children": [
-    {
-        "name": "wind",
-        "type": "volatile_generator",
-        "geometry_type": "point",
-        "tags":
-        {
-            "fuel_type": "wind",
-            "installed_power": "251"
-        },
-        "predecessors": [],
-        "successors": ["hub1"],
-        "pos":
-        {
-            "lng": 51.5,
-            "lat": -0.09
-        }
-    },
-    {
-        "name": "solar",
-        "type": "volatile_generator",
-        "geometry_type": "point",
-        "tags":
-        {
-            "fuel_type": "solar",
-            "installed_power": "251"
-        },
-        "predecessors": [],
-        "successors": ["hub2"],
-        "pos":
-        {
-            "lng": 51.5062793,
-            "lat": -0.13158
-        }
-    },
-    {
-        "name": "demand",
-        "type": "demand",
-        "geometry_type": "point",
-        "tags":
-        {
-            "amount": "100000"
-        },
-        "predecessors": ["hub2"],
-        "successors": [],
-        "pos":
-        {
-            "lng": 51.4062793,
-            "lat": -0.12158
-        }
-    },
-    {
-        "name": "line",
-        "type": "transmission",
-        "geometry_type": "line",
-        "tags":
-        {
-            "capacity": "200",
-            "efficiency": "0.9"
-        },
-        "predecessors": ["hub1"],
-        "successors": ["hub2"]
-    },
-    {
-        "name": "hub1",
-        "type": "hub",
-        "geometry_type": "point",
-        "tags":
-        {
-            "sector": "electricity"
-        },
-        "predecessors": ["wind"],
-        "successors": ["line"],
-        "pos":
-        {
-            "lng": 51.4862793,
-            "lat": -0.13858
-        }
-    },
-    {
-        "name": "hub2",
-        "type": "hub",
-        "geometry_type": "point",
-        "tags":
-        {
-            "sector": "electricity"
-        },
-        "predecessors": ["line", "solar"],
-        "successors": ["demand"],
-        "pos":
-        {
-            "lng": 51.4762793,
-            "lat": -0.12058
-        }
-    }],
-    "tags":
-    {
-        "description": "Minimal example scenario for testing purposes"
+  "api_parameters": {
+    "api_version": "0.1",
+    "api_type": "element",
+    "query": {
+      "geom": "false",
+      "tags": "true",
+      "sequences": "false",
+      "children": "true",
+      "parents": "false",
+      "predecessors": "true",
+      "successors": "true",
+      "expand": "children",
+      "hubs_explicitly": "true"
     }
+  },
+  "type": "scenario",
+  "name": "test_scenario",
+  "children": [{
+      "name": "wind",
+      "type": "volatile_generator",
+      "geometry_type": "point",
+      "tags": {
+        "fuel_type": "wind",
+        "installed_power": "251"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": [],
+      "successors": ["hub1"],
+      "pos": {
+        "lng": 51.5,
+        "lat": -0.09
+      }
+    },
+    {
+      "name": "solar",
+      "type": "volatile_generator",
+      "geometry_type": "point",
+      "tags": {
+        "fuel_type": "solar",
+        "installed_power": "251"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": [],
+      "successors": ["hub2"],
+      "pos": {
+        "lng": 51.5062,
+        "lat": -0.1315
+      }
+    },
+    {
+      "name": "demand",
+      "type": "demand",
+      "geometry_type": "point",
+      "tags": {
+        "amount": "100000"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": ["hub2"],
+      "successors": [],
+      "pos": {
+        "lng": 51.4062,
+        "lat": -0.1215
+      }
+    },
+    {
+      "name": "line",
+      "type": "transmission",
+      "geometry_type": "line",
+      "tags": {
+        "capacity": "200",
+        "efficiency": "0.9"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": ["hub1"],
+      "successors": ["hub2"]
+    },
+    {
+      "name": "hub1",
+      "type": "hub",
+      "geometry_type": "point",
+      "tags": {
+        "sector": "electricity"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": ["wind"],
+      "successors": ["line"],
+      "pos": {
+        "lng": 51.4862,
+        "lat": -0.1385
+      }
+    },
+    {
+      "name": "hub2",
+      "type": "hub",
+      "geometry_type": "point",
+      "tags": {
+        "sector": "electricity"
+      },
+      "sequences": [
+        [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ], [
+          [15532523522, 515162],
+          [14214124, 26326231]
+        ]
+      ],
+      "predecessors": ["line", "solar"],
+      "successors": ["demand"],
+      "pos": {
+        "lng": 51.4762793,
+        "lat": -0.12058
+      }
+    }
+  ],
+  "tags": {
+    "description": "Minimal example scenario for testing purposes"
+  }
 }

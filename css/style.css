@@ -26,14 +26,15 @@ body {
 #map {
   right: 20em;
 }
+#map .leaflet-marker-icon {
+  border-radius: 50% 50%;
+}
 #map .leaflet-marker-draggable {
-  border: solid 3px red;
+  box-shadow: 0 0 0 2pt red!important;
 }
 .leaflet-marker-icon.selectedMarker{
-  border: solid 1px #a0a0a0;
-  background: blue;
+  box-shadow: 0 0 0 2pt black;
 }
-
 .containerCanvas, #map{
 	position: absolute;
 	left: 0;
@@ -59,8 +60,14 @@ body {
   overflow: auto;
   z-index: 1;
 }
+.sidebar .setPosition{
+  margin-top: 5px;
+}
 .sidebar .form-group {
   width: 100%;
+}
+.sidebar label {
+  margin-bottom: 0px;
 }
 .sidebar a {
   colr: #333;
