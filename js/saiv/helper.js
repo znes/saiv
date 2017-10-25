@@ -12,32 +12,6 @@
 		$(".contentPage").css("visibility", "hidden")
 		$(config.dom.content.container).css("visibility", "visible")
 	}
-
-	function hideModal() {
-	  $(config.dom.modal.backdrop).removeClass("in")
-	  $(config.dom.modal.container).removeClass("in")
-	}
-
-	function openSitebar() {
-	  globals.callSitebarTimestamp = Date.now()
-	  $("body").removeClass("sidebar-closed")
-	}
-
-	function closeSitebar() {
-	  // hack
-	  // map calls closeSitebar when polygone is clicked
-	  // if open call is called 100ms before it will not be called
-	  if (globals.callSitebarTimestamp + 100 < Date.now()) {
-	    $("body").addClass("sidebar-closed")
-	    sendEvent(
-	      "dataChanged", {
-	        task: "focusNode",
-	        data: null
-	      }
-	    )
-	  }
-	}
-
 	function discardChanges(abort) {
 	  if (globals.unsavedChanges) {
 	    if (confirm('You have unsaved changes. You want to discard them?')) {
@@ -49,6 +23,19 @@
 	  }
 
 	  return true
+	}
+
+
+	
+	function roundLatLng(obj = {}) {
+		let pos = {}
+			if(obj.lat) {
+				pos.lat = Number(obj.lat).toFixed(4)
+			}
+			if(obj.lng) {
+				pos.lng = Number(obj.lng).toFixed(4)
+			}
+			return pos
 	}
 
 

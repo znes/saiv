@@ -61,6 +61,7 @@ class Sidebar {
 
 
     form.append(this.createTags(data.tags, data.type))
+    form.append(this.createSequences(data.sequence))
 
 
     form.append(createSelect("predecessors", data.predecessors, nodes.filter(node => {
@@ -146,28 +147,24 @@ class Sidebar {
     this.body.append(form)
   }
 
+  createSequences(currentSequences = []) {
+    let div = $('<div class="formTags form-group panel-group"  id="accordion" role="tablist"></div>')
+    let heading = $('<div class="panel panel-default"><div class="panel-heading" role="tab" id="tagsPanel"></div></div>')
+    let tagTitle = $('<h4 class="panel-title"></h4>')
+    tagTitle.append('<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Sequences</a>')
+    heading.find("#tagsPanel").append(tagTitle)
+    div.append(heading)
+
+
+    /**currentSequences.forEach(seq=> {
+      this.createSequencesPlot(seq)
+    })*/
+
+
+    return div
+  }
 
   createTags(tags, type) {
-
-    /*    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
-              <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                gagaga
-                </a>
-              </h4>
-            </div>
-            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-              <div class="panel-body">
-                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-              </div>
-            </div>
-          </div>
-        </div>*/
-
-
-
     let div = $('<div class="formTags form-group panel-group"  id="accordion" role="tablist"></div>')
 
     let heading = $('<div class="panel panel-default"><div class="panel-heading" role="tab" id="tagsPanel"></div></div>')
@@ -184,20 +181,18 @@ class Sidebar {
 
     //if (!configNode.allowCustomTags) {
     configNode.nodesAvailable[type].tags.forEach(tag => {
-
       let input = $("<div class=\"input-group\"></div>")
-      if (typeof tags[tag.name] != "undefined") {
-        input.append('<input class="form-control" type="' + tag.type + '" name="tags_' + tag.name + '" value="' + tags[tag.name] + '"></input>')
+      if (typeof tags[tag] != "undefined") {
+        input.append('<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>')
       } else {
-        input.append('<input class="form-control" type="' + tag.type + '" name="tags_' + tag.name + '" value=""></input>')
+        input.append('<input class="form-control" type="text" name="tags_' + tag + '" value=""></input>')
       }
 
       if (configNode.allowCustomTags) {
         input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
       }
 
-
-      tabBody.find(".panel-body").append('<label for="tags_' + tag.name + '">' + tag.name + '</label>')
+      tabBody.find(".panel-body").append('<label for="tags_' + tag + '">' + tag + '</label>')
         .append(input)
     })
 
@@ -282,5 +277,31 @@ class Sidebar {
         width: '100%'
       })
     })
+  }
+}
+
+/**
+ * Global open Sidebar function
+ */
+function openSitebar() {
+  globals.callSitebarTimestamp = Date.now()
+  $("body").removeClass("sidebar-closed")
+}
+
+/**
+ * Global close Sitebar function
+ */
+function closeSitebar() {
+  // hack
+  // map calls closeSitebar when polygone is clicked
+  // if open call is called 100ms before it will not be called
+  if (globals.callSitebarTimestamp + 100 < Date.now()) {
+    $("body").addClass("sidebar-closed")
+    sendEvent(
+      "dataChanged", {
+        task: "focusNode",
+        data: null
+      }
+    )
   }
 }

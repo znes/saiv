@@ -85,7 +85,7 @@ class DataManager {
           }
 					else if (!configNode.allowCustomTags) {
 						for (let [tag, value] of Object.entries(child.tags)) {
-							if (configNode.nodesAvailable[child.type].tags.findIndex(x => x.name == tag) == -1) {
+							if (configNode.nodesAvailable[child.type].tags.findIndex(x => x == tag) == -1) {
 								delete child.tags[tag]
 							}
 						}
@@ -93,8 +93,8 @@ class DataManager {
 
 					// create tags not created;
 					configNode.nodesAvailable[child.type].tags.forEach((tag) => {
-						if (typeof child.tags[tag.name] == "undefined") {
-							child.tags[tag.name] = ""
+						if (typeof child.tags[tag] == "undefined") {
+							child.tags[tag] = ""
 						} else {
 							// parse value
 						}

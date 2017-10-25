@@ -1,6 +1,6 @@
 function home() {
-  let content = "Home"
-  
+  const content = $("<div>Home</div>")
+
   createContentPage("Saiv", content )
   setActiveMenuItem("home")
 }

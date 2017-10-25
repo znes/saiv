@@ -1,18 +1,15 @@
 class LeafleatMap {
   constructor(id) {
+    // Set variables
     this.elements = {}
-
     this.redraw = {
       ghostPoly: null,
       name: null
     }
     this.shadowEdge = null
-
     this.focusedElement = null
-
-    this.icons = {
-
-    }
+    this.icons = {}
+    this.containerElement = $("#" + id)
 
     this.init(id)
   }
@@ -40,7 +37,7 @@ class LeafleatMap {
       }, {
         text: 'Show coordinates',
         callback: e => {
-          this.showCoordinates(e)
+          modal("Coordinates", "Latitude: " + e.latlng.lat + "</br>Longitude: " + e.latlng.lng)
         }
       }, {
         text: 'Center map',
@@ -50,12 +47,12 @@ class LeafleatMap {
       }, {
         text: 'Zoom in',
         callback: e => {
-          this.zoomIn(e)
+          this.map.zoomIn()
         }
       }, {
         text: 'Zoom out',
         callback: e => {
-          this.zoomOut(e)
+          this.map.zoomOut()
         }
       }]
     })
@@ -103,15 +100,22 @@ class LeafleatMap {
     this.addDefaultBind()
   }
 
+  //
   initMarkers() {
+    let cssRules = $("<style></style>")
+
     Object.keys(configNode.nodesAvailable).forEach(type => {
       this.icons[type] = L.icon({
         iconUrl: configNode.nodesAvailable[type].icon,
         iconSize: [40, 40],
-        iconAnchor: [20, 40]
-        //popupAnchor:  [0, -80]
+        iconAnchor: [20, 40],
+        className:  "markerIcon-" + type
       })
+
+      cssRules.append(`.markerIcon-${type} {background-color: ${configNode.nodesAvailable[type].color}}`)
     })
+
+    $('head').append(cssRules)
   }
 
   registerEvents() {
@@ -422,7 +426,7 @@ class LeafleatMap {
       if (oldGeo != geometryType) {
         this.deleteNode(name, false)
         // No Pos Data
-        this.showButtonAddNodes()
+        this.alertButton.show()
       } else {
         let pos = null
         if (oldGeo == "line" || oldGeo == "polygon")
@@ -724,7 +728,7 @@ class LeafleatMap {
 
         $(".dragPointForm").submit((e) => {
           e.preventDefault()
-          let currentPos = this.elements[name].marker.getLatLng()
+          let currentPos = roundLatLng(this.elements[name].marker.getLatLng())
 
           if (currentPos.lat == this.redraw.pos.lat && currentPos.lng == this.redraw.pos.lng) {
             this.discard()
@@ -753,7 +757,7 @@ class LeafleatMap {
       }
 
       this.elements[name].marker.on("dragend", e => {
-        this.sidebarTextPointPlacement(name, this.elements[name].marker.getLatLng())
+        this.sidebarTextPointPlacement(name, roundLatLng(this.elements[name].marker.getLatLng()))
         watchForm($(".dragPointForm"))
       })
 
@@ -878,10 +882,10 @@ class LeafleatMap {
       if (typeof pos.lng != "undefined" && typeof pos.lat != "undefined" && geometry_type == "point" || typeof pos.wkt != "undefined" && geometry_type == "polygon" || typeof pos.wkt != "undefined" && geometry_type == "line") {
         this.elements[name].marker = this.createNode(name, pos)
       } else {
-        this.showButtonAddNodes()
+        this.alertButton.show()
       }
     } else {
-      this.showButtonAddNodes()
+      this.alertButton.show()
     }
   }
 
@@ -923,7 +927,7 @@ class LeafleatMap {
           li.on("click", e => {
             if (data.geometry_type == "polygon") {
               this.drawPolygon(property)
-            } else {
+            } else if(data.geometry_type == "line"){
               this.drawLine(property)
             }
           })
@@ -968,6 +972,10 @@ class LeafleatMap {
     return count
   }
 
+
+  /**
+   * Register Drag Events of Marker in Sidebar
+   */
   registerDragEvents(eles) {
     let srcEle = null,
       srcName = null,
@@ -981,37 +989,27 @@ class LeafleatMap {
     })
 
 
-    $("#" + config.dom.mapContainerId)
-      .off('dragenter')
+    this.containerElement
       .off('drop')
-      .off('dragleave')
-      .on('dragenter', handleDragEnter)
       .on('drop', handleDrop)
-      .on('dragleave', handleDragLeave)
+      //.off('dragenter')
+      //.off('dragleave')
+      //.on('dragenter', handleDragEnter)
+      //.on('dragleave', handleDragLeave)
 
     function handleDragStart(e) {
-      srcEle = $(this)
-      srcName = srcEle.parent().find("p").text()
-      srcEle.parent().addClass('moving')
-      added = false
+  		srcEle = $(e.target)
+  		srcName = srcEle.parent().find("p").text()
+  		srcEle.parent().addClass('moving')
+  		added = false
 
-      let img = new Image()
-      img.src = srcEle.prop("src")
-      img.width = srcEle.width()
-      img.height = srcEle.height()
+  		let img = new Image()
+  		img.src = srcEle.prop("src")
+  		img.width = srcEle.width()
+  		img.height = srcEle.height()
 
-      //e.dataTransfer.setDragImage(img, -(srcEle.width()/2), -(srcEle.height()))
-    }
-
-    function handleDragEnter(e) {
-      // this / e.target is the current hover target.
-      //this.classList.add('over')
-    }
-
-    function handleDragLeave(e) {
-      // this / e.target is previous target element.
-      //this.classList.remove('over')
-    }
+  		//e.dataTransfer.setDragImage(img, -(srcEle.width()/2), -(srcEle.height()))
+  	}
 
     function handleDrop(e) {
       if (e.stopPropagation) {
@@ -1049,10 +1047,6 @@ class LeafleatMap {
     }
   }
 
-  showButtonAddNodes() {
-    this.alertButton.show()
-  }
-
   deleteNode(name, deleteRefs = true) {
     for (let [k, v] of Object.entries(this.elements)) {
       if (k != name) {
@@ -1086,6 +1080,8 @@ class LeafleatMap {
       }
     }
   }
+
+
 
   addEdge(from, to) {
     if (this.elements[from].marker != null && this.elements[to].marker != null) {
@@ -1148,6 +1144,10 @@ class LeafleatMap {
     }
   }
 
+
+  /**
+   * Get position of marker or center of polygon/line
+   */
   getCoordinates(name) {
     if (this.elements[name].geometry_type == "polygon" || this.elements[name].geometry_type == "line") {
       // different implementations for polygons can be found here
@@ -1158,6 +1158,10 @@ class LeafleatMap {
     }
   }
 
+
+  /**
+   * Remove edge
+   */
   deleteEdge(from, to) {
     if (this.elements[from].successors[to].arrow != null) {
       this.map.removeLayer(this.elements[from].successors[to].arrow)
@@ -1168,8 +1172,12 @@ class LeafleatMap {
     delete this.elements[from].successors[to]
   }
 
+
+  /**
+   * sets position of an element
+   */
   updatePosition(name, pos) {
-    // checck if already on Map
+    // check if already on Map
     if (this.elements[name].marker != null) {
       if (this.elements[name].geometry_type == "polygon" || this.elements[name].geometry_type == "line") {
         this.elements[name].marker.remove()
@@ -1220,10 +1228,9 @@ class LeafleatMap {
     }
   }
 
-  showCoordinates(e) {
-    modal("Coordinates", "Latitude: " + e.latlng.lat + "</br>Longitude: " + e.latlng.lng)
-  }
-
+  /**
+   * Center Map to view all elements
+   */
   centerMap(e) {
     let markers = []
     for (let [k, v] of Object.entries(this.elements)) {
@@ -1236,15 +1243,10 @@ class LeafleatMap {
     }
   }
 
-  zoomIn(e) {
-    this.map.zoomIn()
-  }
-
-  zoomOut(e) {
-    this.map.zoomOut()
-  }
-
-  openSettingsModal(e) {
+  /**
+   * Calls Modal to set boolean showPredAndSuccOnMap
+   */
+  openSettingsModal() {
     const heading = "Map Settings"
     const form = $("<form class='mapSettingsForm'></form>")
 
@@ -1267,7 +1269,7 @@ class LeafleatMap {
       } else {
         globals.showPredAndSuccOnMap = false
       }
-      this.updateGlobals()
+      this.updateStyle()
 
       hideModal()
     })
@@ -1275,7 +1277,12 @@ class LeafleatMap {
     modal(heading, form)
   }
 
-  updateGlobals() {
+
+  /**
+   * depending on current globals.showPredAndSuccOnMap boolean
+   * predecessors and successors gets hided
+   */
+  updateStyle() {
     if(globals.showPredAndSuccOnMap)
       $(".successorsLine").css("display", "block")
     else
