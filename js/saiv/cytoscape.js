@@ -186,10 +186,7 @@ class CyptoScape {
               this.cy.$('#shadowEdge').remove()
               this.updateBind()
 
-              sendEvent("sidebar", {
-                task: "showId",
-                data: evtToTarget.data().id
-              })
+              sidebarShowId(evtToTarget.data().id)
             })
           }
         },
@@ -208,6 +205,8 @@ class CyptoScape {
                 to: event.cyTarget.target().id()
               }
             })
+            closeSitebar()
+
             //datam.deleteEdge(, )
             //event.cyTarget.remove()
           }
@@ -260,10 +259,7 @@ class CyptoScape {
     })
 
     this.cy.on("click", "node", {}, evt => {
-      sendEvent("sidebar", {
-        task: "showId",
-        data: evt.cyTarget.id()
-      })
+      sidebarShowId(evt.cyTarget.id())
     })
   }
 

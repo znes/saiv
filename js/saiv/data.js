@@ -9,7 +9,7 @@ class DataManager {
     }
 
     document.addEventListener("data", (e) => {
-      this.updateData(e.detail);
+      this.updateData(e.detail)
     })
   }
 
@@ -19,7 +19,6 @@ class DataManager {
   get json() {
     return this._json
   }
-
 
 
   /**
@@ -61,7 +60,7 @@ class DataManager {
     this._json.children.forEach((child) => {
 			// Node Type unknown
 			if (typeof configNode.nodesAvailable[child.type] == "undefined") {
-        console.log(child.name + " has been removed because type is unknown.")
+        console.log(child.name + " has been removed. Type is unknown.")
 				removeItems.push(child)
 			}
 			else {
@@ -111,6 +110,10 @@ class DataManager {
       }
     })
 
+    sendEvent("dataChanged", {
+      task: "initElements",
+      data: this._json
+    })
   }
 
   updateData(detail) {
@@ -145,6 +148,16 @@ class DataManager {
       case "updateNodesEnabled":
         this.updateNodesEnabled(detail.data)
         break
+      case "addSequence":
+        this.addSequence(detail.data.name, detail.data.data)
+        break
+      case "deleteSequence":
+        this.deleteSequence(detail.data.name, detail.data.data)
+        break
+        break
+      case "deleteSequences":
+        this.deleteSequence(detail.data)
+        break
       default:
         console.log("default case updateData")
         break
@@ -177,6 +190,31 @@ class DataManager {
     }
   }
 
+  addSequence(name, data) {
+    let index = this._json.children.findIndex(x => x.name == name)
+    if (index !== -1) {
+      if(typeof this._json.children[index].sequences.time != "undefined") {
+        delete data.time
+      }
+      $.extend(this._json.children[index].sequences, data)
+    }
+  }
+
+  deleteSequence(name, sequence = null) {
+    console.log("deleteSequence", name, sequence)
+    let index = this._json.children.findIndex(x => x.name == name)
+    if (index !== -1) {
+      // delete selected
+      if(sequence) {
+        delete this._json.children[index].sequences[sequence]
+      }
+      // delete all
+      else {
+        this._json.children[index].sequences = {}
+      }
+    }
+  }
+
   addNode(data) {
     let formdata = {
       name: data.name,
@@ -195,13 +233,12 @@ class DataManager {
     }
 
 
-    if (typeof data.pos != "undefined") {
+    if (data.pos) {
       formdata.pos = data.pos
     }
 
-
-    for (var i = 0; i < configNode.nodesAvailable[data.type].tags.length; i++) {
-      formdata.tags[configNode.nodesAvailable[data.type].tags[i].name] = ""
+    for (let i = 0; i < configNode.nodesAvailable[data.type].tags.length; i++) {
+      formdata.tags[configNode.nodesAvailable[data.type].tags[i]] = ""
     }
 
     this._json.children.push(formdata)
@@ -217,10 +254,7 @@ class DataManager {
       }
     })
 
-    sendEvent("sidebar", {
-      task: "showId",
-      data: data.name
-    })
+    sidebarShowId(formdata.name)
   }
 
 
@@ -303,8 +337,6 @@ class DataManager {
         return
       }
     }
-
-
 
     if(configNode.nodesEnabled.indexOf(updateData.type) == -1) {
       nodeEnabled = false
@@ -436,7 +468,6 @@ class DataManager {
         }
       }
     })
-
 
     if(nodeEnabled)
       this._json.children.push(updateData)

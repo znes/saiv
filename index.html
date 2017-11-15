@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<title>Saiv</title>
 	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/loader.css">
 	<link rel="stylesheet" href="css/leaflet.css">
 	<link rel="stylesheet" href="css/select2.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -63,6 +64,9 @@
 		</div>
 	</div>
 
+
+	<div class="sequenceContainer"></div>
+
 	<div class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -84,21 +88,28 @@
 	</div>
 
 
+	<div class="loaderDiv"><div class="loader"></div></div>
+
+
 	<!-- LIBS -->
 	<script src="js/lib/jquery-3.1.1.min.js"></script>
 	<script src="js/lib/cytoscape.custom.min.js"></script>
 	<script src="js/lib/select2.min.js"></script>
 	<script src="js/lib/cytoscape-cose-bilkent.js"></script>
 	<script src="js/lib/cytoscape-context-menus.js"></script>
+	<script src="js/lib/plotly-latest.min.js"></script>
 	<script src="js/lib/bootstrap.min.js"></script>
 	<script src="js/lib/leaflet.js"></script>
 	<script src="js/lib/leaflet.polylineDecorator.js"></script>
 	<script src="js/lib/leaflet.contextmenu.js"></script>
 	<script src="js/lib/wicket.js"></script>
 	<script src="js/lib/wicket-leaflet.js"></script>
+	<!--<script src="js/lib/jsoneditor.min.js"></script>
+	<script src="js/lib/bootstrap3.js"></script>
 
 
-	<!-- Custom Files -->
+	 Custom Files
+	<script src="js/saiv/shema/child.js"></script> -->
 	<script src="js/configNode.js"></script>
 	<script src="js/saiv/config.js"></script>
 	<script src="js/saiv/globals.js"></script>
@@ -106,6 +117,7 @@
 	<script src="js/saiv/data.js"></script>
 	<script src="js/saiv/cytoscape.js"></script>
 	<script src="js/saiv/sidebar.js"></script>
+	<script src="js/saiv/sequences.js"></script>
 	<script src="js/saiv/modal.js"></script>
 	<script src="js/saiv/pages/scenario.js"></script>
 	<script src="js/saiv/pages/selectJson.js"></script>

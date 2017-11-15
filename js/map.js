@@ -161,20 +161,14 @@ class LeafleatMap {
 
   initElements(json) {
     this.removeExistingElements()
-
     this.addNodes(json.children)
-
     this.centerMap()
   }
 
   extendSidebar() {
-    document.addEventListener("sidebar", (e) => {
-      switch (e.detail.task) {
-        case "openUpdateForm":
-          this.addPositionToSidebar(e.detail.data)
-          break
-      }
-    })
+    Sidebar.onOpenShowId((e)=>{
+      this.addPositionToSidebar(e.detail.data)
+    })()
   }
 
   addPositionToSidebar(name) {
@@ -353,11 +347,14 @@ class LeafleatMap {
           text: 'Delete',
           index: 3,
           callback: e => {
-            if (discardChanges())
+            if (discardChanges()) {
               sendEvent("data", {
                 task: "deleteNode",
                 data: name
               })
+
+              closeSitebar()
+            }
           }
         }, {
           separator: true,
@@ -369,10 +366,7 @@ class LeafleatMap {
     obj.addTo(this.map)
       //.bindPopup(name)
       .on("click", () => {
-        sendEvent("sidebar", {
-          task: "showId",
-          data: name
-        })
+        sidebarShowId(name)
         return false
       })
 
@@ -558,11 +552,8 @@ class LeafleatMap {
               task: "updatePosition",
               data: readForm(".createPolyForm")
             })
-            sendEvent("sidebar", {
-              task: "showId",
-              data: name
-            })
 
+            sidebarShowId(name)
             that.checkCountNoPosElements()
           } else {
             var fromData = readForm(".createPolyForm")
@@ -653,10 +644,7 @@ class LeafleatMap {
               task: "updatePosition",
               data: readForm(".createPolyForm")
             })
-            sendEvent("sidebar", {
-              task: "showId",
-              data: name
-            })
+            sidebarShowId(name)
 
             that.checkCountNoPosElements()
           } else {
@@ -743,10 +731,7 @@ class LeafleatMap {
               task: "updatePosition",
               data: data
             })
-            sendEvent("sidebar", {
-              task: "showId",
-              data: name
-            })
+            sidebarShowId(name)
           }
         })
 
@@ -779,10 +764,7 @@ class LeafleatMap {
           .off("mouseover")
           .off("mouseout")
           .on("click", () => {
-            sendEvent("sidebar", {
-              task: "showId",
-              data: property
-            })
+            sidebarShowId(property)
           })
       }
     }
@@ -860,10 +842,7 @@ class LeafleatMap {
                 }
               })
 
-              sendEvent("sidebar", {
-                task: "showId",
-                data: property
-              })
+              sidebarShowId(property)
             })
         }
       }

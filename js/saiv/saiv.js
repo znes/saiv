@@ -1,6 +1,8 @@
+var store = null;
+
 class saiv {
   constructor() {
-    this.dataManager = new DataManager()
+    store = new DataManager()
     this.sb = new Sidebar(config.dom.sidebar)
     this.cy = new CyptoScape(config.dom.canvasContainer)
     this.plugins = []
@@ -19,24 +21,8 @@ class saiv {
     /**
      * init menu listener
      */
-    $(config.dom.links.json).click(() => {
-      if (discardChanges()) {
-        openJsonSelection()
-      }
-    })
-
-    $(config.dom.links.home).click(() => {
-      if (discardChanges()) {
-        home()
-      }
-    })
-
-    $(config.dom.links.style).click(() => {
-      selectStyle()
-    })
-
     $(config.dom.links.scenario).click(() => {
-      scenario(this.dataManager.getScenario())
+      scenarioEdit(store.getScenario())
     })
 
     $(config.dom.links.nodeSettings).click(() => {
@@ -66,16 +52,6 @@ class saiv {
       switch (e.detail.task) {
         case "showId":
           this.showId(e.detail.data)
-          sendEvent("sidebar", {
-            task: "openUpdateForm",
-            data: e.detail.data
-          })
-          sendEvent(
-            "dataChanged", {
-              task: "focusNode",
-              data: e.detail.data
-            }
-          )
           break
         case "addNode":
           this.sb.addNode(e.detail.data.pos)
@@ -88,13 +64,8 @@ class saiv {
 
     // Init Event Reciver
     document.addEventListener("dataReceived", (e) => {
+      store.json = e.detail
       this.initListenerDataRevieved()
-      this.dataManager.json = e.detail
-
-      sendEvent("dataChanged", {
-        task: "initElements",
-        data: this.dataManager.json
-      })
     })
   }
 
@@ -102,9 +73,9 @@ class saiv {
    * Opens Sidebar Form
    */
   showId(id) {
-    let data = this.dataManager.getElement(id)
+    let data = store.getElement(id)
 
-    this.sb.updateNodeForm(data, this.dataManager.getAllElements())
+    this.sb.updateNodeForm(data, store.getAllElements())
   }
 
 
@@ -140,8 +111,8 @@ class saiv {
       .off("click")
       .on("click", () => {
         let bool = confirm("Attach Explorer Positions to json?")
-        let data = this.dataManager.json
-        data.children = this.dataManager.getAllElements()
+        let data = store.json
+        data.children = store.getAllElements()
         let urlString = "text/json;charset=utf-8,"
 
         if (bool) {

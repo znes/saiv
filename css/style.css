@@ -246,3 +246,21 @@ a:hover {
 .sidebar .input-group {
   width: 100%;
 }
+.sidebar-closed .sequenceContainer {
+  display: none!important;
+}
+.sequenceContainer {
+  display: none;
+  position: absolute;
+  right: 25em;
+  top:  50px;
+  z-index: 1000;
+
+  width: 40em;
+  padding: 2em;
+
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+
+  overflow: auto;
+}

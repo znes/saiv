@@ -1,4 +1,4 @@
-function scenario(data = null) {
+function scenarioEdit(data = null) {
   let form = $("<form class='scenarioForm'></form>")
 	let heading = ""
 

@@ -1,3 +1,12 @@
+$(document).ready(function() {
+  $(config.dom.links.json).click(() => {
+    if (discardChanges()) {
+      openJsonSelection()
+    }
+  })
+});
+
+
 function openJsonSelection() {
   let content = $("<div></div>")
   content.append("<p>Select File</p>")
@@ -5,29 +14,30 @@ function openJsonSelection() {
     .append("<button id='useDefault' class='btn btn-primary'>Use default</button>")
     .append("<button class='createScenario btn btn-success pull-right'>Create new scenario</button>")
 
-  modal("Select File", content )
+  modal("Select File", content)
 
 
   $("#selectFile").on('change', event => {
+    $('.loaderDiv').show()
     let input = event.target
     sendFile(input.files[0])
   })
 
   $("#useDefault").on('click', () => {
-      $.getJSON("minimal-example.json", jsonData => {
+    $.getJSON("minimal-example.json", jsonData => {
+
         sendEvent("dataReceived", jsonData)
         hideModal()
       })
-        .fail(function(er) {
-          modal("Error", "Cross orgin error. Choose json file above or drop it.")
-        })
+      .fail(function(er) {
+        modal("Error", "Cross orgin error. Choose json file above or drop it.")
+      })
   })
 
   $(".createScenario").on('click', () => {
-    scenario()
+    scenarioEdit()
   })
 }
-
 
 
 function sendFile(file) {
@@ -36,10 +46,12 @@ function sendFile(file) {
   reader.onload = function() {
     let dataURL = reader.result
     try {
+      $('.loaderDiv').hide()
       let json = JSON.parse(dataURL)
       sendEvent("dataReceived", json)
       hideModal()
-    } catch(e) {
+    } catch (e) {
+      $('.loaderDiv').hide()
       modal("Error", "File not supported")
     }
   };

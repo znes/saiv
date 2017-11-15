@@ -61,7 +61,7 @@ class Sidebar {
 
 
     form.append(this.createTags(data.tags, data.type))
-    form.append(this.createSequences(data.sequence))
+    form.append(this.createSequences(data.sequences))
 
 
     form.append(createSelect("predecessors", data.predecessors, nodes.filter(node => {
@@ -87,13 +87,25 @@ class Sidebar {
           })
         }
 
-        sendEvent("sidebar", {
-          task: "showId",
-          data: data.name
-        })
+
+        sidebarShowId(data.name)
       })
     })
 
+
+    // Sequence Click Listener
+    form.find(".addSequence").on("click", () => {
+      createSequence(data.name, data.sequences)
+    })
+    form.find(".removeSequence").on("click", (e) => {
+      deleteSequence(data.name)
+    })
+    form.find(".removeSequenceId").on("click", (e) => {
+      deleteSequence(data.name, e.target.dataset.item)
+    })
+    form.find(".showSequence").on("click", (e) => {
+      showSequence(data.name, data.sequences)
+    })
 
     // listen to changes of type
     // geometry type according to it
@@ -119,10 +131,7 @@ class Sidebar {
         }
       })
 
-      sendEvent("sidebar", {
-        task: "showId",
-        data: data.name
-      })
+      sidebarShowId(data.name)
     })
 
     form.append('<button class="btn btn-success">Save</button>')
@@ -145,79 +154,88 @@ class Sidebar {
     })
 
     this.body.append(form)
+
+
+    sendEvent(
+      "dataChanged", {
+        task: "focusNode",
+        data: data.name
+      }
+    )
+    sendEvent("sidebar", {
+      task: "openUpdateForm",
+      data: data.name
+    })
   }
 
-  createSequences(currentSequences = []) {
-    let div = $('<div class="formTags form-group panel-group"  id="accordion" role="tablist"></div>')
-    let heading = $('<div class="panel panel-default"><div class="panel-heading" role="tab" id="tagsPanel"></div></div>')
-    let tagTitle = $('<h4 class="panel-title"></h4>')
-    tagTitle.append('<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Sequences</a>')
-    heading.find("#tagsPanel").append(tagTitle)
-    div.append(heading)
+  createSequences(currentSequences = {}) {
+    let objKeys = Object.keys(currentSequences)
 
+    let body = '<a href="#" class="addSequence">Add Sequence</a><br>'
+    if (objKeys.length >= 2 && currentSequences.time) {
+      body += `<a href="#" class="showSequence">Show</a><br>`
+    }
+    if (objKeys.length > 0) {
+      body += '<a href="#" class="removeSequence">Remove All</a><br>'
+    }
 
-    /**currentSequences.forEach(seq=> {
-      this.createSequencesPlot(seq)
-    })*/
-
-
-    return div
+    objKeys.forEach(key => {
+      body += `${key}<a class="removeSequenceId pull-right" data-item="${key}">x</a><br>`
+    })
+    return createCollapseEle("sequence", "sequenceBody", "Sequences", body)
   }
 
   createTags(tags, type) {
-    let div = $('<div class="formTags form-group panel-group"  id="accordion" role="tablist"></div>')
-
-    let heading = $('<div class="panel panel-default"><div class="panel-heading" role="tab" id="tagsPanel"></div></div>')
-    let tagTitle = $('<h4 class="panel-title"></h4>')
-    tagTitle.append('<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Tags</a>')
+    let heading = "Tags"
+    let body = ""
 
     if (configNode.allowCustomTags)
-      tagTitle.append('<small><a href="#" class="addTag">Add Tag</a></small>')
-
-    heading.find("#tagsPanel").append(tagTitle)
-    div.append(heading)
-
-    let tabBody = $('<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-expanded="false" aria-labelledby="tagsPanel"><div class="panel-body"></div></div>')
+      heading += '<small><a href="#" class="addTag">Add Tag</a></small>'
 
     //if (!configNode.allowCustomTags) {
     configNode.nodesAvailable[type].tags.forEach(tag => {
-      let input = $("<div class=\"input-group\"></div>")
+      body += '<label for="tags_' + tag + '">' + tag + '</label>'
+      body += '<div class=\"input-group\"></div>'
       if (typeof tags[tag] != "undefined") {
-        input.append('<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>')
+        body += '<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>'
       } else {
-        input.append('<input class="form-control" type="text" name="tags_' + tag + '" value=""></input>')
+        body += '<input class="form-control" type="text" name="tags_' + tag + '" value=""></input>'
       }
 
       if (configNode.allowCustomTags) {
-        input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
+        body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>'
       }
-
-      tabBody.find(".panel-body").append('<label for="tags_' + tag + '">' + tag + '</label>')
-        .append(input)
     })
-
 
     // if didnt added above and custom tags are allowed
     for (let [key, value] of Object.entries(tags)) {
       if (configNode.nodesAvailable[type].tags.findIndex(x => x.name == key) == -1) {
-        let input = $("<div class=\"input-group\"></div>")
+        body += '<div class=\"input-group\"></div>'
         if (configNode.allowCustomTags) {
-          input.append('<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>')
-          input.append('<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>')
-          tabBody.find(".panel-body").append('<label for="tags_' + key + '">' + key + '</label>')
+          body += '<label for="tags_' + key + '">' + key + '</label>'
+          body += '<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>'
+          body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>'
         } else {
-          input = $('<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>')
+          body += '<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>'
         }
-
-        tabBody.find(".panel-body").append(input)
       }
     }
 
-
-    div.append(tabBody)
-    return div
+    return createCollapseEle("tagsAccordion", "tagsAccordionBody", heading, body)
   }
 
+
+  static onOpenShowId(fn) {
+    return () => {
+      document.addEventListener("sidebar", (e) => {
+        switch (e.detail.task) {
+          case "openUpdateForm":
+            fn(e)
+            break
+        }
+      })
+    }
+  }
 
   addNode(pos) {
     this.open()
@@ -297,6 +315,7 @@ function closeSitebar() {
   // if open call is called 100ms before it will not be called
   if (globals.callSitebarTimestamp + 100 < Date.now()) {
     $("body").addClass("sidebar-closed")
+    $(".sequenceContainer").hide()
     sendEvent(
       "dataChanged", {
         task: "focusNode",
