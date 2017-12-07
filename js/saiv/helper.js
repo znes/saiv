@@ -179,17 +179,7 @@
 
 	  return result;
 	}
-
-	function convertToPlotly(data, xIndex = 0, yIndex = 1) {
-	  let plotly = {
-	    x: getArrayRowEntrys(data,xIndex),
-	    y: getArrayRowEntrys(data,yIndex),
-	    type: "bar"
-	  }
-
-	  return [plotly]
-	}
-
+	
 	function sidebarShowId(id) {
 		sendEvent("sidebar", {
 			task: "showId",
