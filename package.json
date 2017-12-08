@@ -1,0 +1,22 @@
+{
+  "name": "saiv",
+  "version": "1.0.0",
+  "description": "Stand alone interactive visualization\r Demo:\r https://znes.github.io/saiv/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/energiekollektiv/saiv.git"
+  },
+  "author": "",
+  "scripts": {
+    "watch": "babel src/saiv.js -w --out-file www/bundle.js",
+    "build": "minify src/saiv.js --out-file www/bundle.js"
+  },
+  "bugs": {
+    "url": "https://github.com/energiekollektiv/saiv/issues"
+  },
+  "homepage": "https://github.com/energiekollektiv/saiv#readme",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-minify": "^0.2.0"
+  }
+}
