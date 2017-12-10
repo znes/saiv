@@ -213,10 +213,10 @@ class CytoScape {
 			closeSitebar()
 		})
 
-		this.cy.on("click", "node", {}, evt => {
+		this.cy.on("click", "node", evt => {
 			sidebar.updateNodeForm(evt.cyTarget.id())
 		})
-		this.cy.on("dragend", "node", {}, evt => {
+		this.cy.on("dragend", "node", evt => {
 			console.log(evt.cyTarget)
 		})
 	}
