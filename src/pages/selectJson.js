@@ -8,7 +8,6 @@ export function openJsonSelection() {
   let content = $("<div></div>")
   content.append("<p>Select File</p>")
     .append("<p><label class='btn btn-default'>Browse <input type='file' id='selectFile' hidden></label></p>")
-    .append("<button id='useDefault' class='btn btn-primary'>Use default</button>")
     .append("<button class='createScenario btn btn-success pull-right'>Create new scenario</button>")
 
   modal("Select File", content)
@@ -18,17 +17,6 @@ export function openJsonSelection() {
     $('.loaderDiv').show()
     let input = event.target
     sendFile(input.files[0])
-  })
-
-  $("#useDefault").on('click', () => {
-    $.getJSON("minimal-example.json", jsonData => {
-
-        sendEvent("dataReceived", jsonData)
-        hideModal()
-      })
-      .fail(function(er) {
-        modal("Error", "Cross orgin error. Choose json file above or drop it.")
-      })
   })
 
   $(".createScenario").on('click', () => {

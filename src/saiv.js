@@ -5,6 +5,7 @@ import { store } from './store.js';
 import { home } from './pages/home.js';
 import { scenarioEdit } from './pages/scenario.js';
 import { nodeSettings } from './pages/nodeSettings.js';
+import { selectStyle } from './pages/selectStyle.js';
 import { openJsonSelection, initDropEvents } from './pages/selectJson.js';
 import { config } from './globals.js';
 import { discardChanges, setActiveMenuItem } from './helper.js'
@@ -33,6 +34,10 @@ $(config.dom.links.nodeSettings).click(() => {
 	nodeSettings()
 })
 
+$(config.dom.links.style).click(() => {
+	selectStyle()
+})
+
 
 /**document.addEventListener("discardChanges", (e) => {
   if ($(".navbar li.active").length == 1) {
@@ -48,21 +53,6 @@ $(config.dom.links.nodeSettings).click(() => {
       }
     }
   }
-})*/
-
-/*
-document.addEventListener("sidebar", (e) => {
-	switch (e.detail.task) {
-		case "showId":
-			sidebar.showId(e.detail.data)
-			break
-		case "addNode":
-			sidebar.addNode(e.detail.data.pos)
-			break
-		case "show":
-			sidebar.show(e.detail.data.head, e.detail.data.body)
-			break;
-	}
 })*/
 
 // Init Event Reciver

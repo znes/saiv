@@ -1,11 +1,12 @@
 import {modal, hideModal} from '../modal.js'
 import {createSelect, sendEvent, readForm} from '../helper.js'
+import {globals, config} from '../globals.js'
 import 'select2';
 import 'select2/dist/css/select2.css';
 
 
 
-function selectStyle() {
+export function selectStyle() {
   let currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.defaultStyle
   let currentAutoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
   let form = $('<form class="editStyle selectStyle"></form>')

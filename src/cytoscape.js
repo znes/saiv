@@ -3,6 +3,12 @@ import { store } from './store.js'
 import { sidebar, closeSitebar } from './sidebar.js'
 import { discardChanges } from './helper.js'
 import { modal } from './modal.js'
+import cytoscape from './libCustom/cytoscape.js'
+import cxtMenu from 'cytoscape-context-menus';
+import 'cytoscape-context-menus/cytoscape-context-menus.css'
+
+cytoscape.use( cxtMenu, $ );
+
 
 class CytoScape {
 	constructor() {
@@ -13,11 +19,10 @@ class CytoScape {
 			},
 			style: config.cytoscape.styleConfig
 		})
+		this.autoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
 
 		this.initMarkers()
 		this.initEvents()
-		//this.registerEvents()
-		this.autoLayout = localStorage.getItem("autoLayout") ? localStorage.getItem("autoLayout") : globals.autoLayout
 	}
 
 	show() {
@@ -25,6 +30,8 @@ class CytoScape {
 	}
 
 	initMarkers() {
+
+
 		Object.keys(config.nodes.nodesAvailable).forEach(type => {
 			this.cy.style()
 				.selector('node[type="' + type + '"]')
@@ -84,13 +91,14 @@ class CytoScape {
 		this.cy.contextMenus({
 			menuItems: [{
 					id: 'remove',
-					title: 'Remove',
+					content: 'Remove',
 					selector: 'node',
 					onClickFunction: (event) => {
+						let evtTarget = event.target || event.cyTarget
 						if (!discardChanges())
 							return
 
-						store.deleteNode(event.cyTarget.id())
+						store.deleteNode(evtTarget.id())
 							.then(name => {
 								this.deleteNode(name)
 							})
@@ -98,7 +106,7 @@ class CytoScape {
 				},
 				{
 					id: 'add-successors',
-					title: 'Connect successors',
+					content: 'Connect successors',
 					selector: 'node',
 					onClickFunction: (event) => {
 						let evtFromTarget = event.target || event.cyTarget
@@ -120,14 +128,14 @@ class CytoScape {
 						}])
 
 
-						this.cy.on("mouseover", "node", {}, (_event) => {
+						this.cy.on("mouseover", "node", (_event) => {
 							let evtToTarget = _event.target || _event.cyTarget
 							this.cy.$('#shadowEdge').move({
 								target: evtToTarget.data().id
 							})
 						})
 
-						this.cy.on("click", "node", {}, (_event) => {
+						this.cy.on("click", "node", (_event) => {
 							let evtToTarget = _event.target || _event.cyTarget
 							store.addEdge(evtFromTarget.data().id, evtToTarget.data().id)
 								.then(obj => {
@@ -146,7 +154,7 @@ class CytoScape {
 				},
 				{
 					id: 'remove',
-					title: 'Remove',
+					content: 'Remove',
 					selector: 'edge',
 					onClickFunction: (event) => {
 						if (!discardChanges())
@@ -161,7 +169,7 @@ class CytoScape {
 				},
 				{
 					id: 'add-node',
-					title: 'Add node',
+					content: 'Add node',
 					coreAsWell: true,
 					onClickFunction: async (event) => {
 						if (!discardChanges())
@@ -177,7 +185,7 @@ class CytoScape {
 				},
 				{
 					id: 'center-map',
-					title: 'Center Map',
+					content: 'Center Map',
 					coreAsWell: true,
 					onClickFunction: (event) => {
 						this.cy.reset()
@@ -186,7 +194,7 @@ class CytoScape {
 				},
 				{
 					id: 'relayout-elements',
-					title: 'Relayout Elements',
+					content: 'Relayout Elements',
 					coreAsWell: true,
 					onClickFunction: (event) => {
 						this.updateLayout()

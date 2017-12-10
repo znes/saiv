@@ -252,17 +252,21 @@ class Store {
 	}
 
 	deleteEdge(src, target) {
-		let srcI = this._json.children.findIndex(x => x.name == src),
-			targetI = this._json.children.findIndex(x => x.name == target);
+		return new Promise((resolve, reject) => {
+			let srcI = this._json.children.findIndex(x => x.name == src),
+				targetI = this._json.children.findIndex(x => x.name == target);
 
-		if (srcI !== -1 && targetI !== -1) {
-			this._json.children[srcI].successors = this._json.children[srcI].successors.filter(succ => {
-				return succ != target
-			})
-			this._json.children[targetI].predecessors = this._json.children[targetI].predecessors.filter(pred => {
-				return pred != src
-			})
-		}
+			if (srcI !== -1 && targetI !== -1) {
+				this._json.children[srcI].successors = this._json.children[srcI].successors.filter(succ => {
+					return succ != target
+				})
+				this._json.children[targetI].predecessors = this._json.children[targetI].predecessors.filter(pred => {
+					return pred != src
+				})
+
+				resolve()
+			}
+		})
 	}
 
 	deleteNode(name) {
