@@ -1,8 +1,9 @@
-$(document).ready(function() {
-  $(config.dom.links.style).click(() => {
-    selectStyle()
-  })
-})
+import {modal, hideModal} from '../modal.js'
+import {createSelect, sendEvent, readForm} from '../helper.js'
+import 'select2';
+import 'select2/dist/css/select2.css';
+
+
 
 function selectStyle() {
   let currentStyle = localStorage.getItem("style") ? localStorage.getItem("style") : config.cytoscape.defaultStyle

@@ -1,10 +1,19 @@
-function nodeSettings() {
+import {modal, hideModal} from '../modal.js'
+import {sendEvent, createSelect} from '../helper.js'
+import {config} from '../globals.js'
+
+import $ from 'jquery';
+import 'select2';
+import 'select2/dist/css/select2.css';
+
+
+export function nodeSettings() {
   const form = $("<form class='nodeSettingsForm'></form>")
   const heading = "Node Settings"
 
-  form.append(createSelect("Nodes enabled", configNode.nodesEnabled, Object.keys(configNode.nodesAvailable), "multiple=\"multiple\""))
+  form.append(createSelect("Nodes enabled", config.nodes.nodesEnabled, Object.keys(config.nodes.nodesAvailable), "multiple=\"multiple\""))
 
-  if (configNode.allowCustomTags == true) {
+  if (config.nodes.allowCustomTags == true) {
     form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input checked class="" type="checkbox" name="allowCustomTags"></div>')
   } else {
     form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input class="" type="checkbox" name="allowCustomTags"></div>')
@@ -19,13 +28,13 @@ function nodeSettings() {
 
 
     if (typeof formData.allowCustomTags != "undefined") {
-      configNode.allowCustomTags = true
+      config.nodes.allowCustomTags = true
     } else {
-      configNode.allowCustomTags = false
+      config.nodes.allowCustomTags = false
     }
 
     // Update Nodes Enabled
-    if (configNode.nodesEnabled.toString() !== formData["Nodes enabled"].toString()) {
+    if (config.nodes.nodesEnabled.toString() !== formData["Nodes enabled"].toString()) {
       sendEvent("data", {
         task: "updateNodesEnabled",
         data: formData["Nodes enabled"]

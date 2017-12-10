@@ -11,14 +11,14 @@ Clone repository and run
   npm install
   ```
 
-After that you can rewrite code and rebuild bundle.js
+After that you can rewrite code in src dir and rebuild bundle.js
   ```
-  npm run build
+  webpack
   ```
 
 During development you should use
   ```
-  npm run watch
+  webpack -w
   ```
 
 This way node will watch for file changes in src dir and recompile bundle.js accordingly

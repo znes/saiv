@@ -1,4 +1,7 @@
-function modal(head = "", content = "", abortFunction = function() {}) {
+import {config} from './globals.js';
+
+
+export function modal(head = "", content = "", abortFunction = function() {}) {
   // Get the modal
   const modal = $(config.dom.modal.container)
   const backdrop = $(config.dom.modal.backdrop)
@@ -35,7 +38,7 @@ function modal(head = "", content = "", abortFunction = function() {}) {
   }, 100)
 }
 
-function hideModal() {
+export function hideModal() {
   $(config.dom.modal.backdrop).removeClass("in")
   $(config.dom.modal.container).removeClass("in")
 }

@@ -1,13 +1,10 @@
-$(document).ready(function() {
-  $(config.dom.links.json).click(() => {
-    if (discardChanges()) {
-      openJsonSelection()
-    }
-  })
-});
+import {modal, hideModal} from '../modal.js'
+import {sendEvent} from '../helper.js'
+import {scenarioEdit} from './scenario.js'
 
 
-function openJsonSelection() {
+
+export function openJsonSelection() {
   let content = $("<div></div>")
   content.append("<p>Select File</p>")
     .append("<p><label class='btn btn-default'>Browse <input type='file' id='selectFile' hidden></label></p>")
@@ -53,6 +50,7 @@ function sendFile(file) {
     } catch (e) {
       $('.loaderDiv').hide()
       modal("Error", "File not supported")
+      console.log("Error", e)
     }
   };
 
@@ -60,7 +58,7 @@ function sendFile(file) {
 }
 
 
-function initDropEvents() {
+export function initDropEvents() {
   document.addEventListener('dragover', e => {
     e.preventDefault()
   });
