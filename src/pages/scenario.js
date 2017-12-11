@@ -2,13 +2,13 @@ import { modal, hideModal } from '../modal.js'
 import { createInput, sendEvent, readForm } from '../helper.js'
 import { store } from '../store.js';
 
-export function scenarioEdit() {
-	const data = store.getScenario()
+export function scenarioEdit(create = false) {
 	let form = $("<form class='scenarioForm'></form>")
 	let heading = ""
 
 	// EditForm
-	if (data != null) {
+	if (!create) {
+		const data = store.getScenario()
 		heading = "Edit Scenario"
 		form.append(createInput("currentId", "currentId", data.name, "hidden", true))
 			.append(createInput("Name", "name", data.name, "text", true))

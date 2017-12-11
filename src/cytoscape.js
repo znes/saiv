@@ -7,7 +7,7 @@ import cytoscape from './libCustom/cytoscape.js'
 import cxtMenu from 'cytoscape-context-menus';
 import 'cytoscape-context-menus/cytoscape-context-menus.css'
 
-cytoscape.use( cxtMenu, $ );
+cytoscape.use(cxtMenu, $);
 
 
 class CytoScape {
@@ -140,6 +140,7 @@ class CytoScape {
 							store.addEdge(evtFromTarget.data().id, evtToTarget.data().id)
 								.then(obj => {
 									this.addEdge(obj.from, obj.to)
+									this.$('#' + obj.to).emit("click")
 								}).catch((err) => {
 									modal("Error", err)
 								});
@@ -147,8 +148,6 @@ class CytoScape {
 							globals.unsavedChanges = false
 							this.cy.$('#shadowEdge').remove()
 							this.updateBind()
-
-							sidebar.updateNodeForm(evtToTarget.data().id)
 						})
 					}
 				},
@@ -161,7 +160,7 @@ class CytoScape {
 							return
 
 						store.deleteEdge(event.cyTarget.source().id(), event.cyTarget.target().id())
-							.then(()=>{
+							.then(() => {
 								this.deleteEdge(event.cyTarget.source().id(), event.cyTarget.target().id())
 							})
 						closeSitebar()
@@ -177,9 +176,13 @@ class CytoScape {
 
 						let pos = event.position || event.cyPosition
 						const addNodeData = await sidebar.addNode(pos)
+						sidebar.close()
 						store.addNode(addNodeData)
 							.then(obj => {
 								this.addNode(obj.name, obj.type, obj.pos)
+							})
+							.catch(e => {
+								modal("Error", e)
 							})
 					}
 				},
@@ -213,11 +216,21 @@ class CytoScape {
 			closeSitebar()
 		})
 
-		this.cy.on("click", "node", evt => {
-			sidebar.updateNodeForm(evt.cyTarget.id())
+		this.cy.on("click", "node", async (evt) => {
+			let evtTarget = evt.target || evt.cyTarget
+			try {
+				const nodeData = await sidebar.updateNodeForm(evtTarget.id())
+				let updateData = await store.updateNode(nodeData)
+				this.updateNode(evtTarget.id(), updateData)
+			} catch (e) {
+				console.log(e)
+			}
 		})
-		this.cy.on("dragend", "node", evt => {
-			console.log(evt.cyTarget)
+
+		this.cy.on("position", "node", evt => {
+			const evtTarget = evt.target || evt.cyTarget
+			const pos = event.position || event.cyPosition
+			store.updatePosition(evtTarget.id(), evtTarget.position())
 		})
 	}
 
@@ -233,9 +246,46 @@ class CytoScape {
 		this.updateBind()
 	}
 
+	updateNodesEnabled(removeEles, addEles) {
+		removeEles.forEach(child => {
+			this.cy.$('#' + child.name).remove()
+		})
 
-	/*
-	changeType(name, newType) {
+		let edges = []
+		addEles.forEach(child => {
+			child.predecessors.forEach(pred=>{
+				edges.push({
+					group: "edges",
+					data: {
+						source: pred,
+						target: child.name
+					}
+				})
+			})
+			child.successors.forEach(succ=>{
+				// dont add if it will be added via addEle already
+				if(addEles.findIndex(x=>x.name == succ) == -1) {
+					edges.push({
+						group: "edges",
+						data: {
+							source: child.name,
+							target: succ
+						}
+					})
+				}
+			})
+			this.addNode(child.name, child.type, child.pos)
+		})
+
+		try {
+			this.cy.add(edges)
+		}
+		catch(e) {
+			//console.log(e)
+		}
+	}
+
+	updateNode(name, updateData) {
 		const ele = this.cy.$("node#" + name)
 		const position = ele.position()
 
@@ -243,34 +293,37 @@ class CytoScape {
 		let edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
 		//replace Nodes
 		let edges = []
-		edgesToUpdate.forEach(edge => {
-			let target = edge.target().id(),
-				source = edge.source().id(),
-				ele = {
-					group: "edges",
-					data: {
-						source: "",
-						target: ""
-					}
+		updateData.predecessors.forEach(pred => {
+			let ele = {
+				group: "edges",
+				data: {
+					source: pred,
+					target: updateData.name
 				}
-
-
-			if (target == name) {
-				ele.data.source = source
-				ele.data.target = name
-			} else {
-				ele.data.source = name
-				ele.data.target = target
 			}
-
+			edges.push(ele)
+		})
+		updateData.successors.forEach(succ => {
+			let ele = {
+				group: "edges",
+				data: {
+					source: updateData.name,
+					target: succ
+				}
+			}
 			edges.push(ele)
 		})
 
 		edgesToUpdate.remove()
 		ele.remove()
-		this.addNode(name, newType, position)
-		this.cy.add(edges)
-	}*/
+		this.addNode(updateData.name, updateData.type, position)
+		try {
+			this.cy.add(edges)
+		}
+		catch(e) {
+			//console.log(e)
+		}
+	}
 
 	addNodes(childs) {
 		let customPos = false
@@ -342,50 +395,6 @@ class CytoScape {
 		if (this.autoLayout == "true") {
 			this.updateLayout()
 		}
-	}
-
-
-	renameNode(oldName, newName) {
-		const ele = this.cy.$("node#" + oldName)
-
-		let newEle = {
-			group: "nodes",
-			data: {
-				id: newName
-			},
-			position: ele.position()
-		}
-		this.cy.add(newEle)
-
-
-		let edgesToUpdate = this.cy.edges("[source='" + oldName + "'], [target='" + oldName + "']");
-		//replace Nodes
-		let edges = []
-		edgesToUpdate.forEach(edge => {
-			let target = edge.target().id(),
-				source = edge.source().id(),
-				ele = {
-					group: "edges",
-					data: {
-						source: "",
-						target: ""
-					}
-				}
-
-			if (target == oldName) {
-				ele.data.source = source
-				ele.data.target = newName
-			} else {
-				ele.data.source = newName
-				ele.data.target = target
-			}
-
-			edges.push(ele)
-		})
-
-		ele.remove()
-		edgesToUpdate.remove()
-		this.cy.add(edges)
 	}
 
 

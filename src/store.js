@@ -1,7 +1,6 @@
 import { globals, config } from './globals.js'
 import { sendEvent } from './helper.js'
 import { modal } from './modal.js'
-import { sidebar } from './sidebar.js'
 
 class Store {
 	constructor() {
@@ -167,14 +166,6 @@ class Store {
 		let index = this._json.children.findIndex(x => x.name == name)
 		if (index !== -1) {
 			this._json.children[index].pos = pos
-
-			sendEvent("dataChanged", {
-				task: "positionUpdate",
-				data: {
-					name: name,
-					pos: pos
-				}
-			})
 		}
 	}
 
@@ -207,7 +198,6 @@ class Store {
 			}
 
 			this._json.children.push(formdata)
-			sidebar.updateNodeForm(formdata.name)
 
 			resolve({
 				name: formdata.name,
@@ -282,134 +272,140 @@ class Store {
 
 
 	updateNode(updateData) {
-		let ele = this.getElement(updateData.currentId)
-		let nodeEnabled = true
+		return new Promise((resolve, reject) => {
+			console.log("store updateNode")
+			console.log(updateData)
+			let ele = this.getElement(updateData.currentId)
+			let nodeEnabled = true
 
 
-		// if name(id) changes
-		if (updateData.currentId != updateData.name) {
-			if (this.getAllElements().findIndex(x => x.name = updateData.name) != -1) {
-				modal("Warning", "Name is already used. Changes have been discarded")
-				return
+			// if name(id) changes
+			if (updateData.currentId != updateData.name) {
+				let index = this.getAllElements().findIndex(x => x.name == updateData.name)
+				if (index != -1) {
+					reject("Name is already used. Changes have been discarded")
+				}
 			}
-		}
 
-		if (config.nodes.nodesEnabled.indexOf(updateData.type) == -1) {
-			nodeEnabled = false
+			if (config.nodes.nodesEnabled.indexOf(updateData.type) == -1) {
+				nodeEnabled = false
 
-			/*sendEvent("dataChanged", {
-				task: "deleteNode",
-				data: updateData.currentId
-			})*/
-		} else {
-			// check if type changed
-			if (updateData.type != ele.type) {
 				/*sendEvent("dataChanged", {
-					task: "changeType",
-					data: {
-						name: updateData.currentId,
-						type: updateData.type
-					}
+					task: "deleteNode",
+					data: updateData.currentId
 				})*/
-			}
-		}
-
-		// remove current updated Child.
-		this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
-
-		delete updateData['currentId']
-
-
-		if (!updateData.tags) {
-			updateData.tags = {}
-		}
-
-
-		// Add Successor and Predecessors to other
-		updateData.successors.forEach(child => {
-			let index = this._json.children.findIndex(x => x.name == child)
-			if (index !== -1) {
-				if (this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
-					this._json.children[index].predecessors.push(updateData.name)
-
-					/*if (nodeEnabled) {
-						sendEvent("dataChanged", {
-							task: "addEdge",
-							data: {
-								from: updateData.name,
-								to: this._json.children[index].name
-							}
-						})
-					}*/
-				}
-			}
-		})
-
-
-		updateData.predecessors.forEach(child => {
-			let index = this._json.children.findIndex(x => x.name == child)
-			if (index !== -1) {
-				if (this._json.children[index].successors.indexOf(updateData.name) === -1) {
-					this._json.children[index].successors.push(updateData.name)
-
-					/*if (nodeEnabled) {
-						sendEvent("dataChanged", {
-							task: "addEdge",
-							data: {
-								from: this._json.children[index].name,
-								to: updateData.name
-							}
-						})
-					}*/
-				}
-			}
-		})
-
-
-
-		// Check if Edges have been removed
-		this._json.children.forEach((child, id, arr) => {
-			let index = child.predecessors.indexOf(updateData.name)
-			if (index !== -1) {
-				if (updateData.successors.indexOf(child.name) === -1) {
-					delete arr[id].predecessors[index]
-
-					/*if (nodeEnabled) {
-						sendEvent("dataChanged", {
-							task: "deleteEdge",
-							data: {
-								from: updateData.name,
-								to: child.name
-							}
-						})
-					}*/
+			} else {
+				// check if type changed
+				if (updateData.type != ele.type) {
+					/*sendEvent("dataChanged", {
+						task: "changeType",
+						data: {
+							name: updateData.currentId,
+							type: updateData.type
+						}
+					})*/
 				}
 			}
 
-			index = child.successors.indexOf(updateData.name)
-			if (index !== -1) {
-				if (updateData.predecessors.indexOf(child.name) === -1) {
-					delete arr[id].successors[index]
+			// remove current updated Child.
+			this._json.children = this._json.children.filter(child => child.name != updateData.currentId)
 
-					if (nodeEnabled) {
-						/*sendEvent("dataChanged", {
-							task: "deleteEdge",
-							data: {
-								from: child.name,
-								to: updateData.name
-							}
-						})*/
+			delete updateData['currentId']
+
+
+			if (!updateData.tags) {
+				updateData.tags = {}
+			}
+
+
+			// Add Successor and Predecessors to other
+			updateData.successors.forEach(child => {
+				let index = this._json.children.findIndex(x => x.name == child)
+				if (index !== -1) {
+					if (this._json.children[index].predecessors.indexOf(updateData.name) === -1) {
+						this._json.children[index].predecessors.push(updateData.name)
+
+						/*if (nodeEnabled) {
+							sendEvent("dataChanged", {
+								task: "addEdge",
+								data: {
+									from: updateData.name,
+									to: this._json.children[index].name
+								}
+							})
+						}*/
 					}
 				}
+			})
+
+
+			updateData.predecessors.forEach(child => {
+				let index = this._json.children.findIndex(x => x.name == child)
+				if (index !== -1) {
+					if (this._json.children[index].successors.indexOf(updateData.name) === -1) {
+						this._json.children[index].successors.push(updateData.name)
+
+						/*if (nodeEnabled) {
+							sendEvent("dataChanged", {
+								task: "addEdge",
+								data: {
+									from: this._json.children[index].name,
+									to: updateData.name
+								}
+							})
+						}*/
+					}
+				}
+			})
+
+
+
+			// Check if Edges have been removed
+			this._json.children.forEach((child, id, arr) => {
+				let index = child.predecessors.indexOf(updateData.name)
+				if (index !== -1) {
+					if (updateData.successors.indexOf(child.name) === -1) {
+						delete arr[id].predecessors[index]
+
+						/*if (nodeEnabled) {
+							sendEvent("dataChanged", {
+								task: "deleteEdge",
+								data: {
+									from: updateData.name,
+									to: child.name
+								}
+							})
+						}*/
+					}
+				}
+
+				index = child.successors.indexOf(updateData.name)
+				if (index !== -1) {
+					if (updateData.predecessors.indexOf(child.name) === -1) {
+						delete arr[id].successors[index]
+
+						if (nodeEnabled) {
+							/*sendEvent("dataChanged", {
+								task: "deleteEdge",
+								data: {
+									from: child.name,
+									to: updateData.name
+								}
+							})*/
+						}
+					}
+				}
+			})
+
+
+			if (nodeEnabled) {
+				this._json.children.push(updateData)
+				resolve(updateData)
+			} else {
+				this.filterElements.push(updateData)
+				resolve()
 			}
 		})
-
-		console.log("updateData", updateData)
-
-		if (nodeEnabled)
-			this._json.children.push(updateData)
-		else
-			this.filterElements.push(updateData)
 	}
 
 	addTag(name, tagName) {
@@ -431,68 +427,67 @@ class Store {
 	}
 
 	updateNodesEnabled(nodesEnabled) {
-		if (this._json != null) {
-			let diffRemovedTypes = config.nodes.nodesEnabled.filter(el => {
-				return (nodesEnabled.indexOf(el) == -1)
-			})
-
-			let diffAddedTypes = nodesEnabled.filter(el => {
-				return (config.nodes.nodesEnabled.indexOf(el) == -1)
-			})
-
-
-
-			// remove filtered Elements
-			diffRemovedTypes.forEach(name => {
-
-				console.log(this._json.children
-					.filter(x => x.type == name))
-
-				this._json.children
-					.filter(x => x.type == name)
-					.forEach(child => {
-						this.filterElements.push(child)
-
-						sendEvent("dataChanged", {
-							task: "deleteNode",
-							data: child.name
-						})
-					})
-			})
-
-
-			this.filterElements.forEach(child => {
-				let index = this._json.children.findIndex(x => x.name == child.name)
-				if (index != -1) {
-					this._json.children.splice(index, 1)
-				}
-			})
-
+		return new Promise((resolve, reject) => {
 
 			let elesToAdd = []
-			diffAddedTypes.forEach(name => {
-				elesToAdd = elesToAdd.concat(this.filterElements.filter(x => x.type == name))
-			})
+			let elesToRemove = []
 
-			elesToAdd.forEach(child => {
-				let index = this.filterElements.findIndex(x => x.name == child.name)
-				this._json.children.push(child)
-
-				if (index != -1) {
-					this.filterElements.splice(index, 1)
-				}
-			})
-
-
-			if (elesToAdd.length >= 1) {
-				sendEvent("dataChanged", {
-					task: "addNodes",
-					data: elesToAdd
+			if (this._json != null) {
+				let diffRemovedTypes = config.nodes.nodesEnabled.filter(el => {
+					return (nodesEnabled.indexOf(el) == -1)
 				})
-			}
-		}
 
-		config.nodes.nodesEnabled = nodesEnabled
+				let diffAddedTypes = nodesEnabled.filter(el => {
+					return (config.nodes.nodesEnabled.indexOf(el) == -1)
+				})
+
+
+				// remove filtered Elements
+				diffRemovedTypes.forEach(name => {
+
+					//console.log(this._json.children
+						//.filter(x => x.type == name))
+
+					this._json.children
+						.filter(x => x.type == name)
+						.forEach(child => {
+							this.filterElements.push(child)
+							elesToRemove.push(child)
+							/*sendEvent("dataChanged", {
+								task: "deleteNode",
+								data: child.name
+							})*/
+						})
+				})
+
+
+				this.filterElements.forEach(child => {
+					let index = this._json.children.findIndex(x => x.name == child.name)
+					if (index != -1) {
+						this._json.children.splice(index, 1)
+					}
+				})
+
+
+				diffAddedTypes.forEach(name => {
+					elesToAdd = elesToAdd.concat(this.filterElements.filter(x => x.type == name))
+				})
+
+				elesToAdd.forEach(child => {
+					let index = this.filterElements.findIndex(x => x.name == child.name)
+					this._json.children.push(child)
+
+					if (index != -1) {
+						this.filterElements.splice(index, 1)
+					}
+				})
+
+
+			}
+
+			config.nodes.nodesEnabled = nodesEnabled
+			resolve({remove: elesToRemove, add: elesToAdd})
+		})
 	}
 
 	deleteRelationNames(name) {

@@ -30,8 +30,11 @@ $(config.dom.links.scenario).click(() => {
 	scenarioEdit()
 })
 
-$(config.dom.links.nodeSettings).click(() => {
-	nodeSettings()
+$(config.dom.links.nodeSettings).click(async() => {
+	let newSettings = await nodeSettings()
+	let obj = await store.updateNodesEnabled(newSettings)
+
+	cyto.updateNodesEnabled(obj.remove, obj.add)
 })
 
 $(config.dom.links.style).click(() => {

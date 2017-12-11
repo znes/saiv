@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10718,8 +10718,6 @@ var _helper = __webpack_require__(1);
 
 var _modal = __webpack_require__(3);
 
-var _sidebar = __webpack_require__(7);
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Store = function () {
@@ -10933,14 +10931,6 @@ var Store = function () {
 			});
 			if (index !== -1) {
 				this._json.children[index].pos = pos;
-
-				(0, _helper.sendEvent)("dataChanged", {
-					task: "positionUpdate",
-					data: {
-						name: name,
-						pos: pos
-					}
-				});
 			}
 		}
 	}, {
@@ -10976,7 +10966,6 @@ var Store = function () {
 				}
 
 				_this4._json.children.push(formdata);
-				_sidebar.sidebar.updateNodeForm(formdata.name);
 
 				resolve({
 					name: formdata.name,
@@ -11069,133 +11058,141 @@ var Store = function () {
 		value: function updateNode(updateData) {
 			var _this8 = this;
 
-			var ele = this.getElement(updateData.currentId);
-			var nodeEnabled = true;
+			return new Promise(function (resolve, reject) {
+				console.log("store updateNode");
+				console.log(updateData);
+				var ele = _this8.getElement(updateData.currentId);
+				var nodeEnabled = true;
 
-			// if name(id) changes
-			if (updateData.currentId != updateData.name) {
-				if (this.getAllElements().findIndex(function (x) {
-					return x.name = updateData.name;
-				}) != -1) {
-					(0, _modal.modal)("Warning", "Name is already used. Changes have been discarded");
-					return;
+				// if name(id) changes
+				if (updateData.currentId != updateData.name) {
+					var index = _this8.getAllElements().findIndex(function (x) {
+						return x.name == updateData.name;
+					});
+					if (index != -1) {
+						reject("Name is already used. Changes have been discarded");
+					}
 				}
-			}
 
-			if (_globals.config.nodes.nodesEnabled.indexOf(updateData.type) == -1) {
-				nodeEnabled = false;
+				if (_globals.config.nodes.nodesEnabled.indexOf(updateData.type) == -1) {
+					nodeEnabled = false;
 
-				/*sendEvent("dataChanged", {
-    	task: "deleteNode",
-    	data: updateData.currentId
-    })*/
-			} else {
-				// check if type changed
-				if (updateData.type != ele.type) {
 					/*sendEvent("dataChanged", {
-     	task: "changeType",
-     	data: {
-     		name: updateData.currentId,
-     		type: updateData.type
-     	}
+     	task: "deleteNode",
+     	data: updateData.currentId
      })*/
+				} else {
+					// check if type changed
+					if (updateData.type != ele.type) {
+						/*sendEvent("dataChanged", {
+      	task: "changeType",
+      	data: {
+      		name: updateData.currentId,
+      		type: updateData.type
+      	}
+      })*/
+					}
 				}
-			}
 
-			// remove current updated Child.
-			this._json.children = this._json.children.filter(function (child) {
-				return child.name != updateData.currentId;
-			});
-
-			delete updateData['currentId'];
-
-			if (!updateData.tags) {
-				updateData.tags = {};
-			}
-
-			// Add Successor and Predecessors to other
-			updateData.successors.forEach(function (child) {
-				var index = _this8._json.children.findIndex(function (x) {
-					return x.name == child;
+				// remove current updated Child.
+				_this8._json.children = _this8._json.children.filter(function (child) {
+					return child.name != updateData.currentId;
 				});
-				if (index !== -1) {
-					if (_this8._json.children[index].predecessors.indexOf(updateData.name) === -1) {
-						_this8._json.children[index].predecessors.push(updateData.name);
 
-						/*if (nodeEnabled) {
-      	sendEvent("dataChanged", {
-      		task: "addEdge",
-      		data: {
-      			from: updateData.name,
-      			to: this._json.children[index].name
-      		}
-      	})
-      }*/
-					}
-				}
-			});
+				delete updateData['currentId'];
 
-			updateData.predecessors.forEach(function (child) {
-				var index = _this8._json.children.findIndex(function (x) {
-					return x.name == child;
-				});
-				if (index !== -1) {
-					if (_this8._json.children[index].successors.indexOf(updateData.name) === -1) {
-						_this8._json.children[index].successors.push(updateData.name);
-
-						/*if (nodeEnabled) {
-      	sendEvent("dataChanged", {
-      		task: "addEdge",
-      		data: {
-      			from: this._json.children[index].name,
-      			to: updateData.name
-      		}
-      	})
-      }*/
-					}
-				}
-			});
-
-			// Check if Edges have been removed
-			this._json.children.forEach(function (child, id, arr) {
-				var index = child.predecessors.indexOf(updateData.name);
-				if (index !== -1) {
-					if (updateData.successors.indexOf(child.name) === -1) {
-						delete arr[id].predecessors[index];
-
-						/*if (nodeEnabled) {
-      	sendEvent("dataChanged", {
-      		task: "deleteEdge",
-      		data: {
-      			from: updateData.name,
-      			to: child.name
-      		}
-      	})
-      }*/
-					}
+				if (!updateData.tags) {
+					updateData.tags = {};
 				}
 
-				index = child.successors.indexOf(updateData.name);
-				if (index !== -1) {
-					if (updateData.predecessors.indexOf(child.name) === -1) {
-						delete arr[id].successors[index];
+				// Add Successor and Predecessors to other
+				updateData.successors.forEach(function (child) {
+					var index = _this8._json.children.findIndex(function (x) {
+						return x.name == child;
+					});
+					if (index !== -1) {
+						if (_this8._json.children[index].predecessors.indexOf(updateData.name) === -1) {
+							_this8._json.children[index].predecessors.push(updateData.name);
 
-						if (nodeEnabled) {
-							/*sendEvent("dataChanged", {
-       	task: "deleteEdge",
-       	data: {
-       		from: child.name,
-       		to: updateData.name
-       	}
-       })*/
+							/*if (nodeEnabled) {
+       	sendEvent("dataChanged", {
+       		task: "addEdge",
+       		data: {
+       			from: updateData.name,
+       			to: this._json.children[index].name
+       		}
+       	})
+       }*/
 						}
 					}
+				});
+
+				updateData.predecessors.forEach(function (child) {
+					var index = _this8._json.children.findIndex(function (x) {
+						return x.name == child;
+					});
+					if (index !== -1) {
+						if (_this8._json.children[index].successors.indexOf(updateData.name) === -1) {
+							_this8._json.children[index].successors.push(updateData.name);
+
+							/*if (nodeEnabled) {
+       	sendEvent("dataChanged", {
+       		task: "addEdge",
+       		data: {
+       			from: this._json.children[index].name,
+       			to: updateData.name
+       		}
+       	})
+       }*/
+						}
+					}
+				});
+
+				// Check if Edges have been removed
+				_this8._json.children.forEach(function (child, id, arr) {
+					var index = child.predecessors.indexOf(updateData.name);
+					if (index !== -1) {
+						if (updateData.successors.indexOf(child.name) === -1) {
+							delete arr[id].predecessors[index];
+
+							/*if (nodeEnabled) {
+       	sendEvent("dataChanged", {
+       		task: "deleteEdge",
+       		data: {
+       			from: updateData.name,
+       			to: child.name
+       		}
+       	})
+       }*/
+						}
+					}
+
+					index = child.successors.indexOf(updateData.name);
+					if (index !== -1) {
+						if (updateData.predecessors.indexOf(child.name) === -1) {
+							delete arr[id].successors[index];
+
+							if (nodeEnabled) {
+								/*sendEvent("dataChanged", {
+        	task: "deleteEdge",
+        	data: {
+        		from: child.name,
+        		to: updateData.name
+        	}
+        })*/
+							}
+						}
+					}
+				});
+
+				if (nodeEnabled) {
+					_this8._json.children.push(updateData);
+					resolve(updateData);
+				} else {
+					_this8.filterElements.push(updateData);
+					resolve();
 				}
 			});
-
-			console.log("updateData", updateData);
-
-			if (nodeEnabled) this._json.children.push(updateData);else this.filterElements.push(updateData);
 		}
 	}, {
 		key: 'addTag',
@@ -11224,70 +11221,68 @@ var Store = function () {
 		value: function updateNodesEnabled(nodesEnabled) {
 			var _this9 = this;
 
-			if (this._json != null) {
-				var diffRemovedTypes = _globals.config.nodes.nodesEnabled.filter(function (el) {
-					return nodesEnabled.indexOf(el) == -1;
-				});
-
-				var diffAddedTypes = nodesEnabled.filter(function (el) {
-					return _globals.config.nodes.nodesEnabled.indexOf(el) == -1;
-				});
-
-				// remove filtered Elements
-				diffRemovedTypes.forEach(function (name) {
-
-					console.log(_this9._json.children.filter(function (x) {
-						return x.type == name;
-					}));
-
-					_this9._json.children.filter(function (x) {
-						return x.type == name;
-					}).forEach(function (child) {
-						_this9.filterElements.push(child);
-
-						(0, _helper.sendEvent)("dataChanged", {
-							task: "deleteNode",
-							data: child.name
-						});
-					});
-				});
-
-				this.filterElements.forEach(function (child) {
-					var index = _this9._json.children.findIndex(function (x) {
-						return x.name == child.name;
-					});
-					if (index != -1) {
-						_this9._json.children.splice(index, 1);
-					}
-				});
+			return new Promise(function (resolve, reject) {
 
 				var elesToAdd = [];
-				diffAddedTypes.forEach(function (name) {
-					elesToAdd = elesToAdd.concat(_this9.filterElements.filter(function (x) {
-						return x.type == name;
-					}));
-				});
+				var elesToRemove = [];
 
-				elesToAdd.forEach(function (child) {
-					var index = _this9.filterElements.findIndex(function (x) {
-						return x.name == child.name;
+				if (_this9._json != null) {
+					var diffRemovedTypes = _globals.config.nodes.nodesEnabled.filter(function (el) {
+						return nodesEnabled.indexOf(el) == -1;
 					});
-					_this9._json.children.push(child);
 
-					if (index != -1) {
-						_this9.filterElements.splice(index, 1);
-					}
-				});
+					var diffAddedTypes = nodesEnabled.filter(function (el) {
+						return _globals.config.nodes.nodesEnabled.indexOf(el) == -1;
+					});
 
-				if (elesToAdd.length >= 1) {
-					(0, _helper.sendEvent)("dataChanged", {
-						task: "addNodes",
-						data: elesToAdd
+					// remove filtered Elements
+					diffRemovedTypes.forEach(function (name) {
+
+						//console.log(this._json.children
+						//.filter(x => x.type == name))
+
+						_this9._json.children.filter(function (x) {
+							return x.type == name;
+						}).forEach(function (child) {
+							_this9.filterElements.push(child);
+							elesToRemove.push(child);
+							/*sendEvent("dataChanged", {
+       	task: "deleteNode",
+       	data: child.name
+       })*/
+						});
+					});
+
+					_this9.filterElements.forEach(function (child) {
+						var index = _this9._json.children.findIndex(function (x) {
+							return x.name == child.name;
+						});
+						if (index != -1) {
+							_this9._json.children.splice(index, 1);
+						}
+					});
+
+					diffAddedTypes.forEach(function (name) {
+						elesToAdd = elesToAdd.concat(_this9.filterElements.filter(function (x) {
+							return x.type == name;
+						}));
+					});
+
+					elesToAdd.forEach(function (child) {
+						var index = _this9.filterElements.findIndex(function (x) {
+							return x.name == child.name;
+						});
+						_this9._json.children.push(child);
+
+						if (index != -1) {
+							_this9.filterElements.splice(index, 1);
+						}
 					});
 				}
-			}
 
-			_globals.config.nodes.nodesEnabled = nodesEnabled;
+				_globals.config.nodes.nodesEnabled = nodesEnabled;
+				resolve({ remove: elesToRemove, add: elesToAdd });
+			});
 		}
 	}, {
 		key: 'deleteRelationNames',
@@ -17184,7 +17179,7 @@ S2.define('jquery.select2',[
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(13);
+var content = __webpack_require__(14);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -17213,373 +17208,65 @@ if(false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function($) {
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.sidebar = undefined;
+exports.scenarioEdit = scenarioEdit;
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.openSitebar = openSitebar;
-exports.closeSitebar = closeSitebar;
-
-var _globals = __webpack_require__(2);
+var _modal = __webpack_require__(3);
 
 var _helper = __webpack_require__(1);
 
 var _store = __webpack_require__(4);
 
-var _jquery = __webpack_require__(0);
+function scenarioEdit() {
+	var create = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-var _jquery2 = _interopRequireDefault(_jquery);
+	var form = $("<form class='scenarioForm'></form>");
+	var heading = "";
 
-__webpack_require__(5);
-
-__webpack_require__(6);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Sidebar = function () {
-	function Sidebar() {
-		_classCallCheck(this, Sidebar);
-
-		this.container = (0, _jquery2.default)(_globals.config.dom.sidebar);
-		this.head = (0, _jquery2.default)('<div class="head"></div>');
-		this.body = (0, _jquery2.default)('<div class="body"></div>');
-		this.container.append(this.head);
-		this.container.append(this.body);
+	// EditForm
+	if (!create) {
+		var data = _store.store.getScenario();
+		heading = "Edit Scenario";
+		form.append((0, _helper.createInput)("currentId", "currentId", data.name, "hidden", true)).append((0, _helper.createInput)("Name", "name", data.name, "text", true)).append((0, _helper.createInput)("Description", "tags_description", data.description, "text")).append("<button class='btn-success btn'>Save</button>");
 	}
-
-	_createClass(Sidebar, [{
-		key: 'show',
-		value: function show($head, $body) {
-			this.open();
-			this.head.html("").append($head);
-			this.body.html("").append($body);
+	// create new Scenario
+	else {
+			heading = "Create Scenario";
+			form.append((0, _helper.createInput)("Name", "name", "", "text", true)).append((0, _helper.createInput)("Description", "tags_description", "", "text")).append("<button class='btn-success btn'>Create</button>");
 		}
-	}, {
-		key: 'addTag',
-		value: function addTag(ready) {
-			this.open();
-			this.head.html("").append("<h4>Add Tag</h4>");
-			this.body.html("");
-			var form = (0, _jquery2.default)('<form class="editForm"></form>');
 
-			form.append((0, _helper.createInput)("Tag name", "tag", "", "text", true)).append('<button class="btn btn-success">Add</button>').append('<a class="btn btn-warning cancelForm pull-right">Cancel</button>').submit(function (e) {
-				e.preventDefault();
-				ready((0, _helper.readForm)(".editForm").tag);
-			}).find("a.cancelForm").on("click", function (e) {
-				ready(false);
-				return false;
+	form.submit(function (e) {
+		e.preventDefault();
+		var formData = (0, _helper.readForm)(".scenarioForm");
+
+		// CreateForm
+		if (typeof formData.currentId == "undefined") {
+			(0, _helper.sendEvent)("dataReceived", {
+				name: formData.name,
+				tags: {
+					description: formData.tags.description
+				},
+				children: []
 			});
-
-			this.body.append(form);
 		}
-	}, {
-		key: 'updateNodeForm',
-		value: function updateNodeForm(name) {
-			var _this = this;
-
-			var data = _store.store.getElement(name);
-			var nodes = _store.store.getAllElements().filter(function (node) {
-				return node.name != name;
-			});
-
-			this.open();
-			this.head.html("<h4>Update " + data.name + "</h4>");
-			this.body.html("");
-			var form = (0, _jquery2.default)('<form class="editForm"></form>');
-
-			form.append((0, _helper.createInput)("currentId", "currentId", data.name, "hidden")).append((0, _helper.createInput)("Name", "name", data.name, "text")).append((0, _helper.createSelect)("type", [data.type], Object.keys(_globals.config.nodes.nodesAvailable).map(function (k) {
-				return k;
-			})));
-
-			form.append(this.createTags(data.tags, data.type));
-
-			form.append((0, _helper.createSelect)("predecessors", data.predecessors, nodes, 'multiple=\"multiple\"')).append((0, _helper.createSelect)("successors", data.successors, nodes, 'multiple=\"multiple\"'));
-
-			form.find(".addTag").on("click", function () {
-				_this.addTag(function (newTag) {
-					if (typeof newTag == "string") {
-						_store.store.addTag(data.name, newTag);
-						/*sendEvent("data", {
-        task: "addTag",
-        data: {
-          id: data.name,
-          tag: newTag
-        }
-      })*/
-					}
-
-					_this.updateNodeForm(data.name);
-				});
-			});
-
-			// listen to changes of type
-			// geometry type according to it
-			this.updateGeometryTypeOnTypeChange(form);
-
-			// update tags
-			if (!_globals.config.nodes.allowCustomTags) {
-				form.find("select[name='type']").on('change', function (e) {
-					form.find('.formTags').replaceWith(_this.createTags(data.tags, form.find('select[name="type"]').val()));
+		// Edit Form
+		else {
+				(0, _helper.sendEvent)("data", {
+					task: "updateScenario",
+					data: formData
 				});
 			}
 
-			form.find('.removeTag').on("click", function () {
-				var inputName = (0, _jquery2.default)(this).parent().parent().find("input").prop("name");
-				var tag = inputName.substring(5, inputName.length);
+		(0, _modal.hideModal)();
+	});
 
-				_store.store.removeTag(data.name, tag);
-
-				this.updateNodeForm(data.name);
-			});
-
-			form.append('<button class="btn btn-success">Save</button>');
-			form.append('<a class="btn btn-warning cancelForm pull-right">Cancel</a>');
-			form.submit(function (e) {
-				e.preventDefault();
-				var formData = (0, _helper.readForm)('.editForm');
-				_store.store.updateNode(formData);
-
-				_this.close();
-			});
-			form.find("a.cancelForm").on("click", function (e) {
-				_this.close();
-				return false;
-			});
-
-			(0, _jquery2.default)('.basic-select', form).select2();
-			this.body.append(form);
-
-			(0, _helper.sendEvent)("dataChanged", {
-				task: "focusNode",
-				data: data.name
-			});
-		}
-	}, {
-		key: 'createSequences',
-		value: function createSequences() {
-			var currentSequences = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-			var objKeys = Object.keys(currentSequences);
-
-			var body = '<a href="#" class="addSequence">Add Sequence</a><br>';
-			if (objKeys.length >= 2 && currentSequences.time) {
-				body += '<a href="#" class="showSequence">Show</a><br>';
-			}
-			if (objKeys.length > 0) {
-				body += '<a href="#" class="removeSequence">Remove All</a><br>';
-			}
-
-			objKeys.forEach(function (key) {
-				body += key + '<a class="removeSequenceId pull-right" data-item="' + key + '">x</a><br>';
-			});
-			return (0, _helper.createCollapseEle)("sequence", "sequenceBody", "Sequences", body);
-		}
-	}, {
-		key: 'createTags',
-		value: function createTags(tags, type) {
-			var heading = "Tags";
-			var body = "";
-
-			if (_globals.config.nodes.allowCustomTags) heading += '<small><a href="#" class="addTag">Add Tag</a></small>';
-
-			//if (!config.nodes.allowCustomTags) {
-			_globals.config.nodes.nodesAvailable[type].tags.forEach(function (tag) {
-				body += '<label for="tags_' + tag + '">' + tag + '</label>';
-				body += '<div class=\"input-group\"></div>';
-				if (tags[tag]) {
-					body += '<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>';
-				} else {
-					body += '<input class="form-control" type="text" name="tags_' + tag + '" value=""></input>';
-				}
-
-				if (_globals.config.nodes.allowCustomTags) {
-					body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
-				}
-			});
-
-			// if didnt added above and custom tags are allowed
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				var _loop = function _loop() {
-					var _step$value = _slicedToArray(_step.value, 2),
-					    key = _step$value[0],
-					    value = _step$value[1];
-
-					if (_globals.config.nodes.nodesAvailable[type].tags.findIndex(function (x) {
-						return x.name == key;
-					}) == -1) {
-						body += '<div class=\"input-group\"></div>';
-						if (_globals.config.nodes.allowCustomTags) {
-							body += '<label for="tags_' + key + '">' + key + '</label>';
-							body += '<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>';
-							body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
-						}
-						/*else {
-      	body += '<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>'
-      }*/
-					}
-				};
-
-				for (var _iterator = Object.entries(tags)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					_loop();
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
-
-			return (0, _helper.createCollapseEle)("tagsAccordion", "tagsAccordionBody", heading, body);
-		}
-
-		/*static onOpenShowId(fn) {
-  	return () => {
-  		document.addEventListener("sidebar", (e) => {
-  			switch (e.detail.task) {
-  				case "openUpdateForm":
-  					fn(e)
-  					break
-  			}
-  		})
-  	}
-  }*/
-
-	}, {
-		key: 'addNode',
-		value: function addNode(pos) {
-			var _this2 = this;
-
-			return new Promise(function (resolve, reject) {
-				_this2.open();
-				_this2.head.html("Add Node");
-				_this2.body.html("");
-
-				var form = (0, _jquery2.default)('<form class="editForm"></form>');
-				form.append((0, _helper.createInput)("name", "name", "", "text", true));
-				form.append((0, _helper.createSelect)("type", [_globals.config.nodes.nodesEnabled], _globals.config.nodes.nodesEnabled, "required"));
-
-				var _iteratorNormalCompletion2 = true;
-				var _didIteratorError2 = false;
-				var _iteratorError2 = undefined;
-
-				try {
-					for (var _iterator2 = Object.entries(pos)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var _step2$value = _slicedToArray(_step2.value, 2),
-						    property = _step2$value[0],
-						    val = _step2$value[1];
-
-						form.append((0, _helper.createInput)("pos_" + property, "pos_" + property, val, "hidden"));
-					}
-				} catch (err) {
-					_didIteratorError2 = true;
-					_iteratorError2 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion2 && _iterator2.return) {
-							_iterator2.return();
-						}
-					} finally {
-						if (_didIteratorError2) {
-							throw _iteratorError2;
-						}
-					}
-				}
-
-				form.append('<button class="btn btn-success">Add</button>');
-				form.append('<a class="btn btn-warning pull-right">Cancel</button>');
-
-				(0, _jquery2.default)('.basic-select', form).select2();
-
-				form.submit(function (e) {
-					e.preventDefault();
-
-					resolve((0, _helper.readForm)(".editForm"));
-				});
-				form.find(".btn-warning").on("click", function (e) {
-					_this2.close();
-				});
-
-				// listen to changes of type
-				// update tags and geometry type according to it
-				_this2.updateGeometryTypeOnTypeChange(form);
-
-				_this2.body.append(form);
-			});
-		}
-	}, {
-		key: 'open',
-		value: function open() {
-			openSitebar();
-		}
-	}, {
-		key: 'close',
-		value: function close() {
-			closeSitebar();
-		}
-	}, {
-		key: 'updateGeometryTypeOnTypeChange',
-		value: function updateGeometryTypeOnTypeChange(form) {
-			form.find("select[name='type']").on('change', function (e) {
-				var currentType = form.find('select[name="type"]').val();
-
-				// update geometric types to select
-				form.find('label[for="geometry_type"]').parent().replaceWith((0, _helper.createSelect)("geometry_type", [currentType], _globals.config.nodes.nodesAvailable[e.target.value].geometryTypes));
-				(0, _jquery2.default)('select[name="geometry_type"]', form).select2({
-					width: '100%'
-				});
-			});
-		}
-	}]);
-
-	return Sidebar;
-}();
-
-var sidebar = exports.sidebar = new Sidebar();
-/**
- * Global open Sidebar function
- */
-function openSitebar() {
-	_globals.globals.callSitebarTimestamp = Date.now();
-	(0, _jquery2.default)("body").removeClass("sidebar-closed");
+	(0, _modal.modal)(heading, form);
 }
-
-/**
- * Global close Sitebar function
- */
-function closeSitebar() {
-	// hack
-	// map calls closeSitebar when polygone is clicked
-	// if open call is called 100ms before it will not be called
-	if (_globals.globals.callSitebarTimestamp + 100 < Date.now()) {
-		(0, _jquery2.default)("body").addClass("sidebar-closed");
-		(0, _jquery2.default)(".sequenceContainer").hide();
-		(0, _helper.sendEvent)("dataChanged", {
-			task: "focusNode",
-			data: null
-		});
-	}
-}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
 /* 8 */
@@ -17720,7 +17407,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(14);
+var	fixUrls = __webpack_require__(15);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -18039,69 +17726,6 @@ function updateLink (link, options, obj) {
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.scenarioEdit = scenarioEdit;
-
-var _modal = __webpack_require__(3);
-
-var _helper = __webpack_require__(1);
-
-var _store = __webpack_require__(4);
-
-function scenarioEdit() {
-	var data = _store.store.getScenario();
-	var form = $("<form class='scenarioForm'></form>");
-	var heading = "";
-
-	// EditForm
-	if (data != null) {
-		heading = "Edit Scenario";
-		form.append((0, _helper.createInput)("currentId", "currentId", data.name, "hidden", true)).append((0, _helper.createInput)("Name", "name", data.name, "text", true)).append((0, _helper.createInput)("Description", "tags_description", data.description, "text")).append("<button class='btn-success btn'>Save</button>");
-	}
-	// create new Scenario
-	else {
-			heading = "Create Scenario";
-			form.append((0, _helper.createInput)("Name", "name", "", "text", true)).append((0, _helper.createInput)("Description", "tags_description", "", "text")).append("<button class='btn-success btn'>Create</button>");
-		}
-
-	form.submit(function (e) {
-		e.preventDefault();
-		var formData = (0, _helper.readForm)(".scenarioForm");
-
-		// CreateForm
-		if (typeof formData.currentId == "undefined") {
-			(0, _helper.sendEvent)("dataReceived", {
-				name: formData.name,
-				tags: {
-					description: formData.tags.description
-				},
-				children: []
-			});
-		}
-		// Edit Form
-		else {
-				(0, _helper.sendEvent)("data", {
-					task: "updateScenario",
-					data: formData
-				});
-			}
-
-		(0, _modal.hideModal)();
-	});
-
-	(0, _modal.modal)(heading, form);
-}
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
@@ -18158,7 +17782,7 @@ exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18166,21 +17790,21 @@ exports.clearImmediate = clearImmediate;
 
 var _store = __webpack_require__(4);
 
-var _home = __webpack_require__(15);
+var _home = __webpack_require__(12);
 
-var _scenario = __webpack_require__(10);
+var _scenario = __webpack_require__(7);
 
-var _nodeSettings = __webpack_require__(16);
+var _nodeSettings = __webpack_require__(13);
 
-var _selectStyle = __webpack_require__(17);
+var _selectStyle = __webpack_require__(16);
 
-var _selectJson = __webpack_require__(18);
+var _selectJson = __webpack_require__(17);
 
 var _globals = __webpack_require__(2);
 
 var _helper = __webpack_require__(1);
 
-var _cytoscape = __webpack_require__(19);
+var _cytoscape = __webpack_require__(18);
 
 (0, _selectJson.initDropEvents)();
 // Open Page home
@@ -18200,8 +17824,11 @@ $(_globals.config.dom.links.scenario).click(function () {
 	(0, _scenario.scenarioEdit)();
 });
 
-$(_globals.config.dom.links.nodeSettings).click(function () {
-	(0, _nodeSettings.nodeSettings)();
+$(_globals.config.dom.links.nodeSettings).click(async function () {
+	var newSettings = await (0, _nodeSettings.nodeSettings)();
+	var obj = await _store.store.updateNodesEnabled(newSettings);
+
+	_cytoscape.cyto.updateNodesEnabled(obj.remove, obj.add);
 });
 
 $(_globals.config.dom.links.style).click(function () {
@@ -18273,7 +17900,99 @@ function initListenerDataRevieved() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.home = home;
+
+var _helper = __webpack_require__(1);
+
+function home() {
+  var content = $("<div>Home</div>");
+
+  (0, _helper.createContentPage)("Saiv", content);
+  (0, _helper.setActiveMenuItem)("home");
+}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
 /* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.nodeSettings = nodeSettings;
+
+var _modal = __webpack_require__(3);
+
+var _helper = __webpack_require__(1);
+
+var _globals = __webpack_require__(2);
+
+var _jquery = __webpack_require__(0);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+__webpack_require__(5);
+
+__webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function nodeSettings() {
+	return new Promise(function (resolve, reject) {
+		var form = (0, _jquery2.default)("<form class='nodeSettingsForm'></form>");
+		var heading = "Node Settings";
+
+		form.append((0, _helper.createSelect)("Nodes enabled", _globals.config.nodes.nodesEnabled, Object.keys(_globals.config.nodes.nodesAvailable), "multiple=\"multiple\""));
+
+		if (_globals.config.nodes.allowCustomTags == true) {
+			form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input checked class="" type="checkbox" name="allowCustomTags"></div>');
+		} else {
+			form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input class="" type="checkbox" name="allowCustomTags"></div>');
+		}
+
+		form.append('<button class="btn btn-success">Save</button>');
+
+		form.submit(function (e) {
+			e.preventDefault();
+			var formData = (0, _helper.readForm)(".nodeSettingsForm");
+
+			if (typeof formData.allowCustomTags != "undefined") {
+				_globals.config.nodes.allowCustomTags = true;
+			} else {
+				_globals.config.nodes.allowCustomTags = false;
+			}
+
+			// Update Nodes Enabled changed
+			if (_globals.config.nodes.nodesEnabled.toString() !== formData["Nodes enabled"].toString()) {
+				resolve(formData["Nodes enabled"]);
+			} else {
+				reject();
+			}
+
+			(0, _modal.hideModal)();
+		});
+
+		(0, _jquery2.default)('select', form).select2({
+			width: "100%"
+		});
+		(0, _modal.modal)(heading, form);
+	});
+}
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(8)(undefined);
@@ -18287,7 +18006,7 @@ exports.push([module.i, ".select2-container {\n  box-sizing: border-box;\n  disp
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 
@@ -18382,98 +18101,7 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.home = home;
-
-var _helper = __webpack_require__(1);
-
-function home() {
-  var content = $("<div>Home</div>");
-
-  (0, _helper.createContentPage)("Saiv", content);
-  (0, _helper.setActiveMenuItem)("home");
-}
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
 /* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.nodeSettings = nodeSettings;
-
-var _modal = __webpack_require__(3);
-
-var _helper = __webpack_require__(1);
-
-var _globals = __webpack_require__(2);
-
-var _jquery = __webpack_require__(0);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-__webpack_require__(5);
-
-__webpack_require__(6);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function nodeSettings() {
-  var form = (0, _jquery2.default)("<form class='nodeSettingsForm'></form>");
-  var heading = "Node Settings";
-
-  form.append((0, _helper.createSelect)("Nodes enabled", _globals.config.nodes.nodesEnabled, Object.keys(_globals.config.nodes.nodesAvailable), "multiple=\"multiple\""));
-
-  if (_globals.config.nodes.allowCustomTags == true) {
-    form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input checked class="" type="checkbox" name="allowCustomTags"></div>');
-  } else {
-    form.append('<div class="form-group"><label for="allowCustomTags">Allow custom Tags</label><input class="" type="checkbox" name="allowCustomTags"></div>');
-  }
-
-  form.append('<button class="btn btn-success">Save</button>');
-
-  form.submit(function (e) {
-    e.preventDefault();
-    var formData = readForm(".nodeSettingsForm");
-
-    if (typeof formData.allowCustomTags != "undefined") {
-      _globals.config.nodes.allowCustomTags = true;
-    } else {
-      _globals.config.nodes.allowCustomTags = false;
-    }
-
-    // Update Nodes Enabled
-    if (_globals.config.nodes.nodesEnabled.toString() !== formData["Nodes enabled"].toString()) {
-      (0, _helper.sendEvent)("data", {
-        task: "updateNodesEnabled",
-        data: formData["Nodes enabled"]
-      });
-    }
-
-    (0, _modal.hideModal)();
-  });
-
-  (0, _jquery2.default)('select', form).select2({
-    width: "100%"
-  });
-  (0, _modal.modal)(heading, form);
-}
-
-/***/ }),
-/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18534,7 +18162,7 @@ function selectStyle() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18550,7 +18178,7 @@ var _modal = __webpack_require__(3);
 
 var _helper = __webpack_require__(1);
 
-var _scenario = __webpack_require__(10);
+var _scenario = __webpack_require__(7);
 
 function openJsonSelection() {
   var content = $("<div></div>");
@@ -18565,7 +18193,7 @@ function openJsonSelection() {
   });
 
   $(".createScenario").on('click', function () {
-    (0, _scenario.scenarioEdit)();
+    (0, _scenario.scenarioEdit)(true);
   });
 }
 
@@ -18604,7 +18232,7 @@ function initDropEvents() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18621,13 +18249,13 @@ var _globals = __webpack_require__(2);
 
 var _store = __webpack_require__(4);
 
-var _sidebar = __webpack_require__(7);
+var _sidebar = __webpack_require__(19);
 
 var _helper = __webpack_require__(1);
 
 var _modal = __webpack_require__(3);
 
-var _cytoscape = __webpack_require__(27);
+var _cytoscape = __webpack_require__(20);
 
 var _cytoscape2 = _interopRequireDefault(_cytoscape);
 
@@ -18771,6 +18399,7 @@ var CytoScape = function () {
 							var evtToTarget = _event.target || _event.cyTarget;
 							_store.store.addEdge(evtFromTarget.data().id, evtToTarget.data().id).then(function (obj) {
 								_this2.addEdge(obj.from, obj.to);
+								_this2.$('#' + obj.to).emit("click");
 							}).catch(function (err) {
 								(0, _modal.modal)("Error", err);
 							});
@@ -18778,8 +18407,6 @@ var CytoScape = function () {
 							_globals.globals.unsavedChanges = false;
 							_this2.cy.$('#shadowEdge').remove();
 							_this2.updateBind();
-
-							_sidebar.sidebar.updateNodeForm(evtToTarget.data().id);
 						});
 					}
 				}, {
@@ -18803,8 +18430,11 @@ var CytoScape = function () {
 
 						var pos = event.position || event.cyPosition;
 						var addNodeData = await _sidebar.sidebar.addNode(pos);
+						_sidebar.sidebar.close();
 						_store.store.addNode(addNodeData).then(function (obj) {
 							_this2.addNode(obj.name, obj.type, obj.pos);
+						}).catch(function (e) {
+							(0, _modal.modal)("Error", e);
 						});
 					}
 				}, {
@@ -18828,6 +18458,8 @@ var CytoScape = function () {
 	}, {
 		key: 'updateBind',
 		value: function updateBind() {
+			var _this3 = this;
+
 			this.cy.off('mouseover');
 			this.cy.off('click');
 
@@ -18836,11 +18468,21 @@ var CytoScape = function () {
 				(0, _sidebar.closeSitebar)();
 			});
 
-			this.cy.on("click", "node", {}, function (evt) {
-				_sidebar.sidebar.updateNodeForm(evt.cyTarget.id());
+			this.cy.on("click", "node", async function (evt) {
+				var evtTarget = evt.target || evt.cyTarget;
+				try {
+					var nodeData = await _sidebar.sidebar.updateNodeForm(evtTarget.id());
+					var updateData = await _store.store.updateNode(nodeData);
+					_this3.updateNode(evtTarget.id(), updateData);
+				} catch (e) {
+					console.log(e);
+				}
 			});
-			this.cy.on("dragend", "node", {}, function (evt) {
-				console.log(evt.cyTarget);
+
+			this.cy.on("position", "node", function (evt) {
+				var evtTarget = evt.target || evt.cyTarget;
+				var pos = event.position || event.cyPosition;
+				_store.store.updatePosition(evtTarget.id(), evtTarget.position());
 			});
 		}
 	}, {
@@ -18856,49 +18498,92 @@ var CytoScape = function () {
 
 			this.updateBind();
 		}
+	}, {
+		key: 'updateNodesEnabled',
+		value: function updateNodesEnabled(removeEles, addEles) {
+			var _this4 = this;
 
-		/*
-  changeType(name, newType) {
-  	const ele = this.cy.$("node#" + name)
-  	const position = ele.position()
-  
-  
-  	let edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
-  	//replace Nodes
-  	let edges = []
-  	edgesToUpdate.forEach(edge => {
-  		let target = edge.target().id(),
-  			source = edge.source().id(),
-  			ele = {
-  				group: "edges",
-  				data: {
-  					source: "",
-  					target: ""
-  				}
-  			}
-  
-  
-  		if (target == name) {
-  			ele.data.source = source
-  			ele.data.target = name
-  		} else {
-  			ele.data.source = name
-  			ele.data.target = target
-  		}
-  
-  		edges.push(ele)
-  	})
-  
-  	edgesToUpdate.remove()
-  	ele.remove()
-  	this.addNode(name, newType, position)
-  	this.cy.add(edges)
-  }*/
+			removeEles.forEach(function (child) {
+				_this4.cy.$('#' + child.name).remove();
+			});
 
+			var edges = [];
+			addEles.forEach(function (child) {
+				child.predecessors.forEach(function (pred) {
+					edges.push({
+						group: "edges",
+						data: {
+							source: pred,
+							target: child.name
+						}
+					});
+				});
+				child.successors.forEach(function (succ) {
+					// dont add if it will be added via addEle already
+					if (addEles.findIndex(function (x) {
+						return x.name == succ;
+					}) == -1) {
+						edges.push({
+							group: "edges",
+							data: {
+								source: child.name,
+								target: succ
+							}
+						});
+					}
+				});
+				_this4.addNode(child.name, child.type, child.pos);
+			});
+
+			try {
+				this.cy.add(edges);
+			} catch (e) {
+				//console.log(e)
+			}
+		}
+	}, {
+		key: 'updateNode',
+		value: function updateNode(name, updateData) {
+			var ele = this.cy.$("node#" + name);
+			var position = ele.position();
+
+			var edgesToUpdate = this.cy.edges("[source='" + name + "'], [target='" + name + "']");
+			//replace Nodes
+			var edges = [];
+			updateData.predecessors.forEach(function (pred) {
+				var ele = {
+					group: "edges",
+					data: {
+						source: pred,
+						target: updateData.name
+					}
+				};
+				edges.push(ele);
+			});
+			updateData.successors.forEach(function (succ) {
+				var ele = {
+					group: "edges",
+					data: {
+						source: updateData.name,
+						target: succ
+					}
+				};
+				edges.push(ele);
+			});
+
+			edgesToUpdate.remove();
+			ele.remove();
+			this.addNode(updateData.name, updateData.type, position);
+			try {
+				this.cy.add(edges);
+			} catch (e) {
+				//console.log(e)
+			}
+		}
 	}, {
 		key: 'addNodes',
 		value: function addNodes(childs) {
-			var _this3 = this;
+			var _this5 = this;
 
 			var customPos = false;
 
@@ -18906,12 +18591,12 @@ var CytoScape = function () {
 				if (typeof child.pos != "undefined") {
 					if (typeof child.pos.x != "undefined" && typeof child.pos.y != "undefined") {
 						customPos = true;
-						_this3.addNode(child.name, child.type, child.pos);
+						_this5.addNode(child.name, child.type, child.pos);
 					} else {
-						_this3.addNode(child.name, child.type);
+						_this5.addNode(child.name, child.type);
 					}
 				} else {
-					_this3.addNode(child.name, child.type);
+					_this5.addNode(child.name, child.type);
 				}
 			});
 
@@ -18919,16 +18604,16 @@ var CytoScape = function () {
 			// Only add Successors
 			childs.forEach(function (child) {
 				child.successors.forEach(function (succ) {
-					_this3.addEdge(child.name, succ);
+					_this5.addEdge(child.name, succ);
 				});
 			});
 
 			// check if all pred added
 			childs.forEach(function (child) {
 				child.predecessors.forEach(function (pred) {
-					if (_this3.cy.edges("[source='" + pred + "'][target='" + child.name + "']").length == 0) {
-						if (_this3.cy.$("#" + pred).length > 0) {
-							_this3.addEdge(pred, child.name);
+					if (_this5.cy.edges("[source='" + pred + "'][target='" + child.name + "']").length == 0) {
+						if (_this5.cy.$("#" + pred).length > 0) {
+							_this5.addEdge(pred, child.name);
 						}
 					}
 				});
@@ -18971,49 +18656,6 @@ var CytoScape = function () {
 			if (this.autoLayout == "true") {
 				this.updateLayout();
 			}
-		}
-	}, {
-		key: 'renameNode',
-		value: function renameNode(oldName, newName) {
-			var ele = this.cy.$("node#" + oldName);
-
-			var newEle = {
-				group: "nodes",
-				data: {
-					id: newName
-				},
-				position: ele.position()
-			};
-			this.cy.add(newEle);
-
-			var edgesToUpdate = this.cy.edges("[source='" + oldName + "'], [target='" + oldName + "']");
-			//replace Nodes
-			var edges = [];
-			edgesToUpdate.forEach(function (edge) {
-				var target = edge.target().id(),
-				    source = edge.source().id(),
-				    ele = {
-					group: "edges",
-					data: {
-						source: "",
-						target: ""
-					}
-				};
-
-				if (target == oldName) {
-					ele.data.source = source;
-					ele.data.target = newName;
-				} else {
-					ele.data.source = newName;
-					ele.data.target = target;
-				}
-
-				edges.push(ele);
-			});
-
-			ele.remove();
-			edgesToUpdate.remove();
-			this.cy.add(edges);
 		}
 	}, {
 		key: 'deleteNode',
@@ -19064,954 +18706,368 @@ var cyto = exports.cyto = new CytoScape();
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 20 */,
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
-    "use strict";
+"use strict";
 
-    if (global.setImmediate) {
-        return;
-    }
 
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.sidebar = undefined;
 
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
+exports.openSitebar = openSitebar;
+exports.closeSitebar = closeSitebar;
 
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
+var _globals = __webpack_require__(2);
 
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
+var _helper = __webpack_require__(1);
 
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
+var _store = __webpack_require__(4);
 
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+var _jquery = __webpack_require__(0);
 
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
+var _jquery2 = _interopRequireDefault(_jquery);
 
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
+__webpack_require__(5);
 
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
+__webpack_require__(6);
 
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
+var Sidebar = function () {
+	function Sidebar() {
+		_classCallCheck(this, Sidebar);
 
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
+		this.container = (0, _jquery2.default)(_globals.config.dom.sidebar);
+		this.head = (0, _jquery2.default)('<div class="head"></div>');
+		this.body = (0, _jquery2.default)('<div class="body"></div>');
+		this.container.append(this.head);
+		this.container.append(this.body);
+	}
 
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+	_createClass(Sidebar, [{
+		key: 'show',
+		value: function show($head, $body) {
+			this.open();
+			this.head.html("").append($head);
+			this.body.html("").append($body);
+		}
+	}, {
+		key: 'addTag',
+		value: function addTag(ready) {
+			this.open();
+			this.head.html("").append("<h4>Add Tag</h4>");
+			this.body.html("");
+			var form = (0, _jquery2.default)('<form class="editForm"></form>');
 
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
+			form.append((0, _helper.createInput)("Tag name", "tag", "", "text", true)).append('<button class="btn btn-success">Add</button>').append('<a class="btn btn-warning cancelForm pull-right">Cancel</button>').submit(function (e) {
+				e.preventDefault();
+				ready((0, _helper.readForm)(".editForm").tag);
+			}).find("a.cancelForm").on("click", function (e) {
+				ready(false);
+				return false;
+			});
 
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
+			this.body.append(form);
+		}
+	}, {
+		key: 'updateNodeForm',
+		value: function updateNodeForm(name) {
+			var _this = this;
 
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
+			return new Promise(function (resolve, reject) {
+				var data = _store.store.getElement(name);
+				var nodes = _store.store.getAllElements().filter(function (node) {
+					return node.name != name;
+				});
 
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
+				_this.open();
+				_this.head.html("<h4>Update " + data.name + "</h4>");
+				_this.body.html("");
+				var form = (0, _jquery2.default)('<form class="editForm"></form>');
 
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
+				form.append((0, _helper.createInput)("currentId", "currentId", data.name, "hidden")).append((0, _helper.createInput)("Name", "name", data.name, "text")).append((0, _helper.createSelect)("type", [data.type], Object.keys(_globals.config.nodes.nodesAvailable).map(function (k) {
+					return k;
+				})));
 
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+				form.append(_this.createTags(data.tags, data.type));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22), __webpack_require__(23)))
+				form.append((0, _helper.createSelect)("predecessors", data.predecessors, nodes, 'multiple=\"multiple\"')).append((0, _helper.createSelect)("successors", data.successors, nodes, 'multiple=\"multiple\"'));
 
-/***/ }),
-/* 22 */
-/***/ (function(module, exports) {
+				form.find(".addTag").on("click", function () {
+					_this.addTag(function (newTag) {
+						if (typeof newTag == "string") {
+							_store.store.addTag(data.name, newTag);
+						}
 
-var g;
+						_this.close();
+						reject();
+					});
+				});
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
+				// listen to changes of type
+				// geometry type according to it
+				//this.updateGeometryTypeOnTypeChange(form)
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
+				// update tags
+				if (!_globals.config.nodes.allowCustomTags) {
+					form.find("select[name='type']").on('change', function (e) {
+						form.find('.formTags').replaceWith(_this.createTags(data.tags, form.find('select[name="type"]').val()));
+					});
+				}
+
+				form.find('.removeTag').on("click", function () {
+					var inputName = (0, _jquery2.default)(this).parent().parent().find("input").prop("name");
+					var tag = inputName.substring(5, inputName.length);
+
+					_store.store.removeTag(data.name, tag);
+					this.close();
+				});
+
+				form.append('<button class="btn btn-success">Save</button>');
+				form.append('<a class="btn btn-warning cancelForm pull-right">Cancel</a>');
+				form.submit(function (e) {
+					e.preventDefault();
+					resolve((0, _helper.readForm)('.editForm'));
+					_this.close();
+				});
+				form.find("a.cancelForm").on("click", function (e) {
+					_this.close();
+					reject();
+				});
+
+				(0, _jquery2.default)('.basic-select', form).select2();
+				_this.body.append(form);
+			});
+		}
+	}, {
+		key: 'createSequences',
+		value: function createSequences() {
+			var currentSequences = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+			var objKeys = Object.keys(currentSequences);
+
+			var body = '<a href="#" class="addSequence">Add Sequence</a><br>';
+			if (objKeys.length >= 2 && currentSequences.time) {
+				body += '<a href="#" class="showSequence">Show</a><br>';
+			}
+			if (objKeys.length > 0) {
+				body += '<a href="#" class="removeSequence">Remove All</a><br>';
+			}
+
+			objKeys.forEach(function (key) {
+				body += key + '<a class="removeSequenceId pull-right" data-item="' + key + '">x</a><br>';
+			});
+			return (0, _helper.createCollapseEle)("sequence", "sequenceBody", "Sequences", body);
+		}
+	}, {
+		key: 'createTags',
+		value: function createTags(tags, type) {
+			var heading = "Tags";
+			var body = "";
+
+			if (_globals.config.nodes.allowCustomTags) heading += '<small><a href="#" class="addTag">Add Tag</a></small>';
+
+			//if (!config.nodes.allowCustomTags) {
+			_globals.config.nodes.nodesAvailable[type].tags.forEach(function (tag) {
+				body += '<label for="tags_' + tag + '">' + tag + '</label>';
+				body += '<div class=\"input-group\"></div>';
+				if (tags[tag]) {
+					body += '<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>';
+				} else {
+					body += '<input class="form-control" type="text" name="tags_' + tag + '" value=""></input>';
+				}
+
+				if (_globals.config.nodes.allowCustomTags) {
+					body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
+				}
+			});
+
+			// if didnt added above and custom tags are allowed
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				var _loop = function _loop() {
+					var _step$value = _slicedToArray(_step.value, 2),
+					    key = _step$value[0],
+					    value = _step$value[1];
+
+					if (_globals.config.nodes.nodesAvailable[type].tags.findIndex(function (x) {
+						return x.name == key;
+					}) == -1) {
+						body += '<div class=\"input-group\"></div>';
+						if (_globals.config.nodes.allowCustomTags) {
+							body += '<label for="tags_' + key + '">' + key + '</label>';
+							body += '<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>';
+							body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
+						}
+						/*else {
+      	body += '<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>'
+      }*/
+					}
+				};
+
+				for (var _iterator = Object.entries(tags)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					_loop();
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+
+			return (0, _helper.createCollapseEle)("tagsAccordion", "tagsAccordionBody", heading, body);
+		}
+
+		/*static onOpenShowId(fn) {
+  	return () => {
+  		document.addEventListener("sidebar", (e) => {
+  			switch (e.detail.task) {
+  				case "openUpdateForm":
+  					fn(e)
+  					break
+  			}
+  		})
+  	}
+  }*/
+
+	}, {
+		key: 'addNode',
+		value: function addNode(pos) {
+			var _this2 = this;
+
+			return new Promise(function (resolve, reject) {
+				_this2.open();
+				_this2.head.html("Add Node");
+				_this2.body.html("");
+
+				var form = (0, _jquery2.default)('<form class="editForm"></form>');
+				form.append((0, _helper.createInput)("name", "name", "", "text", true));
+				form.append((0, _helper.createSelect)("type", [_globals.config.nodes.nodesEnabled], _globals.config.nodes.nodesEnabled, "required"));
+
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+
+				try {
+					for (var _iterator2 = Object.entries(pos)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var _step2$value = _slicedToArray(_step2.value, 2),
+						    property = _step2$value[0],
+						    val = _step2$value[1];
+
+						form.append((0, _helper.createInput)("pos_" + property, "pos_" + property, val, "hidden"));
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
+
+				form.append('<button class="btn btn-success">Add</button>');
+				form.append('<a class="btn btn-warning pull-right">Cancel</button>');
+
+				(0, _jquery2.default)('.basic-select', form).select2();
+
+				form.submit(function (e) {
+					e.preventDefault();
+
+					resolve((0, _helper.readForm)(".editForm"));
+				});
+				form.find(".btn-warning").on("click", function (e) {
+					_this2.close();
+				});
+
+				// listen to changes of type
+				// update tags and geometry type according to it
+				//this.updateGeometryTypeOnTypeChange(form)
+
+				_this2.body.append(form);
+			});
+		}
+	}, {
+		key: 'open',
+		value: function open() {
+			openSitebar();
+		}
+	}, {
+		key: 'close',
+		value: function close() {
+			closeSitebar();
+		}
+	}, {
+		key: 'updateGeometryTypeOnTypeChange',
+		value: function updateGeometryTypeOnTypeChange(form) {
+			form.find("select[name='type']").on('change', function (e) {
+				var currentType = form.find('select[name="type"]').val();
+
+				// update geometric types to select
+				form.find('label[for="geometry_type"]').parent().replaceWith((0, _helper.createSelect)("geometry_type", [currentType], _globals.config.nodes.nodesAvailable[e.target.value].geometryTypes));
+				(0, _jquery2.default)('select[name="geometry_type"]', form).select2({
+					width: '100%'
+				});
+			});
+		}
+	}]);
+
+	return Sidebar;
+}();
+
+var sidebar = exports.sidebar = new Sidebar();
+/**
+ * Global open Sidebar function
+ */
+function openSitebar() {
+	_globals.globals.callSitebarTimestamp = Date.now();
+	(0, _jquery2.default)("body").removeClass("sidebar-closed");
 }
 
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {var __WEBPACK_AMD_DEFINE_RESULT__;;(function(){ 'use strict';
-
-  var $ = typeof jQuery === typeof undefined ? null : jQuery;
-
-  var register = function( cytoscape, $ ){
-    
-    if( !cytoscape ){ return; } // can't register if cytoscape unspecified
-    
-    var defaults = {
-      // List of initial menu items
-      menuItems: [
-        /*
-        {
-          id: 'remove',
-          content: 'remove',
-          tooltipText: 'remove',
-          selector: 'node, edge',
-          onClickFunction: function () {
-            console.log('remove element');
-          },
-          hasTrailingDivider: true
-        },
-        {
-          id: 'hide',
-          content: 'hide',
-          tooltipText: 'remove',
-          selector: 'node, edge',
-          onClickFunction: function () {
-            console.log('hide element');
-          },
-          disabled: true
-        }*/
-      ],
-      // css classes that menu items will have
-      menuItemClasses: [
-        // add class names to this list
-      ],
-      // css classes that context menu will have
-      contextMenuClasses: [
-        // add class names to this list
-      ]
-    };
-    
-    var eventCyTapStart; // The event to be binded on tap start
-    
-    // To initialize with options.
-    cytoscape('core', 'contextMenus', function (opts) {
-      var cy = this;
-      
-      // Initilize scratch pad
-      if (!cy.scratch('cycontextmenus')) {
-        cy.scratch('cycontextmenus', {});
-      }
-      
-      var options = getScratchProp('options');
-      var $cxtMenu = getScratchProp('cxtMenu');
-      var menuItemCSSClass = 'cy-context-menus-cxt-menuitem';
-      var dividerCSSClass = 'cy-context-menus-divider';
-      
-      // Merge default options with the ones coming from parameter
-      function extend(defaults, options) {
-        var obj = {};
-
-        for (var i in defaults) {
-          obj[i] = defaults[i];
-        }
-
-        for (var i in options) {
-          obj[i] = options[i];
-        }
-
-        return obj;
-      };
-
-      function getScratchProp(propname) {
-        return cy.scratch('cycontextmenus')[propname];
-      };
-      
-      function setScratchProp(propname, value) {
-        cy.scratch('cycontextmenus')[propname] = value;
-      };
-
-      function preventDefaultContextTap() {
-        $(".cy-context-menus-cxt-menu").contextmenu( function() {
-            return false;
-        });
-      }
-
-      // Get string representation of css classes
-      function getMenuItemClassStr(classes, hasTrailingDivider) {
-        var str = getClassStr(classes);
-
-        str += ' ' + menuItemCSSClass;
-
-        if(hasTrailingDivider) {
-          str += ' ' + dividerCSSClass;
-        }
-
-        return str;
-      }
-
-      // Get string representation of css classes
-      function getClassStr(classes) {
-        var str = '';
-
-        for( var i = 0; i < classes.length; i++ ) {
-          var className = classes[i];
-          str += className;
-          if(i !== classes.length - 1) {
-            str += ' ';
-          }
-        }
-
-        return str;
-      }
-
-      function displayComponent($component) {
-        $component.css('display', 'block');
-      }
-
-      function hideComponent($component) {
-        $component.css('display', 'none');
-      }
-
-      function hideMenuItemComponents() {
-        $cxtMenu.children().css('display', 'none');
-      }
-
-      function bindOnClickFunction($component, onClickFcn) {
-        var callOnClickFcn;
-
-        $component.on('click', callOnClickFcn = function() {
-          onClickFcn(getScratchProp('currentCyEvent'));
-        });
-
-        $component.data('call-on-click-function', callOnClickFcn); 
-      }
-
-      function bindCyCxttap($component, selector, coreAsWell) {
-        function _cxtfcn(event) {
-          setScratchProp('currentCyEvent', event);
-          adjustCxtMenu(event); // adjust the position of context menu
-          if ($component.data('show')) {
-            // Now we have a visible element display context menu if it is not visible
-            if (!$cxtMenu.is(':visible')) {
-              displayComponent($cxtMenu);
-            }
-            // anyVisibleChild indicates if there is any visible child of context menu if not do not show the context menu
-            setScratchProp('anyVisibleChild', true);// there is visible child
-            displayComponent($component); // display the component
-          }
-
-          // If there is no visible element hide the context menu as well(If it is visible)
-          if (!getScratchProp('anyVisibleChild') && $cxtMenu.is(':visible')) {
-            hideComponent($cxtMenu);
-          }
-        }
-
-        var cxtfcn;
-        var cxtCoreFcn;
-
-        if(coreAsWell) {
-          cy.on('cxttap', cxtCoreFcn = function(event) {
-            var target = event.target || event.cyTarget;
-            if( target != cy ) {
-              return;
-            }
-
-            _cxtfcn(event);
-          });
-        }
-
-        if(selector) {
-          cy.on('cxttap', selector, cxtfcn = function(event) {
-            _cxtfcn(event);
-          });
-        }
-
-        // Bind the event to menu item to be able to remove it back
-        $component.data('cy-context-menus-cxtfcn', cxtfcn);
-        $component.data('cy-context-menus-cxtcorefcn', cxtCoreFcn);
-      }
-
-      function bindCyEvents() {
-        cy.on('tapstart', eventCyTapStart = function(){
-          hideComponent($cxtMenu);
-          setScratchProp('cxtMenuPosition', undefined);
-          setScratchProp('currentCyEvent', undefined);
-        });
-      }
-
-      function performBindings($component, onClickFcn, selector, coreAsWell) {
-        bindOnClickFunction($component, onClickFcn);
-        bindCyCxttap($component, selector, coreAsWell);
-      }
-
-      // Adjusts context menu if necessary
-      function adjustCxtMenu(event) {
-        var currentCxtMenuPosition = getScratchProp('cxtMenuPosition');
-        var cyPos = event.position || event.cyPosition;
-
-        if( currentCxtMenuPosition != cyPos ) {
-          hideMenuItemComponents();
-          setScratchProp('anyVisibleChild', false);// we hide all children there is no visible child remaining
-          setScratchProp('cxtMenuPosition', cyPos);
-
-          var containerPos = $(cy.container()).offset();
-          var renderedPos = event.renderedPosition || event.cyRenderedPosition;
-
-          var left = containerPos.left + renderedPos.x;
-          var top = containerPos.top + renderedPos.y;
-
-          $cxtMenu.css('left', left);
-          $cxtMenu.css('top', top);
-        }
-      }
-
-      function createAndAppendMenuItemComponents(menuItems) {
-        for (var i = 0; i < menuItems.length; i++) {
-          createAndAppendMenuItemComponent(menuItems[i]);
-        }
-      }
-
-      function createAndAppendMenuItemComponent(menuItem) {
-        // Create and append menu item
-        var $menuItemComponent = createMenuItemComponent(menuItem);
-        appendComponentToCxtMenu($menuItemComponent);
-
-        performBindings($menuItemComponent, menuItem.onClickFunction, menuItem.selector, menuItem.coreAsWell);
-      }//insertComponentBeforeExistingItem(component, existingItemID)
-
-      function createAndInsertMenuItemComponentBeforeExistingComponent(menuItem, existingComponentID) {
-        // Create and insert menu item
-        var $menuItemComponent = createMenuItemComponent(menuItem);
-        insertComponentBeforeExistingItem($menuItemComponent, existingComponentID);
-
-        performBindings($menuItemComponent, menuItem.onClickFunction, menuItem.selector, menuItem.coreAsWell);
-      }
-
-      // create cxtMenu and append it to body
-      function createAndAppendCxtMenuComponent() {
-        var classes = getClassStr(options.contextMenuClasses);
-//        classes += ' cy-context-menus-cxt-menu';
-        $cxtMenu = $('<div class=' + classes + '></div>');
-        $cxtMenu.addClass('cy-context-menus-cxt-menu');
-        setScratchProp('cxtMenu', $cxtMenu);
-
-        $('body').append($cxtMenu);
-        return $cxtMenu;
-      }
-
-      // Creates a menu item as an html component
-      function createMenuItemComponent(item) {
-        var classStr = getMenuItemClassStr(options.menuItemClasses, item.hasTrailingDivider);
-        var itemStr = '<button id="' + item.id + '" class="' + classStr + '"';
-
-        if(item.tooltipText) {
-          itemStr += ' title="' + item.tooltipText + '"';
-        }
-
-        if(item.disabled) {
-          itemStr += ' disabled';
-        }
-        if (!item.image){
-            itemStr += '>' + item.content + '</button>';
-        }
-        else{
-            itemStr += '>' + '<img src="' + item.image.src + '" width="' + item.image.width + 'px"; height="'
-                + item.image.height + 'px"; style="position:absolute; top: ' + item.image.y + 'px; left: '
-                + item.image.x + 'px;">' + item.content + '</button>';
-        };
-
-        var $menuItemComponent = $(itemStr);
-
-        $menuItemComponent.data('selector', item.selector); 
-        $menuItemComponent.data('on-click-function', item.onClickFunction);
-        $menuItemComponent.data('show', (typeof(item.show) === 'undefined' || item.show));  
-        return $menuItemComponent;
-      }
-
-      // Appends the given component to cxtMenu
-      function appendComponentToCxtMenu(component) {
-        $cxtMenu.append(component);
-        bindMenuItemClickFunction(component);
-      }
-
-      // Insert the given component to cxtMenu just before the existing item with given ID
-      function insertComponentBeforeExistingItem(component, existingItemID) {
-        var $existingItem = $('#' + existingItemID);
-        component.insertBefore($existingItem);
-      }
-
-      function destroyCxtMenu() {
-        if(!getScratchProp('active')) {
-          return;
-        }
-
-        removeAndUnbindMenuItems();
-
-        cy.off('tapstart', eventCyTapStart);
-
-        $cxtMenu.remove();
-        $cxtMenu = undefined;
-        setScratchProp($cxtMenu, undefined);
-        setScratchProp('active', false);
-        setScratchProp('anyVisibleChild', false);
-      }
-
-      function removeAndUnbindMenuItems() {
-        var children = $cxtMenu.children();
-
-        $(children).each(function() {
-          removeAndUnbindMenuItem($(this));
-        });
-      }
-
-      function removeAndUnbindMenuItem(itemID) {
-        var $component = typeof itemID === 'string' ? $('#' + itemID) : itemID;
-        var cxtfcn = $component.data('cy-context-menus-cxtfcn');
-        var selector = $component.data('selector');
-        var callOnClickFcn = $component.data('call-on-click-function');
-        var cxtCoreFcn = $component.data('cy-context-menus-cxtcorefcn');
-
-        if(cxtfcn) {
-          cy.off('cxttap', selector, cxtfcn);
-        }
-
-        if(cxtCoreFcn) {
-          cy.off('cxttap', cxtCoreFcn);
-        }
-
-        if(callOnClickFcn) {
-          $component.off('click', callOnClickFcn);
-        }
-
-        $component.remove();
-      }
-
-      function moveBeforeOtherMenuItemComponent(componentID, existingComponentID) {
-        if( componentID === existingComponentID ) {
-          return;
-        }
-
-        var $component = $('#' + componentID).detach();
-        var $existingComponent = $('#' + existingComponentID);
-
-        $component.insertBefore($existingComponent);
-      }
-
-      function bindMenuItemClickFunction(component) {
-        component.click( function() {
-            hideComponent($cxtMenu);
-            setScratchProp('cxtMenuPosition', undefined);
-        });
-      }
-
-      function disableComponent(componentID) {
-        $('#' + componentID).attr('disabled', true);
-      }
-
-      function enableComponent(componentID) {
-        $('#' + componentID).attr('disabled', false);
-      }
-
-      function setTrailingDivider(componentID, status) {
-        var $component = $('#' + componentID);
-        if(status) {
-          $component.addClass(dividerCSSClass);
-        }
-        else {
-          $component.removeClass(dividerCSSClass);
-        }
-      }
-
-      // Get an extension instance to enable users to access extension methods
-      function getInstance(cy) {
-        var instance = {
-          // Returns whether the extension is active
-         isActive: function() {
-           return getScratchProp('active');
-         },
-         // Appends given menu item to the menu items list.
-         appendMenuItem: function(item) {
-           createAndAppendMenuItemComponent(item);
-           return cy;
-         },
-         // Appends menu items in the given list to the menu items list.
-         appendMenuItems: function(items) {
-           createAndAppendMenuItemComponents(items);
-           return cy;
-         },
-         // Removes the menu item with given ID.
-         removeMenuItem: function(itemID) {
-           removeAndUnbindMenuItem(itemID);
-           return cy;
-         },
-         // Sets whether the menuItem with given ID will have a following divider.
-         setTrailingDivider: function(itemID, status) {
-           setTrailingDivider(itemID, status);
-           return cy;
-         },
-         // Inserts given item before the existingitem.
-         insertBeforeMenuItem: function(item, existingItemID) {
-           createAndInsertMenuItemComponentBeforeExistingComponent(item, existingItemID);
-           return cy;
-         },
-         // Moves the item with given ID before the existingitem.
-         moveBeforeOtherMenuItem: function(itemID, existingItemID) {
-           moveBeforeOtherMenuItemComponent(itemID, existingItemID);
-           return cy;
-         },
-         // Disables the menu item with given ID.
-         disableMenuItem: function(itemID) {
-           disableComponent(itemID);
-           return cy;
-         },
-         // Enables the menu item with given ID.
-         enableMenuItem: function(itemID) {
-           enableComponent(itemID);
-           return cy;
-         },
-         // Disables the menu item with given ID.
-         hideMenuItem: function(itemID) {
-           $('#'+itemID).data('show', false);
-           hideComponent($('#'+itemID));
-           return cy;
-         },
-         // Enables the menu item with given ID.
-         showMenuItem: function(itemID) {
-           $('#'+itemID).data('show', true);
-           displayComponent($('#'+itemID));
-           return cy;
-         },
-         // Destroys the extension instance
-         destroy: function() {
-           destroyCxtMenu();
-           return cy;
-         }
-        };
-
-        return instance;
-      }
-
-      if ( opts !== 'get' ) {
-        // merge the options with default ones
-        options = extend(defaults, opts);
-        setScratchProp('options', options);
-
-        // Clear old context menu if needed
-        if(getScratchProp('active')) {
-          destroyCxtMenu();
-        }
-
-        setScratchProp('active', true);
-
-        $cxtMenu = createAndAppendCxtMenuComponent();
-
-        var menuItems = options.menuItems;
-        createAndAppendMenuItemComponents(menuItems);
-
-        bindCyEvents();
-        preventDefaultContextTap();
-      }
-      
-      return getInstance(this);
-    });
-  };
-
-  if( typeof module !== 'undefined' && module.exports ){ // expose as a commonjs module
-    module.exports = register;
-  }
-
-  if( true ){ // expose as an amd/requirejs module
-    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){
-      return register;
-    }).call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  }
-
-  if( typeof cytoscape !== 'undefined' && $ ){ // expose to global cytoscape (i.e. window.cytoscape)
-    register( cytoscape, $ );
-  }
-
-})();
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(26);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {"hmr":true}
-options.transform = transform
-// add the styles to the DOM
-var update = __webpack_require__(9)(content, options);
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../css-loader/index.js!./cytoscape-context-menus.css", function() {
-			var newContent = require("!!../css-loader/index.js!./cytoscape-context-menus.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
+/**
+ * Global close Sitebar function
+ */
+function closeSitebar() {
+	// hack
+	// map calls closeSitebar when polygone is clicked
+	// if open call is called 100ms before it will not be called
+	if (_globals.globals.callSitebarTimestamp + 100 < Date.now()) {
+		(0, _jquery2.default)("body").addClass("sidebar-closed");
+		(0, _jquery2.default)(".sequenceContainer").hide();
+		(0, _helper.sendEvent)("dataChanged", {
+			task: "focusNode",
+			data: null
 		});
 	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
 }
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(8)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, ".cy-context-menus-cxt-menu {\n    display:none;\n    z-index:1000;\n    position:absolute;\n    border:1px solid #A0A0A0;\n    padding: 0;\n    margin: 0;\n    width:auto;\n}\n\n.cy-context-menus-cxt-menuitem {\n    display:block;\n    z-index:1000;\n    width: 100%;\n    padding: 3px 20px;\n    position:relative;\n    margin:0;\n    background-color:#f8f8f8;\n    font-weight:normal;\n    font-size: 12px;\n    white-space:nowrap;\n    border: 0;\n    text-align: left;\n}\n\n.cy-context-menus-cxt-menuitem:enabled {\n    color: #000000;\n}\n\n.cy-context-menus-ctx-operation:focus {\n  outline: none;\n}\n\n.cy-context-menus-cxt-menuitem:hover {\n    color: #ffffff;\n    text-decoration: none;\n    background-color: #0B9BCD;\n    background-image: none;\n    cursor: pointer;\n}\n\n.cy-context-menus-cxt-menuitem[content]:before {\n    content:attr(content);\n}\n\n.cy-context-menus-divider {\n  border-bottom:1px solid #A0A0A0;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 27 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {(function webpackUniversalModuleDefinition(root, factory) {
@@ -50301,7 +49357,953 @@ exports.clearImmediate = clearImmediate;
 /******/ ]);
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11).setImmediate, __webpack_require__(11).clearImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10).setImmediate, __webpack_require__(10).clearImmediate))
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22), __webpack_require__(23)))
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {var __WEBPACK_AMD_DEFINE_RESULT__;;(function(){ 'use strict';
+
+  var $ = typeof jQuery === typeof undefined ? null : jQuery;
+
+  var register = function( cytoscape, $ ){
+    
+    if( !cytoscape ){ return; } // can't register if cytoscape unspecified
+    
+    var defaults = {
+      // List of initial menu items
+      menuItems: [
+        /*
+        {
+          id: 'remove',
+          content: 'remove',
+          tooltipText: 'remove',
+          selector: 'node, edge',
+          onClickFunction: function () {
+            console.log('remove element');
+          },
+          hasTrailingDivider: true
+        },
+        {
+          id: 'hide',
+          content: 'hide',
+          tooltipText: 'remove',
+          selector: 'node, edge',
+          onClickFunction: function () {
+            console.log('hide element');
+          },
+          disabled: true
+        }*/
+      ],
+      // css classes that menu items will have
+      menuItemClasses: [
+        // add class names to this list
+      ],
+      // css classes that context menu will have
+      contextMenuClasses: [
+        // add class names to this list
+      ]
+    };
+    
+    var eventCyTapStart; // The event to be binded on tap start
+    
+    // To initialize with options.
+    cytoscape('core', 'contextMenus', function (opts) {
+      var cy = this;
+      
+      // Initilize scratch pad
+      if (!cy.scratch('cycontextmenus')) {
+        cy.scratch('cycontextmenus', {});
+      }
+      
+      var options = getScratchProp('options');
+      var $cxtMenu = getScratchProp('cxtMenu');
+      var menuItemCSSClass = 'cy-context-menus-cxt-menuitem';
+      var dividerCSSClass = 'cy-context-menus-divider';
+      
+      // Merge default options with the ones coming from parameter
+      function extend(defaults, options) {
+        var obj = {};
+
+        for (var i in defaults) {
+          obj[i] = defaults[i];
+        }
+
+        for (var i in options) {
+          obj[i] = options[i];
+        }
+
+        return obj;
+      };
+
+      function getScratchProp(propname) {
+        return cy.scratch('cycontextmenus')[propname];
+      };
+      
+      function setScratchProp(propname, value) {
+        cy.scratch('cycontextmenus')[propname] = value;
+      };
+
+      function preventDefaultContextTap() {
+        $(".cy-context-menus-cxt-menu").contextmenu( function() {
+            return false;
+        });
+      }
+
+      // Get string representation of css classes
+      function getMenuItemClassStr(classes, hasTrailingDivider) {
+        var str = getClassStr(classes);
+
+        str += ' ' + menuItemCSSClass;
+
+        if(hasTrailingDivider) {
+          str += ' ' + dividerCSSClass;
+        }
+
+        return str;
+      }
+
+      // Get string representation of css classes
+      function getClassStr(classes) {
+        var str = '';
+
+        for( var i = 0; i < classes.length; i++ ) {
+          var className = classes[i];
+          str += className;
+          if(i !== classes.length - 1) {
+            str += ' ';
+          }
+        }
+
+        return str;
+      }
+
+      function displayComponent($component) {
+        $component.css('display', 'block');
+      }
+
+      function hideComponent($component) {
+        $component.css('display', 'none');
+      }
+
+      function hideMenuItemComponents() {
+        $cxtMenu.children().css('display', 'none');
+      }
+
+      function bindOnClickFunction($component, onClickFcn) {
+        var callOnClickFcn;
+
+        $component.on('click', callOnClickFcn = function() {
+          onClickFcn(getScratchProp('currentCyEvent'));
+        });
+
+        $component.data('call-on-click-function', callOnClickFcn); 
+      }
+
+      function bindCyCxttap($component, selector, coreAsWell) {
+        function _cxtfcn(event) {
+          setScratchProp('currentCyEvent', event);
+          adjustCxtMenu(event); // adjust the position of context menu
+          if ($component.data('show')) {
+            // Now we have a visible element display context menu if it is not visible
+            if (!$cxtMenu.is(':visible')) {
+              displayComponent($cxtMenu);
+            }
+            // anyVisibleChild indicates if there is any visible child of context menu if not do not show the context menu
+            setScratchProp('anyVisibleChild', true);// there is visible child
+            displayComponent($component); // display the component
+          }
+
+          // If there is no visible element hide the context menu as well(If it is visible)
+          if (!getScratchProp('anyVisibleChild') && $cxtMenu.is(':visible')) {
+            hideComponent($cxtMenu);
+          }
+        }
+
+        var cxtfcn;
+        var cxtCoreFcn;
+
+        if(coreAsWell) {
+          cy.on('cxttap', cxtCoreFcn = function(event) {
+            var target = event.target || event.cyTarget;
+            if( target != cy ) {
+              return;
+            }
+
+            _cxtfcn(event);
+          });
+        }
+
+        if(selector) {
+          cy.on('cxttap', selector, cxtfcn = function(event) {
+            _cxtfcn(event);
+          });
+        }
+
+        // Bind the event to menu item to be able to remove it back
+        $component.data('cy-context-menus-cxtfcn', cxtfcn);
+        $component.data('cy-context-menus-cxtcorefcn', cxtCoreFcn);
+      }
+
+      function bindCyEvents() {
+        cy.on('tapstart', eventCyTapStart = function(){
+          hideComponent($cxtMenu);
+          setScratchProp('cxtMenuPosition', undefined);
+          setScratchProp('currentCyEvent', undefined);
+        });
+      }
+
+      function performBindings($component, onClickFcn, selector, coreAsWell) {
+        bindOnClickFunction($component, onClickFcn);
+        bindCyCxttap($component, selector, coreAsWell);
+      }
+
+      // Adjusts context menu if necessary
+      function adjustCxtMenu(event) {
+        var currentCxtMenuPosition = getScratchProp('cxtMenuPosition');
+        var cyPos = event.position || event.cyPosition;
+
+        if( currentCxtMenuPosition != cyPos ) {
+          hideMenuItemComponents();
+          setScratchProp('anyVisibleChild', false);// we hide all children there is no visible child remaining
+          setScratchProp('cxtMenuPosition', cyPos);
+
+          var containerPos = $(cy.container()).offset();
+          var renderedPos = event.renderedPosition || event.cyRenderedPosition;
+
+          var left = containerPos.left + renderedPos.x;
+          var top = containerPos.top + renderedPos.y;
+
+          $cxtMenu.css('left', left);
+          $cxtMenu.css('top', top);
+        }
+      }
+
+      function createAndAppendMenuItemComponents(menuItems) {
+        for (var i = 0; i < menuItems.length; i++) {
+          createAndAppendMenuItemComponent(menuItems[i]);
+        }
+      }
+
+      function createAndAppendMenuItemComponent(menuItem) {
+        // Create and append menu item
+        var $menuItemComponent = createMenuItemComponent(menuItem);
+        appendComponentToCxtMenu($menuItemComponent);
+
+        performBindings($menuItemComponent, menuItem.onClickFunction, menuItem.selector, menuItem.coreAsWell);
+      }//insertComponentBeforeExistingItem(component, existingItemID)
+
+      function createAndInsertMenuItemComponentBeforeExistingComponent(menuItem, existingComponentID) {
+        // Create and insert menu item
+        var $menuItemComponent = createMenuItemComponent(menuItem);
+        insertComponentBeforeExistingItem($menuItemComponent, existingComponentID);
+
+        performBindings($menuItemComponent, menuItem.onClickFunction, menuItem.selector, menuItem.coreAsWell);
+      }
+
+      // create cxtMenu and append it to body
+      function createAndAppendCxtMenuComponent() {
+        var classes = getClassStr(options.contextMenuClasses);
+//        classes += ' cy-context-menus-cxt-menu';
+        $cxtMenu = $('<div class=' + classes + '></div>');
+        $cxtMenu.addClass('cy-context-menus-cxt-menu');
+        setScratchProp('cxtMenu', $cxtMenu);
+
+        $('body').append($cxtMenu);
+        return $cxtMenu;
+      }
+
+      // Creates a menu item as an html component
+      function createMenuItemComponent(item) {
+        var classStr = getMenuItemClassStr(options.menuItemClasses, item.hasTrailingDivider);
+        var itemStr = '<button id="' + item.id + '" class="' + classStr + '"';
+
+        if(item.tooltipText) {
+          itemStr += ' title="' + item.tooltipText + '"';
+        }
+
+        if(item.disabled) {
+          itemStr += ' disabled';
+        }
+        if (!item.image){
+            itemStr += '>' + item.content + '</button>';
+        }
+        else{
+            itemStr += '>' + '<img src="' + item.image.src + '" width="' + item.image.width + 'px"; height="'
+                + item.image.height + 'px"; style="position:absolute; top: ' + item.image.y + 'px; left: '
+                + item.image.x + 'px;">' + item.content + '</button>';
+        };
+
+        var $menuItemComponent = $(itemStr);
+
+        $menuItemComponent.data('selector', item.selector); 
+        $menuItemComponent.data('on-click-function', item.onClickFunction);
+        $menuItemComponent.data('show', (typeof(item.show) === 'undefined' || item.show));  
+        return $menuItemComponent;
+      }
+
+      // Appends the given component to cxtMenu
+      function appendComponentToCxtMenu(component) {
+        $cxtMenu.append(component);
+        bindMenuItemClickFunction(component);
+      }
+
+      // Insert the given component to cxtMenu just before the existing item with given ID
+      function insertComponentBeforeExistingItem(component, existingItemID) {
+        var $existingItem = $('#' + existingItemID);
+        component.insertBefore($existingItem);
+      }
+
+      function destroyCxtMenu() {
+        if(!getScratchProp('active')) {
+          return;
+        }
+
+        removeAndUnbindMenuItems();
+
+        cy.off('tapstart', eventCyTapStart);
+
+        $cxtMenu.remove();
+        $cxtMenu = undefined;
+        setScratchProp($cxtMenu, undefined);
+        setScratchProp('active', false);
+        setScratchProp('anyVisibleChild', false);
+      }
+
+      function removeAndUnbindMenuItems() {
+        var children = $cxtMenu.children();
+
+        $(children).each(function() {
+          removeAndUnbindMenuItem($(this));
+        });
+      }
+
+      function removeAndUnbindMenuItem(itemID) {
+        var $component = typeof itemID === 'string' ? $('#' + itemID) : itemID;
+        var cxtfcn = $component.data('cy-context-menus-cxtfcn');
+        var selector = $component.data('selector');
+        var callOnClickFcn = $component.data('call-on-click-function');
+        var cxtCoreFcn = $component.data('cy-context-menus-cxtcorefcn');
+
+        if(cxtfcn) {
+          cy.off('cxttap', selector, cxtfcn);
+        }
+
+        if(cxtCoreFcn) {
+          cy.off('cxttap', cxtCoreFcn);
+        }
+
+        if(callOnClickFcn) {
+          $component.off('click', callOnClickFcn);
+        }
+
+        $component.remove();
+      }
+
+      function moveBeforeOtherMenuItemComponent(componentID, existingComponentID) {
+        if( componentID === existingComponentID ) {
+          return;
+        }
+
+        var $component = $('#' + componentID).detach();
+        var $existingComponent = $('#' + existingComponentID);
+
+        $component.insertBefore($existingComponent);
+      }
+
+      function bindMenuItemClickFunction(component) {
+        component.click( function() {
+            hideComponent($cxtMenu);
+            setScratchProp('cxtMenuPosition', undefined);
+        });
+      }
+
+      function disableComponent(componentID) {
+        $('#' + componentID).attr('disabled', true);
+      }
+
+      function enableComponent(componentID) {
+        $('#' + componentID).attr('disabled', false);
+      }
+
+      function setTrailingDivider(componentID, status) {
+        var $component = $('#' + componentID);
+        if(status) {
+          $component.addClass(dividerCSSClass);
+        }
+        else {
+          $component.removeClass(dividerCSSClass);
+        }
+      }
+
+      // Get an extension instance to enable users to access extension methods
+      function getInstance(cy) {
+        var instance = {
+          // Returns whether the extension is active
+         isActive: function() {
+           return getScratchProp('active');
+         },
+         // Appends given menu item to the menu items list.
+         appendMenuItem: function(item) {
+           createAndAppendMenuItemComponent(item);
+           return cy;
+         },
+         // Appends menu items in the given list to the menu items list.
+         appendMenuItems: function(items) {
+           createAndAppendMenuItemComponents(items);
+           return cy;
+         },
+         // Removes the menu item with given ID.
+         removeMenuItem: function(itemID) {
+           removeAndUnbindMenuItem(itemID);
+           return cy;
+         },
+         // Sets whether the menuItem with given ID will have a following divider.
+         setTrailingDivider: function(itemID, status) {
+           setTrailingDivider(itemID, status);
+           return cy;
+         },
+         // Inserts given item before the existingitem.
+         insertBeforeMenuItem: function(item, existingItemID) {
+           createAndInsertMenuItemComponentBeforeExistingComponent(item, existingItemID);
+           return cy;
+         },
+         // Moves the item with given ID before the existingitem.
+         moveBeforeOtherMenuItem: function(itemID, existingItemID) {
+           moveBeforeOtherMenuItemComponent(itemID, existingItemID);
+           return cy;
+         },
+         // Disables the menu item with given ID.
+         disableMenuItem: function(itemID) {
+           disableComponent(itemID);
+           return cy;
+         },
+         // Enables the menu item with given ID.
+         enableMenuItem: function(itemID) {
+           enableComponent(itemID);
+           return cy;
+         },
+         // Disables the menu item with given ID.
+         hideMenuItem: function(itemID) {
+           $('#'+itemID).data('show', false);
+           hideComponent($('#'+itemID));
+           return cy;
+         },
+         // Enables the menu item with given ID.
+         showMenuItem: function(itemID) {
+           $('#'+itemID).data('show', true);
+           displayComponent($('#'+itemID));
+           return cy;
+         },
+         // Destroys the extension instance
+         destroy: function() {
+           destroyCxtMenu();
+           return cy;
+         }
+        };
+
+        return instance;
+      }
+
+      if ( opts !== 'get' ) {
+        // merge the options with default ones
+        options = extend(defaults, opts);
+        setScratchProp('options', options);
+
+        // Clear old context menu if needed
+        if(getScratchProp('active')) {
+          destroyCxtMenu();
+        }
+
+        setScratchProp('active', true);
+
+        $cxtMenu = createAndAppendCxtMenuComponent();
+
+        var menuItems = options.menuItems;
+        createAndAppendMenuItemComponents(menuItems);
+
+        bindCyEvents();
+        preventDefaultContextTap();
+      }
+      
+      return getInstance(this);
+    });
+  };
+
+  if( typeof module !== 'undefined' && module.exports ){ // expose as a commonjs module
+    module.exports = register;
+  }
+
+  if( true ){ // expose as an amd/requirejs module
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){
+      return register;
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  }
+
+  if( typeof cytoscape !== 'undefined' && $ ){ // expose to global cytoscape (i.e. window.cytoscape)
+    register( cytoscape, $ );
+  }
+
+})();
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(26);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {"hmr":true}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(9)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../css-loader/index.js!./cytoscape-context-menus.css", function() {
+			var newContent = require("!!../css-loader/index.js!./cytoscape-context-menus.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(8)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".cy-context-menus-cxt-menu {\n    display:none;\n    z-index:1000;\n    position:absolute;\n    border:1px solid #A0A0A0;\n    padding: 0;\n    margin: 0;\n    width:auto;\n}\n\n.cy-context-menus-cxt-menuitem {\n    display:block;\n    z-index:1000;\n    width: 100%;\n    padding: 3px 20px;\n    position:relative;\n    margin:0;\n    background-color:#f8f8f8;\n    font-weight:normal;\n    font-size: 12px;\n    white-space:nowrap;\n    border: 0;\n    text-align: left;\n}\n\n.cy-context-menus-cxt-menuitem:enabled {\n    color: #000000;\n}\n\n.cy-context-menus-ctx-operation:focus {\n  outline: none;\n}\n\n.cy-context-menus-cxt-menuitem:hover {\n    color: #ffffff;\n    text-decoration: none;\n    background-color: #0B9BCD;\n    background-image: none;\n    cursor: pointer;\n}\n\n.cy-context-menus-cxt-menuitem[content]:before {\n    content:attr(content);\n}\n\n.cy-context-menus-divider {\n  border-bottom:1px solid #A0A0A0;\n}\n", ""]);
+
+// exports
+
 
 /***/ })
 /******/ ]);

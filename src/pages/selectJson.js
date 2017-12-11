@@ -20,7 +20,7 @@ export function openJsonSelection() {
   })
 
   $(".createScenario").on('click', () => {
-    scenarioEdit()
+    scenarioEdit(true)
   })
 }
 
