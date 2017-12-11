@@ -1,5 +1,9 @@
+.loading .loaderDiv {
+  display:block;
+}
+
 .loaderDiv {
-  display: block;
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -24,6 +28,10 @@
   transform: translateZ(0);
   -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
   animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+}
+
+.loading > *{
+  display:none;
 }
 
 @-webkit-keyframes load6 {

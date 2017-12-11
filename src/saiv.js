@@ -17,7 +17,7 @@ import '../www/css/style.css'
 
 
 
-$('.loaderDiv').hide()
+document.body.classList.remove('loading')
 
 initDropEvents()
 // Open Page home
