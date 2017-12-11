@@ -10,7 +10,8 @@ import { openJsonSelection, initDropEvents } from './pages/selectJson.js';
 import { config } from './globals.js';
 import { discardChanges, setActiveMenuItem } from './helper.js'
 import { cyto } from './cytoscape.js'
-import {}
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap'
 
 
 

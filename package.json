@@ -12,6 +12,8 @@
   },
   "homepage": "https://github.com/energiekollektiv/saiv#readme",
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "bootstrap": "^3.3.7",
     "css-loader": "^0.28.7",
     "cytoscape": "^3.2.7",
@@ -20,6 +22,7 @@
     "jquery": "^3.2.1",
     "select2": "^4.0.6-rc.1",
     "style-loader": "^0.19.0",
+    "url-loader": "^0.6.2",
     "webpack": "^3.10.0"
   },
   "dependencies": {

@@ -10,9 +10,8 @@ var loaders = [{
 	"loader": "babel-loader",
 	"query": {
 		"presets": [
-			"es2015"
-		],
-		"plugins": []
+			"env"
+		]
 	}
 }, {
 	test: /\.(css)$/,
@@ -35,10 +34,11 @@ var loaders = [{
 	options: {
 		outputPath: 'images/'
 	}
-}];
+}, { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader' }
+];
 
 module.exports = {
-	entry: './src/saiv.js',
+	entry: ['babel-polyfill', './src/saiv.js'],
 	output: {
 		filename: './bundle.js',
 		path: path.resolve(__dirname, 'www')
