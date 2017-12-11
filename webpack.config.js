@@ -15,11 +15,10 @@ var loaders = [{
 	}
 }, {
 	test: /\.(css)$/,
-	use: [{
-		loader: 'style-loader', // inject CSS to page
-	}, {
-		loader: 'css-loader', // translates CSS into CommonJS modules
-	}]
+	use: [
+		'style-loader',
+		'css-loader'
+	]
 }, {
 	test: /\.html$/,
 	use: [{
@@ -34,8 +33,7 @@ var loaders = [{
 	options: {
 		outputPath: 'images/'
 	}
-}, { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader' }
-];
+}, { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader' }];
 
 module.exports = {
 	entry: ['babel-polyfill', './src/saiv.js'],

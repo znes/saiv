@@ -6,9 +6,11 @@ export let globals = {
 }
 export let config = {
 	cytoscape: {
-		defaultStyle: "cose-bilkent",
+		defaultStyle: "grid",
 		styles: [
+			"preset",
 			"circle",
+			"concentric",
 			"grid",
 			"breadthfirst",
 			"cose"

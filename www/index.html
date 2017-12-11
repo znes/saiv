@@ -4,42 +4,38 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Saiv</title>
-	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/loader.css">
-	<link rel="stylesheet" href="css/leaflet.css">
-	<!--link rel="stylesheet" href="css/bootstrap.min.css"-->
-	<!--link rel="stylesheet" href="css/contextmenu.css"-->
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 </head>
 
 <body class="sidebar-closed">
 	<nav class="navbar navbar-default navbar-static-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-				<a class="navbar-brand home" href="#">Saiv</a>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
-					<li class="disabled"><a href="#Explorer" class="showExplorer">Graph Explorer</a></li>
-					<li class=""><a href="#UploadJson" class="changeJson">Select Json</a></li>
-					<li class="disabled"><a href="#DownloadJson" class="downloadJson">Download Json</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="#" class="styleSettings">Style</a></li>
-							<li><a href="#" class="scenarioSetting">Scenario</a></li>
-							<li><a href="#" class="nodeSettings">Node Settings</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
+	  <div class="container">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+	          <span class="sr-only">Toggle navigation</span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </button>
+	      <a class="navbar-brand home" href="#">Saiv</a>
+	    </div>
+	    <div id="navbar" class="navbar-collapse collapse">
+	      <ul class="nav navbar-nav">
+	        <li class="disabled"><a href="#Explorer" class="showExplorer">Graph Explorer</a></li>
+	        <li class=""><a href="#UploadJson" class="changeJson">Select Json</a></li>
+	        <li class="disabled"><a href="#DownloadJson" class="downloadJson">Download Json</a></li>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings<span class="caret"></span></a>
+	          <ul class="dropdown-menu">
+	            <li><a href="#" class="styleSettings">Style</a></li>
+	            <li><a href="#" class="scenarioSetting">Scenario</a></li>
+	            <li><a href="#" class="nodeSettings">Node Settings</a></li>
+	          </ul>
+	        </li>
+	      </ul>
+	    </div>
+	  </div>
 	</nav>
 
 	<div class="sidebar">
@@ -49,44 +45,39 @@
 	</div>
 
 	<div class="container containerContent contentPage">
-		<div class="page-header">
-			<h1></h1>
-		</div>
-		<div class="page-content">
-		</div>
+	  <div class="page-header">
+	    <h1></h1>
+	  </div>
+	  <div class="page-content">
+	  </div>
 	</div>
 
 
 	<div class="sequenceContainer"></div>
 
 	<div class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<span class="close">&times;</span>
-					<h3>Modal Header</h3>
-				</div>
-				<div class="modal-body">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <span class="close">&times;</span>
+	        <h3>Modal Header</h3>
+	      </div>
+	      <div class="modal-body">
 
-				</div>
+	      </div>
 
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
 	</div>
 	<div class="modal-backdrop fade">
 	</div>
 
-
 	<div class="loaderDiv">
 		<div class="loader"></div>
 	</div>
-
-
-	<!-- LIBS -->
-	<script src="./lib/jquery-3.1.1.min.js"></script>
 
 	<script async defer src="bundle.js"></script>
 </html>

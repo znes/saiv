@@ -10,11 +10,14 @@ import { openJsonSelection, initDropEvents } from './pages/selectJson.js';
 import { config } from './globals.js';
 import { discardChanges, setActiveMenuItem } from './helper.js'
 import { cyto } from './cytoscape.js'
-import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '../www/css/style.css'
 
 
 
+
+$('.loaderDiv').hide()
 
 initDropEvents()
 // Open Page home
@@ -40,8 +43,14 @@ $(config.dom.links.nodeSettings).click(async() => {
 	cyto.updateNodesEnabled(obj.remove, obj.add)
 })
 
-$(config.dom.links.style).click(() => {
-	selectStyle()
+$(config.dom.links.style).click(async() => {
+	try {
+		let newStyle = await selectStyle()
+		cyto.updateLayout()
+	}
+	catch(e) {
+		console.log(e)
+	}
 })
 
 
