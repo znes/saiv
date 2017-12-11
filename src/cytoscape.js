@@ -159,9 +159,11 @@ class CytoScape {
 						if (!discardChanges())
 							return
 
-						store.deleteEdge(event.cyTarget.source().id(), event.cyTarget.target().id())
+						let evtTarget = event.target || event.cyTarget
+
+						store.deleteEdge(evtTarget.source().id(), evtTarget.target().id())
 							.then(() => {
-								this.deleteEdge(event.cyTarget.source().id(), event.cyTarget.target().id())
+								this.deleteEdge(evtTarget.source().id(), evtTarget.target().id())
 							})
 						closeSitebar()
 					}
