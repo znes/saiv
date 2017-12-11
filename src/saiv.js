@@ -1,6 +1,3 @@
-/*import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';*/
-
 import { store } from './store.js';
 import { home } from './pages/home.js';
 import { scenarioEdit } from './pages/scenario.js';
@@ -15,66 +12,21 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import '../www/css/style.css'
 
 
-
-
 document.body.classList.remove('loading')
 
 initDropEvents()
-// Open Page home
-home()
+initMenu()
 
 
-
-// init Menu
-$(config.dom.links.json).click(() => {
-	if (discardChanges()) {
-		openJsonSelection()
-	}
+document.addEventListener("discardChanges", (e) => {
+	cyto.discard()
 })
 
-$(config.dom.links.scenario).click(() => {
-	scenarioEdit()
-})
-
-$(config.dom.links.nodeSettings).click(async() => {
-	let newSettings = await nodeSettings()
-	let obj = await store.updateNodesEnabled(newSettings)
-
-	cyto.updateNodesEnabled(obj.remove, obj.add)
-})
-
-$(config.dom.links.style).click(async() => {
-	try {
-		let newStyle = await selectStyle()
-		cyto.updateLayout()
-	}
-	catch(e) {
-		console.log(e)
-	}
-})
-
-
-/**document.addEventListener("discardChanges", (e) => {
-  if ($(".navbar li.active").length == 1) {
-    let activeLink = $(".navbar li.active a").attr('class')
-    let index = this.plugins.findIndex(x => x.selector == "." + activeLink)
-    if (index != -1) {
-      this.plugins[index].class.discard()
-    } else {
-      switch (activeLink) {
-        case "changeJson":
-          this.cy.discard()
-          break
-      }
-    }
-  }
-})*/
-
-// Init Event Reciver
 document.addEventListener("dataReceived", (e) => {
 	store.json = e.detail
 	initListenerDataRevieved()
 })
+
 
 
 function initListenerDataRevieved() {
@@ -123,4 +75,37 @@ function initListenerDataRevieved() {
 			$(config.dom.links.download).prop("download", "data.json")
 		})
 		.parent("li").removeClass("disabled")
+}
+
+function initMenu() {
+	$(config.dom.links.home).click(() => {
+		if (discardChanges()) {
+			home()
+		}
+	}).click()
+	$(config.dom.links.json).click(() => {
+		if (discardChanges()) {
+			openJsonSelection()
+		}
+	})
+
+	$(config.dom.links.scenario).click(() => {
+		scenarioEdit()
+	})
+
+	$(config.dom.links.nodeSettings).click(async () => {
+		let newSettings = await nodeSettings()
+		let obj = await store.updateNodesEnabled(newSettings)
+
+		cyto.updateNodesEnabled(obj.remove, obj.add)
+	})
+
+	$(config.dom.links.style).click(async () => {
+		try {
+			let newStyle = await selectStyle()
+			cyto.updateLayout()
+		} catch (e) {
+			console.log(e)
+		}
+	})
 }

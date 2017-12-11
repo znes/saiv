@@ -1,5 +1,11 @@
+.loading {
+  overflow: hidden;
+}
 .loading .loaderDiv {
   display:block;
+}
+.loading > *{
+  display:none;
 }
 
 .loaderDiv {
@@ -28,10 +34,6 @@
   transform: translateZ(0);
   -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
   animation: load6 1.7s infinite ease, round 1.7s infinite ease;
-}
-
-.loading > *{
-  display:none;
 }
 
 @-webkit-keyframes load6 {

@@ -60,6 +60,9 @@ body {
   overflow: auto;
   z-index: 1;
 }
+.sidebar .select2{
+  color: #555;
+}
 .sidebar .setPosition{
   margin-top: 5px;
 }

@@ -26771,102 +26771,17 @@ __webpack_require__(367);
 
 __webpack_require__(373);
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } /*import 'bootstrap';
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           import 'bootstrap/dist/css/bootstrap.min.css';*/
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 document.body.classList.remove('loading');
 
 (0, _selectJson.initDropEvents)();
-// Open Page home
-(0, _home.home)();
+initMenu();
 
-// init Menu
-$(_globals.config.dom.links.json).click(function () {
-	if ((0, _helper.discardChanges)()) {
-		(0, _selectJson.openJsonSelection)();
-	}
+document.addEventListener("discardChanges", function (e) {
+	_cytoscape.cyto.discard();
 });
 
-$(_globals.config.dom.links.scenario).click(function () {
-	(0, _scenario.scenarioEdit)();
-});
-
-$(_globals.config.dom.links.nodeSettings).click(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-	var newSettings, obj;
-	return regeneratorRuntime.wrap(function _callee$(_context) {
-		while (1) {
-			switch (_context.prev = _context.next) {
-				case 0:
-					_context.next = 2;
-					return (0, _nodeSettings.nodeSettings)();
-
-				case 2:
-					newSettings = _context.sent;
-					_context.next = 5;
-					return _store.store.updateNodesEnabled(newSettings);
-
-				case 5:
-					obj = _context.sent;
-
-
-					_cytoscape.cyto.updateNodesEnabled(obj.remove, obj.add);
-
-				case 7:
-				case 'end':
-					return _context.stop();
-			}
-		}
-	}, _callee, undefined);
-})));
-
-$(_globals.config.dom.links.style).click(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-	var newStyle;
-	return regeneratorRuntime.wrap(function _callee2$(_context2) {
-		while (1) {
-			switch (_context2.prev = _context2.next) {
-				case 0:
-					_context2.prev = 0;
-					_context2.next = 3;
-					return (0, _selectStyle.selectStyle)();
-
-				case 3:
-					newStyle = _context2.sent;
-
-					_cytoscape.cyto.updateLayout();
-					_context2.next = 10;
-					break;
-
-				case 7:
-					_context2.prev = 7;
-					_context2.t0 = _context2['catch'](0);
-
-					console.log(_context2.t0);
-
-				case 10:
-				case 'end':
-					return _context2.stop();
-			}
-		}
-	}, _callee2, undefined, [[0, 7]]);
-})));
-
-/**document.addEventListener("discardChanges", (e) => {
-  if ($(".navbar li.active").length == 1) {
-    let activeLink = $(".navbar li.active a").attr('class')
-    let index = this.plugins.findIndex(x => x.selector == "." + activeLink)
-    if (index != -1) {
-      this.plugins[index].class.discard()
-    } else {
-      switch (activeLink) {
-        case "changeJson":
-          this.cy.discard()
-          break
-      }
-    }
-  }
-})*/
-
-// Init Event Reciver
 document.addEventListener("dataReceived", function (e) {
 	_store.store.json = e.detail;
 	initListenerDataRevieved();
@@ -26911,6 +26826,84 @@ function initListenerDataRevieved() {
 		$(_globals.config.dom.links.download).prop("href", "data:" + urlString);
 		$(_globals.config.dom.links.download).prop("download", "data.json");
 	}).parent("li").removeClass("disabled");
+}
+
+function initMenu() {
+	var _this2 = this;
+
+	$(_globals.config.dom.links.home).click(function () {
+		if ((0, _helper.discardChanges)()) {
+			(0, _home.home)();
+		}
+	}).click();
+	$(_globals.config.dom.links.json).click(function () {
+		if ((0, _helper.discardChanges)()) {
+			(0, _selectJson.openJsonSelection)();
+		}
+	});
+
+	$(_globals.config.dom.links.scenario).click(function () {
+		(0, _scenario.scenarioEdit)();
+	});
+
+	$(_globals.config.dom.links.nodeSettings).click(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+		var newSettings, obj;
+		return regeneratorRuntime.wrap(function _callee$(_context) {
+			while (1) {
+				switch (_context.prev = _context.next) {
+					case 0:
+						_context.next = 2;
+						return (0, _nodeSettings.nodeSettings)();
+
+					case 2:
+						newSettings = _context.sent;
+						_context.next = 5;
+						return _store.store.updateNodesEnabled(newSettings);
+
+					case 5:
+						obj = _context.sent;
+
+
+						_cytoscape.cyto.updateNodesEnabled(obj.remove, obj.add);
+
+					case 7:
+					case 'end':
+						return _context.stop();
+				}
+			}
+		}, _callee, _this2);
+	})));
+
+	$(_globals.config.dom.links.style).click(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+		var newStyle;
+		return regeneratorRuntime.wrap(function _callee2$(_context2) {
+			while (1) {
+				switch (_context2.prev = _context2.next) {
+					case 0:
+						_context2.prev = 0;
+						_context2.next = 3;
+						return (0, _selectStyle.selectStyle)();
+
+					case 3:
+						newStyle = _context2.sent;
+
+						_cytoscape.cyto.updateLayout();
+						_context2.next = 10;
+						break;
+
+					case 7:
+						_context2.prev = 7;
+						_context2.t0 = _context2['catch'](0);
+
+						console.log(_context2.t0);
+
+					case 10:
+					case 'end':
+						return _context2.stop();
+				}
+			}
+		}, _callee2, _this2, [[0, 7]]);
+	})));
 }
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
@@ -27901,18 +27894,17 @@ var Sidebar = function () {
 				//this.updateGeometryTypeOnTypeChange(form)
 
 				// update tags
-				if (!_globals.config.nodes.allowCustomTags) {
-					form.find("select[name='type']").on('change', function (e) {
-						form.find('.formTags').replaceWith(_this.createTags(data.tags, form.find('select[name="type"]').val()));
-					});
-				}
+				form.find("select[name='type']").on('change', function (e) {
+					form.find('#tagsAccordion').replaceWith(_this.createTags(data.tags, form.find('select[name="type"]').val()));
+				});
 
-				form.find('.removeTag').on("click", function () {
-					var inputName = (0, _jquery2.default)(this).parent().parent().find("input").prop("name");
+				form.find('.removeTag').on("click", function (e) {
+					var inputName = (0, _jquery2.default)(e.target).parent().parent().find("input").prop("name");
 					var tag = inputName.substring(5, inputName.length);
 
+					console.log("removetag", data.name, tag);
 					_store.store.removeTag(data.name, tag);
-					this.close();
+					_this.close();
 				});
 
 				form.append('<button class="btn btn-success">Save</button>');
@@ -27962,7 +27954,7 @@ var Sidebar = function () {
 			//if (!config.nodes.allowCustomTags) {
 			_globals.config.nodes.nodesAvailable[type].tags.forEach(function (tag) {
 				body += '<label for="tags_' + tag + '">' + tag + '</label>';
-				body += '<div class=\"input-group\"></div>';
+				body += '<div class=\"input-group\">';
 				if (tags[tag]) {
 					body += '<input class="form-control" type="text" name="tags_' + tag + '" value="' + tags[tag] + '"></input>';
 				} else {
@@ -27972,19 +27964,22 @@ var Sidebar = function () {
 				if (_globals.config.nodes.allowCustomTags) {
 					body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
 				}
+
+				body += '</div>';
 			});
 
 			// if didnt added above and custom tags are allowed
 
 			var _loop = function _loop(key, value) {
 				if (_globals.config.nodes.nodesAvailable[type].tags.findIndex(function (x) {
-					return x.name == key;
+					return x == key;
 				}) == -1) {
-					body += '<div class=\"input-group\"></div>';
 					if (_globals.config.nodes.allowCustomTags) {
 						body += '<label for="tags_' + key + '">' + key + '</label>';
+						body += '<div class="input-group">';
 						body += '<input class="form-control" type="text" name="tags_' + key + '" value="' + value + '"></input>';
 						body += '<span class="input-group-btn"><a class="btn btn-danger removeTag">&times;</a></span>';
+						body += '</div>';
 					}
 					/*else {
      	body += '<input class="form-control" type="hidden" name="tags_' + key + '" value="' + value + '"></input>'
@@ -61927,7 +61922,7 @@ exports = module.exports = __webpack_require__(68)(undefined);
 
 
 // module
-exports.push([module.i, "@mixin max-width($width) {\r\n    @media screen and (max-width: $width) {\r\n        @content;\r\n    }\r\n}\r\n\r\n\r\n* {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\n[hidden] {\r\n  display: none !important;\r\n}\r\n\r\nbody {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: hidden;\r\n  word-break:  break-all;\r\n  min-height: 2000px;\r\n}\r\n.navbar-static-top {\r\n  margin-bottom: 50px;\r\n}\r\n#map {\r\n  right: 20em;\r\n}\r\n#map .leaflet-marker-icon {\r\n  border-radius: 50% 50%;\r\n}\r\n#map .leaflet-marker-draggable {\r\n  box-shadow: 0 0 0 2pt red!important;\r\n}\r\n.leaflet-marker-icon.selectedMarker{\r\n  box-shadow: 0 0 0 2pt black;\r\n}\r\n.containerCanvas, #map{\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 50px;\r\n\tbottom: 0;\r\n}\r\n.sidebar-closed .containerCanvas, .sidebar-closed #map {\r\n  right: 0;\r\n}\r\n.sidebar {\r\n  position: absolute;\r\n  right: 0;\r\n  top: 50px;\r\n  bottom: 0;\r\n  width: 20em;\r\n  background: rgba(0, 0, 0, 0.75);\r\n  box-sizing: border-box;\r\n  padding: 2em;\r\n  color: #fff;\r\n  transition-property: opacity;\r\n  transition-duration: 250ms;\r\n  transition-timing-function: ease-out;\r\n  overflow: auto;\r\n  z-index: 1;\r\n}\r\n.sidebar .setPosition{\r\n  margin-top: 5px;\r\n}\r\n.sidebar .form-group {\r\n  width: 100%;\r\n}\r\n.sidebar label {\r\n  margin-bottom: 0px;\r\n}\r\n.sidebar a {\r\n  colr: #333;\r\n}\r\n.sidebar a.btn-default {\r\n  color: #333;\r\n}\r\n.sidebar h5 small a {\r\n  color: #fff;\r\n}\r\n.sidebar small a {\r\n  text-decoration: underline;\r\n}\r\n.sidebar .formTags label{\r\n  margin-top: 5px;\r\n}\r\n.sidebar-toggle {\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 1em;\r\n  margin: 0.2em;\r\n  cursor: pointer;\r\n  color: #888;\r\n  z-index: 9999999;\r\n}\r\n\r\n.sidebar-closed .sidebar {\r\n  opacity: 0;\r\n  pointer-events: none;\r\n}\r\n.sidebar .body {\r\n  margin-top: 20px;\r\n}\r\n.sidebar .body .select2-container {\r\n  display: block;\r\n}\r\n.sidebar .body input,\r\n.sidebar .body select {\r\n\r\n}\r\n\r\n.m-t-sm {\r\n  margin-top: 15px;\r\n}\r\na:hover {\r\n  color: #62daea;\r\n}\r\n\r\n@media (max-width: 600px){\r\n  .containerCy {\r\n    right: 0;\r\n  }\r\n}\r\n\r\n\r\n/* The Modal (background) */\r\n.moal {\r\n    display: none; /* Hidden by default */\r\n    position: fixed; /* Stay in place */\r\n    z-index: 200; /* Sit on top */\r\n    padding-top: 100px; /* Location of the box */\r\n    left: 0;\r\n    top: 0;\r\n    width: 100%; /* Full width */\r\n    height: 100%; /* Full height */\r\n    overflow: auto; /* Enable scroll if needed */\r\n    background-color: rgb(0,0,0); /* Fallback color */\r\n    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */\r\n}\r\n\r\n/* Modal Content */\r\n.moal-content {\r\n    position: relative;\r\n    background-color: #fefefe;\r\n    margin: auto;\r\n    padding: 0;\r\n    border: 1px solid #888;\r\n    width: 80%;\r\n    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);\r\n    -webkit-animation-name: animatetop;\r\n    -webkit-animation-duration: 0.4s;\r\n    animation-name: animatetop;\r\n    animation-duration: 0.4s\r\n}\r\n\r\n/* Add Animation */\r\n@-webkit-keyframes animatetop {\r\n    from {top:-300px; opacity:0}\r\n    to {top:0; opacity:1}\r\n}\r\n\r\n@keyframes animatetop {\r\n    from {top:-300px; opacity:0}\r\n    to {top:0; opacity:1}\r\n}\r\n\r\n/* The Close Button */\r\n.close {\r\n    color: white;\r\n    float: right;\r\n    font-size: 28px;\r\n    font-weight: bold;\r\n}\r\n\r\n.close:hover,\r\n.close:focus {\r\n    color: #000;\r\n    text-decoration: none;\r\n    cursor: pointer;\r\n}\r\n\r\n.modal.fade, .modal-backdrop {\r\n  display:block;\r\n  visibility: hidden;\r\n}\r\n.modal.in, .modal-backdrop.in {\r\n  visibility: visible;\r\n}\r\n\r\n/**\r\n * Sidebar Drag\r\n */\r\n.dragContainer {\r\n  display: flex;\r\n  justify-content: space-around;\r\n  flex-flow: row wrap;\r\n  text-align: center;\r\n}\r\n\r\n@include max-width(992px) {\r\n    .dragArticle {\r\n        flex-basis: 45%;\r\n    }\r\n}\r\n.dragArticle .dragImg {\r\n  padding: 0 5px;\r\n}\r\n.dragArticle .dragImg, .dragArticle .dragMarkerName{\r\n  -webkit-transition: -webkit-transform 0.2s ease-out;\r\n  -moz-transition: -moz-transform 0.2s ease-out;\r\n  -o-transition: -o-transform 0.2s ease-out;\r\n  -ms-transition: -ms-transform 0.2s ease-out;\r\n}\r\n.dragArticle.moving .dragImg{\r\n  opacity: 0.25;\r\n  -webkit-transform: scale(0.8);\r\n  -moz-transform: scale(0.8);\r\n  -ms-transform: scale(0.8);\r\n  -o-transform: scale(0.8);\r\n}\r\n.dragArticle.moving .dragMarkerName{\r\n  -webkit-transform: scale(1.1);\r\n  -moz-transform: scale(1.1);\r\n  -ms-transform: scale(1.1);\r\n  -o-transform: scale(1.1);\r\n}\r\n\r\n.dragMarkerName {\r\n  margin: 0;\r\n}\r\n\r\n.form-group-sm {\r\n  margin-bottom: 10px;\r\n}\r\n\r\n\r\n\r\n.selectStyle label{\r\n  display: block;\r\n}\r\n.sidebar .input-group .form-control:first-child,\r\n.sidebar .input-group .form-control:last-child {\r\n  border-radius: 4px;\r\n}\r\n.sidebar .input-group {\r\n  width: 100%;\r\n}\r\n.sidebar-closed .sequenceContainer {\r\n  display: none!important;\r\n}\r\n.sequenceContainer {\r\n  display: none;\r\n  position: absolute;\r\n  right: 25em;\r\n  top:  50px;\r\n  z-index: 1000;\r\n\r\n  width: 40em;\r\n  padding: 2em;\r\n\r\n  background: rgba(0, 0, 0, 0.75);\r\n  color: #fff;\r\n\r\n  overflow: auto;\r\n}", ""]);
+exports.push([module.i, "@mixin max-width($width) {\r\n    @media screen and (max-width: $width) {\r\n        @content;\r\n    }\r\n}\r\n\r\n\r\n* {\r\n\tmargin: 0;\r\n\tpadding: 0;\r\n}\r\n[hidden] {\r\n  display: none !important;\r\n}\r\n\r\nbody {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: hidden;\r\n  word-break:  break-all;\r\n  min-height: 2000px;\r\n}\r\n.navbar-static-top {\r\n  margin-bottom: 50px;\r\n}\r\n#map {\r\n  right: 20em;\r\n}\r\n#map .leaflet-marker-icon {\r\n  border-radius: 50% 50%;\r\n}\r\n#map .leaflet-marker-draggable {\r\n  box-shadow: 0 0 0 2pt red!important;\r\n}\r\n.leaflet-marker-icon.selectedMarker{\r\n  box-shadow: 0 0 0 2pt black;\r\n}\r\n.containerCanvas, #map{\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 50px;\r\n\tbottom: 0;\r\n}\r\n.sidebar-closed .containerCanvas, .sidebar-closed #map {\r\n  right: 0;\r\n}\r\n.sidebar {\r\n  position: absolute;\r\n  right: 0;\r\n  top: 50px;\r\n  bottom: 0;\r\n  width: 20em;\r\n  background: rgba(0, 0, 0, 0.75);\r\n  box-sizing: border-box;\r\n  padding: 2em;\r\n  color: #fff;\r\n  transition-property: opacity;\r\n  transition-duration: 250ms;\r\n  transition-timing-function: ease-out;\r\n  overflow: auto;\r\n  z-index: 1;\r\n}\r\n.sidebar .select2{\r\n  color: #555;\r\n}\r\n.sidebar .setPosition{\r\n  margin-top: 5px;\r\n}\r\n.sidebar .form-group {\r\n  width: 100%;\r\n}\r\n.sidebar label {\r\n  margin-bottom: 0px;\r\n}\r\n.sidebar a {\r\n  colr: #333;\r\n}\r\n.sidebar a.btn-default {\r\n  color: #333;\r\n}\r\n.sidebar h5 small a {\r\n  color: #fff;\r\n}\r\n.sidebar small a {\r\n  text-decoration: underline;\r\n}\r\n.sidebar .formTags label{\r\n  margin-top: 5px;\r\n}\r\n.sidebar-toggle {\r\n  position: absolute;\r\n  right: 0;\r\n  top: 0;\r\n  padding: 1em;\r\n  margin: 0.2em;\r\n  cursor: pointer;\r\n  color: #888;\r\n  z-index: 9999999;\r\n}\r\n\r\n.sidebar-closed .sidebar {\r\n  opacity: 0;\r\n  pointer-events: none;\r\n}\r\n.sidebar .body {\r\n  margin-top: 20px;\r\n}\r\n.sidebar .body .select2-container {\r\n  display: block;\r\n}\r\n.sidebar .body input,\r\n.sidebar .body select {\r\n\r\n}\r\n\r\n.m-t-sm {\r\n  margin-top: 15px;\r\n}\r\na:hover {\r\n  color: #62daea;\r\n}\r\n\r\n@media (max-width: 600px){\r\n  .containerCy {\r\n    right: 0;\r\n  }\r\n}\r\n\r\n\r\n/* The Modal (background) */\r\n.moal {\r\n    display: none; /* Hidden by default */\r\n    position: fixed; /* Stay in place */\r\n    z-index: 200; /* Sit on top */\r\n    padding-top: 100px; /* Location of the box */\r\n    left: 0;\r\n    top: 0;\r\n    width: 100%; /* Full width */\r\n    height: 100%; /* Full height */\r\n    overflow: auto; /* Enable scroll if needed */\r\n    background-color: rgb(0,0,0); /* Fallback color */\r\n    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */\r\n}\r\n\r\n/* Modal Content */\r\n.moal-content {\r\n    position: relative;\r\n    background-color: #fefefe;\r\n    margin: auto;\r\n    padding: 0;\r\n    border: 1px solid #888;\r\n    width: 80%;\r\n    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);\r\n    -webkit-animation-name: animatetop;\r\n    -webkit-animation-duration: 0.4s;\r\n    animation-name: animatetop;\r\n    animation-duration: 0.4s\r\n}\r\n\r\n/* Add Animation */\r\n@-webkit-keyframes animatetop {\r\n    from {top:-300px; opacity:0}\r\n    to {top:0; opacity:1}\r\n}\r\n\r\n@keyframes animatetop {\r\n    from {top:-300px; opacity:0}\r\n    to {top:0; opacity:1}\r\n}\r\n\r\n/* The Close Button */\r\n.close {\r\n    color: white;\r\n    float: right;\r\n    font-size: 28px;\r\n    font-weight: bold;\r\n}\r\n\r\n.close:hover,\r\n.close:focus {\r\n    color: #000;\r\n    text-decoration: none;\r\n    cursor: pointer;\r\n}\r\n\r\n.modal.fade, .modal-backdrop {\r\n  display:block;\r\n  visibility: hidden;\r\n}\r\n.modal.in, .modal-backdrop.in {\r\n  visibility: visible;\r\n}\r\n\r\n/**\r\n * Sidebar Drag\r\n */\r\n.dragContainer {\r\n  display: flex;\r\n  justify-content: space-around;\r\n  flex-flow: row wrap;\r\n  text-align: center;\r\n}\r\n\r\n@include max-width(992px) {\r\n    .dragArticle {\r\n        flex-basis: 45%;\r\n    }\r\n}\r\n.dragArticle .dragImg {\r\n  padding: 0 5px;\r\n}\r\n.dragArticle .dragImg, .dragArticle .dragMarkerName{\r\n  -webkit-transition: -webkit-transform 0.2s ease-out;\r\n  -moz-transition: -moz-transform 0.2s ease-out;\r\n  -o-transition: -o-transform 0.2s ease-out;\r\n  -ms-transition: -ms-transform 0.2s ease-out;\r\n}\r\n.dragArticle.moving .dragImg{\r\n  opacity: 0.25;\r\n  -webkit-transform: scale(0.8);\r\n  -moz-transform: scale(0.8);\r\n  -ms-transform: scale(0.8);\r\n  -o-transform: scale(0.8);\r\n}\r\n.dragArticle.moving .dragMarkerName{\r\n  -webkit-transform: scale(1.1);\r\n  -moz-transform: scale(1.1);\r\n  -ms-transform: scale(1.1);\r\n  -o-transform: scale(1.1);\r\n}\r\n\r\n.dragMarkerName {\r\n  margin: 0;\r\n}\r\n\r\n.form-group-sm {\r\n  margin-bottom: 10px;\r\n}\r\n\r\n\r\n\r\n.selectStyle label{\r\n  display: block;\r\n}\r\n.sidebar .input-group .form-control:first-child,\r\n.sidebar .input-group .form-control:last-child {\r\n  border-radius: 4px;\r\n}\r\n.sidebar .input-group {\r\n  width: 100%;\r\n}\r\n.sidebar-closed .sequenceContainer {\r\n  display: none!important;\r\n}\r\n.sequenceContainer {\r\n  display: none;\r\n  position: absolute;\r\n  right: 25em;\r\n  top:  50px;\r\n  z-index: 1000;\r\n\r\n  width: 40em;\r\n  padding: 2em;\r\n\r\n  background: rgba(0, 0, 0, 0.75);\r\n  color: #fff;\r\n\r\n  overflow: auto;\r\n}\r\n", ""]);
 
 // exports
 
