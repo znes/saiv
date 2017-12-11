@@ -1,7 +1,7 @@
 # saiv
 Stand alone interactive visualization
 Demo:
-https://znes.github.io/saiv/
+https://znes.github.io/saiv/www
 
 
 ## Dev
