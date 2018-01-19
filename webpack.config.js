@@ -9,9 +9,14 @@ var loaders = [{
 	],
 	"loader": "babel-loader",
 	"query": {
-		"presets": [
-			"env"
-		]
+		"presets": [[
+			"env",
+			{
+				"targets": {
+					"browsers": ["last 2 versions"]
+				}
+			}
+		]]
 	}
 }, {
 	test: /\.(css)$/,

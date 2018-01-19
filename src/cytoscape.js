@@ -231,7 +231,6 @@ class CytoScape {
 
 		this.cy.on("position", "node", evt => {
 			const evtTarget = evt.target || evt.cyTarget
-			const pos = event.position || event.cyPosition
 			store.updatePosition(evtTarget.id(), evtTarget.position())
 		})
 	}

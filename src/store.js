@@ -278,7 +278,8 @@ class Store {
 			let ele = this.getElement(updateData.currentId)
 			let nodeEnabled = true
 
-
+			if(!updateData.pos)
+				updateData.pos = ele.pos
 			// if name(id) changes
 			if (updateData.currentId != updateData.name) {
 				let index = this.getAllElements().findIndex(x => x.name == updateData.name)

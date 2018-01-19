@@ -7,8 +7,8 @@ export function scenarioEdit(create = false) {
 	let heading = ""
 
 	// EditForm
-	if (!create) {
-		const data = store.getScenario()
+	const data = store.getScenario()
+	if (!create && data) {
 		heading = "Edit Scenario"
 		form.append(createInput("currentId", "currentId", data.name, "hidden", true))
 			.append(createInput("Name", "name", data.name, "text", true))
@@ -41,10 +41,7 @@ export function scenarioEdit(create = false) {
 		}
 		// Edit Form
 		else {
-			sendEvent("data", {
-				task: "updateScenario",
-				data: formData
-			})
+			store.updateScenario(formData)
 		}
 
 		hideModal()
